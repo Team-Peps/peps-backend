@@ -1,3 +1,38 @@
 spring:
-  application:
-    name: peps-backend
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+application:
+  security:
+    jwt:
+      secret-key: ${SECRET_KEY}
+      expiration: 86400000 #a day
+      refresh-token:
+        expiration: 604800000 #7 days
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/teampeps
+    username: ${DB_USERNAME}
+    password: ${DB_USERNAME}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    database-platform: postgresql
