@@ -20,7 +20,7 @@ public class Match {
     @Column(name = "id",
             nullable = false)
     @GeneratedValue
-    private Long id;
+    private String id;
 
     @Column(name = "date",
             nullable = false)

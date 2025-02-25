@@ -2,6 +2,7 @@ package fr.teampeps.model;
 
 public enum Role {
 
+    PLAYER("Player"),
     DPS("DPS"),
     TANK("Tank"),
     SUPPORT("Support"),

@@ -20,15 +20,13 @@ public class Roster {
     @Column(name = "id",
             nullable = false)
     @GeneratedValue
-    private Long id;
+    private String id;
 
     @Column(name = "name",
             nullable = false)
     private String name = "Team Peps";
 
-    @Column(name = "game",
-            nullable = false)
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Game game;
 
     @OneToMany(mappedBy = "roster",
@@ -36,4 +34,10 @@ public class Roster {
             fetch = FetchType.LAZY,
             orphanRemoval = true)
     private List<Member> members;
+
+    @OneToMany(mappedBy = "roster",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    private List<Match> matches;
 }
