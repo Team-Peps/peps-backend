@@ -1,4 +1,4 @@
-package fr.teampeps.model;
+package fr.teampeps.model.user;
 
 import fr.teampeps.model.token.Token;
 import jakarta.persistence.*;

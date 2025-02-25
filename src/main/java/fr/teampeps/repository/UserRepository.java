@@ -1,6 +1,6 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.User;
+import fr.teampeps.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

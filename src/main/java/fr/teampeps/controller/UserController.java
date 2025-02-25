@@ -1,7 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.UserDto;
-import fr.teampeps.model.UserRequest;
+import fr.teampeps.model.user.UserRequest;
 import fr.teampeps.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

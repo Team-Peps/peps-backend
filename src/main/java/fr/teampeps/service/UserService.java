@@ -2,11 +2,10 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.UserDto;
 import fr.teampeps.mapper.UserMapper;
-import fr.teampeps.model.Authority;
-import fr.teampeps.model.User;
+import fr.teampeps.model.user.Authority;
+import fr.teampeps.model.user.User;
 import fr.teampeps.repository.TokenRepository;
 import fr.teampeps.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

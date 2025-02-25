@@ -1,7 +1,7 @@
 package fr.teampeps.security.auth;
 
-import fr.teampeps.model.Authority;
-import fr.teampeps.model.User;
+import fr.teampeps.model.user.Authority;
+import fr.teampeps.model.user.User;
 import fr.teampeps.model.token.Token;
 import fr.teampeps.model.token.TokenType;
 import fr.teampeps.repository.TokenRepository;
