@@ -1,6 +1,6 @@
 package fr.teampeps.model.token;
 
-import fr.teampeps.model.User;
+import fr.teampeps.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

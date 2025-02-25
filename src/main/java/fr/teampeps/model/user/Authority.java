@@ -1,4 +1,4 @@
-package fr.teampeps.model;
+package fr.teampeps.model.user;
 
 import org.springframework.security.core.GrantedAuthority;
 
