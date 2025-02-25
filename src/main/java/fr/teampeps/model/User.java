@@ -55,6 +55,10 @@ public class User implements UserDetails {
     @Transient
     private List<Token> tokens;
 
+    @Column(name = "enable",
+            nullable = false)
+    private Boolean enable = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorityList = new ArrayList<>();
@@ -91,7 +95,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enable;
     }
 
 }
