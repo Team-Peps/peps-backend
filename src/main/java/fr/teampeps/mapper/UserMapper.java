@@ -2,7 +2,6 @@ package fr.teampeps.mapper;
 
 import fr.teampeps.dto.UserDto;
 import fr.teampeps.model.user.User;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class UserMapper {
 
     public UserDto map(User user){

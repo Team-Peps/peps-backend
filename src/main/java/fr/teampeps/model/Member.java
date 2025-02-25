@@ -17,7 +17,7 @@ public class Member {
     @Column(name = "id",
             nullable = false)
     @GeneratedValue
-    private Long id;
+    private String id;
 
     @Column(name = "pseudo",
             nullable = false,

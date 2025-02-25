@@ -18,7 +18,7 @@ public class OpponentTeam {
     @Column(name = "id",
             nullable = false)
     @GeneratedValue
-    private Long id;
+    private String id;
 
     @Column(name = "name",
             nullable = false)

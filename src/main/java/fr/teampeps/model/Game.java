@@ -1,17 +1,26 @@
 package fr.teampeps.model;
 
-public enum Game {
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    OVERWATCH("Overwatch"),
-    MARVEL_RIVAL("Marvel Rival");
+@Entity
+@Table(name = "games")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Game {
 
-    private final String name;
+    @Id
+    @Column(name = "id",
+            nullable = false)
+    @GeneratedValue
+    private String id;
 
-    Game(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    @Column(name = "name",
+            nullable = false)
+    private String name;
 }
