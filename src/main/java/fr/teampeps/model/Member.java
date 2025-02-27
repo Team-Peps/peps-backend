@@ -53,4 +53,8 @@ public class Member {
             nullable = false)
     private Roster roster;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id",
+            nullable = false)
+    private Image image;
 }
