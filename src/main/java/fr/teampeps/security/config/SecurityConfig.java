@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,9 +44,10 @@ public class SecurityConfig {
                         (request, response, exception) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage())))
                 .authorizeHttpRequests()
                     //Everybody are able to access to the application patterns bellow
+                    .requestMatchers(HttpMethod.GET, "/**").permitAll()
                     .requestMatchers("/api/v1/auth/authenticate").permitAll()
                     .requestMatchers("/api/v1/auth/refresh-token").permitAll()
-                    //For all the others, everybody need to be authenticated with a JWT token
+                //For all the others, everybody need to be authenticated with a JWT token
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
