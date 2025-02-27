@@ -2,12 +2,12 @@ package fr.teampeps.model;
 
 public enum Role {
 
-    PLAYER("Player"),
+    PLAYER("PLAYER"),
     DPS("DPS"),
-    TANK("Tank"),
-    SUPPORT("Support"),
-    COACH("Coach"),
-    MANAGER("Manager");
+    TANK("TANK"),
+    SUPPORT("SUPPORT"),
+    COACH("COACH"),
+    MANAGER("MANAGER");
 
     private final String name;
 

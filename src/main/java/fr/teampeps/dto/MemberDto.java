@@ -21,5 +21,6 @@ public class MemberDto {
     private Integer dpi;
     private String nationality;
     private Role role;
+    private String roster;
 
 }

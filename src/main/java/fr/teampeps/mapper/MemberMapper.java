@@ -2,15 +2,16 @@ package fr.teampeps.mapper;
 
 import fr.teampeps.dto.MemberDto;
 import fr.teampeps.model.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class MemberMapper {
 
     public MemberDto map(Member member){
@@ -18,10 +19,11 @@ public class MemberMapper {
                 .id(member.getId())
                 .role(member.getRole())
                 .dpi(member.getDpi())
-                .dateOfBirth(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(member.getDateOfBirth()))
+                .dateOfBirth(member.getDateOfBirth().toString())
                 .age(member.getDateOfBirth().until(LocalDate.now()).getYears())
                 .lastname(member.getLastname())
                 .firstname(member.getFirstname())
+                .roster(member.getRoster().getName())
                 .nationality(member.getNationality())
                 .pseudo(member.getPseudo())
                 .build();

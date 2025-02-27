@@ -1,6 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.RosterDto;
+import fr.teampeps.dto.RosterShortDto;
 import fr.teampeps.service.RosterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class RosterController {
     private final RosterService rosterService;
 
     @GetMapping
-    public ResponseEntity<Set<RosterDto>> getAllRosters() {
+    public ResponseEntity<Set<RosterShortDto>> getAllRosters() {
         return ResponseEntity.ok(rosterService.getAllRosters());
     }
 
