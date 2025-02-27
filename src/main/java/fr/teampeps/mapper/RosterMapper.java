@@ -1,6 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.RosterDto;
+import fr.teampeps.dto.RosterShortDto;
 import fr.teampeps.model.Roster;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,8 +22,8 @@ public class RosterMapper {
                 .build();
     }
 
-    public RosterDto mapShort(Roster roster){
-        return RosterDto.builder()
+    public RosterShortDto mapShort(Roster roster){
+        return RosterShortDto.builder()
                 .id(roster.getId())
                 .name(roster.getName())
                 .game(gameMapper.map(roster.getGame()))
