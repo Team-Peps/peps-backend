@@ -26,7 +26,7 @@ public class Map {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id",
-            nullable = false)
+            nullable = true)
     private Image image;
 
     @OneToOne(fetch = FetchType.LAZY)

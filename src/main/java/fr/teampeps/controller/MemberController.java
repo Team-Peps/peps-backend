@@ -45,5 +45,23 @@ public class MemberController {
         }
     }
 
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Map<String, Object>> saveMember(@RequestBody Member member) {
+        log.info("Saving member : {}", member);
+        try {
+            MemberDto savedMember = memberService.saveMember(member);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Membre enregistré avec succès",
+                    "member", savedMember
+            ));
+        } catch (Exception e) {
+            log.error("Error saving member", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Erreur lors de l'enregistrement du membre",
+                    "error", e.getMessage()
+            ));
+        }
+    }
 
 }

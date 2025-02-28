@@ -23,7 +23,7 @@ public class MemberMapper {
                 .age(member.getDateOfBirth().until(LocalDate.now()).getYears())
                 .lastname(member.getLastname())
                 .firstname(member.getFirstname())
-                .roster(member.getRoster().getName())
+                .roster(member.getRoster() != null ? member.getRoster().getName() : null)
                 .nationality(member.getNationality())
                 .pseudo(member.getPseudo())
                 .build();
