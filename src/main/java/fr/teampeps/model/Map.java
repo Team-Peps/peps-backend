@@ -6,34 +6,36 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
-@Table(name = "games")
+@Table(name = "maps")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Game {
+public class Map {
 
     @Id
+    @GeneratedValue
     @Column(name = "id",
             nullable = false)
-    @GeneratedValue
-    private String id;
+    private Long id;
 
     @Column(name = "name",
             nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "game",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
-    private List<Map> maps;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id",
             nullable = false)
     private Image image;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "map_type_id",
+            nullable = false)
+    private MapType mapType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id",
+            nullable = false)
+    private Game game;
 }

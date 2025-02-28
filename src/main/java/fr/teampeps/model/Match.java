@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "matches")
 @Entity
@@ -47,4 +48,14 @@ public class Match {
     @Column(name = "competition_name",
             nullable = false)
     private String competitionName;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id",
+            nullable = false)
+    private List<MapOfMatch> maps;
+
+    @Column(name = "type",
+            nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MatchType type;
 }
