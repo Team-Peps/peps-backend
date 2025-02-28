@@ -31,6 +31,6 @@ public class Hero {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id",
-            nullable = false)
+            nullable = true)
     private Image image;
 }

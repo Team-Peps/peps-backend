@@ -1,5 +1,7 @@
 package fr.teampeps.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import fr.teampeps.utils.RosterDeserializer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +18,7 @@ public class Member {
     @Id
     @Column(name = "id",
             nullable = false)
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "pseudo",
@@ -49,12 +51,25 @@ public class Member {
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "roster_id",
-            nullable = false)
+    @JoinColumn(name = "roster_id")
+    @JsonDeserialize(using = RosterDeserializer.class)
     private Roster roster;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id",
-            nullable = false)
+            nullable = true)
     private Image image;
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id='" + id + '\'' +
+                ", pseudo='" + pseudo + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", role=" + role +
+                ", nationality=" + nationality +
+                ", dpi=" + dpi + '}';
+    }
 }

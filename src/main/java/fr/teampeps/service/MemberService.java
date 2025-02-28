@@ -25,7 +25,7 @@ public class MemberService {
 
     @Transactional
     public MemberDto updateMember(Member member) {
-         log.info("Saving member : {}", member);
+         log.info("Updating member : {}", member);
         try {
             Roster roster = memberRepository.findById(member.getId())
                    .map(Member::getRoster)
@@ -42,5 +42,15 @@ public class MemberService {
         return memberRepository.findAll().stream()
                 .map(memberMapper::map)
                 .collect(Collectors.toSet());
+    }
+
+    public MemberDto saveMember(Member member) {
+        log.info("Saving member : {}", member);
+        try {
+            return memberMapper.map(memberRepository.save(member));
+        } catch (Exception e) {
+            log.error("Error saving member", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de l'enregistrement du membre", e);
+        }
     }
 }
