@@ -47,11 +47,12 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/**").permitAll()
                     .requestMatchers("/api/v1/auth/authenticate").permitAll()
                     .requestMatchers("/api/v1/auth/refresh-token").permitAll()
+                .requestMatchers("/api/v1/images/**").permitAll()
                 //For all the others, everybody need to be authenticated with a JWT token
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
