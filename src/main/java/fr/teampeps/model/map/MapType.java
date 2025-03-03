@@ -1,4 +1,4 @@
-package fr.teampeps.model;
+package fr.teampeps.model.map;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,10 +15,10 @@ import lombok.NoArgsConstructor;
 public class MapType {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",
             nullable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "name",
             nullable = false)

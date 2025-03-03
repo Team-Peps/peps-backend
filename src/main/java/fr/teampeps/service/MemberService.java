@@ -1,9 +1,12 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.MemberDto;
+import fr.teampeps.dto.OpponentMemberDto;
+import fr.teampeps.dto.PepsMemberDto;
 import fr.teampeps.mapper.MemberMapper;
-import fr.teampeps.model.Member;
+import fr.teampeps.model.member.Member;
 import fr.teampeps.model.Roster;
+import fr.teampeps.model.member.OpponentMember;
 import fr.teampeps.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +41,9 @@ public class MemberService {
         }
     }
 
-    public Set<MemberDto> getAllMembers() {
-        return memberRepository.findAll().stream()
-                .map(memberMapper::map)
+    public Set<PepsMemberDto> getAllPepsMembers() {
+        return memberRepository.findAllPepsMember().stream()
+                .map(memberMapper::toPepsMemberDto)
                 .collect(Collectors.toSet());
     }
 
@@ -52,5 +55,11 @@ public class MemberService {
             log.error("Error saving member", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de l'enregistrement du membre", e);
         }
+    }
+
+    public Set<OpponentMemberDto> getAllOpponentMembers() {
+        return memberRepository.findAllOpponentMember().stream()
+                .map(memberMapper::toOpponentMemberDto)
+                .collect(Collectors.toSet());
     }
 }

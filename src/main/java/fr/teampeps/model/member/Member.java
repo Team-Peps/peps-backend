@@ -1,18 +1,18 @@
-package fr.teampeps.model;
+package fr.teampeps.model.member;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import fr.teampeps.model.Roster;
 import fr.teampeps.utils.RosterDeserializer;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDate;
-
-@Table(name = "members")
+@Getter
+@Setter
 @Entity
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "member_type", discriminatorType = DiscriminatorType.STRING)
+@Table(name = "members")
 public class Member {
 
     @Id
@@ -34,13 +34,6 @@ public class Member {
             nullable = false)
     private String lastname;
 
-    @Column(name = "date_of_birth",
-            nullable = false)
-    private LocalDate dateOfBirth;
-
-    @Column(name = "dpi")
-    private Integer dpi;
-
     @Column(name = "nationality",
             nullable = false)
     private String nationality;
@@ -48,28 +41,10 @@ public class Member {
     @Column(name = "role",
             nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private MemberRole role;
 
-    @ManyToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "roster_id")
     @JsonDeserialize(using = RosterDeserializer.class)
     private Roster roster;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id",
-            nullable = true)
-    private Image image;
-
-    @Override
-    public String toString() {
-        return "Member{" +
-                "id='" + id + '\'' +
-                ", pseudo='" + pseudo + '\'' +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", role=" + role +
-                ", nationality=" + nationality +
-                ", dpi=" + dpi + '}';
-    }
 }
