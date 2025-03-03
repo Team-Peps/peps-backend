@@ -19,9 +19,14 @@ public class RosterController {
 
     private final RosterService rosterService;
 
-    @GetMapping
-    public ResponseEntity<Set<RosterShortDto>> getAllRosters() {
-        return ResponseEntity.ok(rosterService.getAllRosters());
+    @GetMapping("/peps")
+    public ResponseEntity<Set<RosterShortDto>> getAllPepsRosters() {
+        return ResponseEntity.ok(rosterService.getAllPepsRosters());
+    }
+
+    @GetMapping("/opponent")
+    public ResponseEntity<Set<RosterShortDto>> getAllOpponentRosters() {
+        return ResponseEntity.ok(rosterService.getAllOpponentRosters());
     }
 
     @GetMapping("/{id}")

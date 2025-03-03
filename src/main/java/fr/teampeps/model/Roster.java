@@ -19,25 +19,17 @@ public class Roster {
     @Id
     @Column(name = "id",
             nullable = false)
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    @Column(name = "name",
-            nullable = false)
-    private String name = "Team Peps";
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Game game;
 
-    @OneToMany(mappedBy = "roster",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
-    private List<Member> members;
+    @Column(name = "is_opponent",
+            nullable = false)
+    private Boolean isOpponent;
 
-    @OneToMany(mappedBy = "roster",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
-    private List<Match> matches;
+    @Column(name = "name",
+            nullable = false)
+    private String name;
 }

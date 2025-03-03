@@ -1,4 +1,4 @@
-package fr.teampeps.model;
+package fr.teampeps.model.match;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,22 +20,12 @@ public class Match {
     @Id
     @Column(name = "id",
             nullable = false)
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "date",
             nullable = false)
     private LocalDateTime date;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "opponent_team_id",
-            nullable = false)
-    private OpponentTeam opponent;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roster_id",
-            nullable = false)
-    private Roster roster;
 
     @Column(name = "score",
             nullable = false)
@@ -52,10 +42,11 @@ public class Match {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id",
             nullable = false)
-    private List<MapOfMatch> maps;
+    private List<MapMatch> maps;
 
     @Column(name = "type",
             nullable = false)
     @Enumerated(EnumType.STRING)
     private MatchType type;
+
 }

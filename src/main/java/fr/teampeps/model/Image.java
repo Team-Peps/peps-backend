@@ -15,10 +15,10 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class Image {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",
             nullable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "name",
             nullable = false)

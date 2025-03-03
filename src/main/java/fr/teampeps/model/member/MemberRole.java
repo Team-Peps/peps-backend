@@ -1,6 +1,6 @@
-package fr.teampeps.model;
+package fr.teampeps.model.member;
 
-public enum Role {
+public enum MemberRole {
 
     PLAYER("PLAYER"),
     DPS("DPS"),
@@ -11,7 +11,7 @@ public enum Role {
 
     private final String name;
 
-    Role(String name) {
+    MemberRole(String name) {
         this.name = name;
     }
 

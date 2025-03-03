@@ -1,14 +1,12 @@
 package fr.teampeps.dto;
 
 import fr.teampeps.model.member.MemberRole;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-public class MemberDto {
+public class PepsMemberDto {
 
     private String id;
     private String pseudo;
@@ -20,5 +18,4 @@ public class MemberDto {
     private String nationality;
     private MemberRole role;
     private String roster;
-
 }

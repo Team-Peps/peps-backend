@@ -1,7 +1,10 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.MemberDto;
-import fr.teampeps.model.Member;
+import fr.teampeps.dto.OpponentMemberDto;
+import fr.teampeps.dto.PepsMemberDto;
+import fr.teampeps.model.member.Member;
+import fr.teampeps.model.member.PepsMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,21 +21,47 @@ public class MemberMapper {
         return MemberDto.builder()
                 .id(member.getId())
                 .role(member.getRole())
+                //.dpi(member.getDpi())
+                //.dateOfBirth(member.getDateOfBirth().toString())
+                //.age(member.getDateOfBirth().until(LocalDate.now()).getYears())
+                .lastname(member.getLastname())
+                .firstname(member.getFirstname())
+                .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
+                .nationality(member.getNationality())
+                .pseudo(member.getPseudo())
+                .build();
+    }
+
+    public PepsMemberDto toPepsMemberDto(PepsMember member){
+        return PepsMemberDto.builder()
+                .id(member.getId())
+                .role(member.getRole())
                 .dpi(member.getDpi())
                 .dateOfBirth(member.getDateOfBirth().toString())
                 .age(member.getDateOfBirth().until(LocalDate.now()).getYears())
                 .lastname(member.getLastname())
                 .firstname(member.getFirstname())
-                .roster(member.getRoster() != null ? member.getRoster().getName() : null)
+                .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
                 .nationality(member.getNationality())
                 .pseudo(member.getPseudo())
+                .build();
+    }
+
+    public OpponentMemberDto toOpponentMemberDto(Member member) {
+        return OpponentMemberDto.builder()
+                .id(member.getId())
+                .role(member.getRole())
+                .lastname(member.getLastname())
+                .firstname(member.getFirstname())
+                .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
                 .build();
     }
 
     public List<MemberDto> mapList(List<Member> members){
         return members.stream()
             .map(this::map)
-            .sorted(Comparator.comparing(MemberDto::getRole))
-            .collect(Collectors.toList());
+                .sorted(Comparator.comparing(MemberDto::getRole))
+                .collect(Collectors.toList());
+
     }
 }

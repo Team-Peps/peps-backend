@@ -1,5 +1,6 @@
 package fr.teampeps.model;
 
+import fr.teampeps.model.map.Map;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class Game {
     @Id
     @Column(name = "id",
             nullable = false)
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "name",
