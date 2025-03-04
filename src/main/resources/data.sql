@@ -1,8 +1,8 @@
 INSERT INTO games (id, name)
 VALUES ('game-ow', 'Overwatch');
 
-INSERT INTO rosters (id, game_id, name)
-VALUES ('roster-1', 'game-ow', 'Team Peps');
+INSERT INTO rosters (id, game_id, name, is_opponent)
+VALUES ('roster-1', 'game-ow', 'Team Peps', false);
 
 INSERT INTO members (id, date_of_birth, dpi, firstname, lastname, nationality, pseudo, role, roster_id)
 VALUES (gen_random_uuid(), '2001-08-27', '1600', 'Brice','Montsçavoir', 'FR', 'FDGod', 'SUPPORT', 'roster-1');

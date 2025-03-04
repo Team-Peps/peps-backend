@@ -18,4 +18,5 @@ public class PepsMemberDto {
     private String nationality;
     private MemberRole role;
     private String roster;
+    private byte[] image;
 }

@@ -13,10 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @RestController
@@ -39,21 +39,51 @@ public class MemberController {
 
     @PutMapping("/peps")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> updatePepsMember(@RequestBody PepsMember member) {
-        return handleMemberOperation(member, "Updating peps member", "Membre mis à jour avec succès", memberService::updateMember);
+    public ResponseEntity<Map<String, Object>> updatePepsMember(
+            @RequestPart("member") PepsMember member,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+    ) {
+        try {
+            MemberDto updatedMember = memberService.updatePepsMember(member, imageFile);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Membre mis à jour avec succès",
+                    "member", updatedMember
+            ));
+        } catch (Exception e) {
+            log.error("❌ Error processing member with ID: {}", member.getId(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Erreur lors du traitement du membre",
+                    "error", e.getMessage()
+            ));
+        }
     }
 
     @PostMapping("/peps")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> savePepsMember(@RequestBody PepsMember member) {
-        return handleMemberOperation(member, "Saving peps member", "Membre enregistré avec succès", memberService::saveMember);
+    public ResponseEntity<Map<String, Object>> savePepsMember(
+            @RequestPart("member") PepsMember member,
+            @RequestPart("imageFile") MultipartFile imageFile
+    ) {
+        try {
+            MemberDto updatedMember = memberService.savePepsMember(member, imageFile);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Membre enregistré avec succès",
+                    "member", updatedMember
+            ));
+        } catch (Exception e) {
+            log.error("❌ Error processing member with ID: {}", member.getId(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Erreur lors du traitement du membre",
+                    "error", e.getMessage()
+            ));
+        }
     }
-
+/*
     @PutMapping("/opponent")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateOpponentMember(@RequestBody OpponentMember member) {
         return handleMemberOperation(member, "Updating opponent member", "Membre mis à jour avec succès", memberService::updateMember);
-    }
+    }*/
 
     @PostMapping("/opponent")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -62,7 +92,13 @@ public class MemberController {
     }
 
     /**
-     * Méthode générique pour gérer les opérations de sauvegarde et mise à jour des membres.
+     * Handle member operation.
+     * @param member
+     * @param logMessage
+     * @param successMessage
+     * @param memberFunction
+     * @return
+     * @param <T>
      */
     private <T extends Member> ResponseEntity<Map<String, Object>> handleMemberOperation(
             T member, String logMessage, String successMessage, Function<T, MemberDto> memberFunction) {

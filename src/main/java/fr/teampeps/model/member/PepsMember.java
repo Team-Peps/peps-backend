@@ -1,6 +1,5 @@
 package fr.teampeps.model.member;
 
-import fr.teampeps.model.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,9 +19,9 @@ public class PepsMember extends Member {
     @Column(name = "dpi")
     private Integer dpi;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id",
-            nullable = true)
-    private Image image;
+    @Lob
+    @Column(name = "image",
+            nullable = false)
+    private byte[] image;
 
 }

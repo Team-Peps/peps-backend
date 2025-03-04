@@ -9,6 +9,7 @@ import fr.teampeps.repository.MemberRepository;
 import fr.teampeps.repository.RosterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class RosterService {
                 .collect(java.util.stream.Collectors.toSet());
     }
 
+    @Transactional
     public RosterDto getRoster(String id) {
         Optional<Roster> roster = rosterRepository.findById(id);
         if (roster.isEmpty()) {
