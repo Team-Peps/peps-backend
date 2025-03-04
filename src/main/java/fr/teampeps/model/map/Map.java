@@ -1,7 +1,6 @@
 package fr.teampeps.model.map;
 
 import fr.teampeps.model.Game;
-import fr.teampeps.model.Image;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,10 +25,10 @@ public class Map {
             nullable = false)
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id",
-            nullable = true)
-    private Image image;
+    @Lob
+    @Column(name = "image",
+            nullable = false)
+    private byte[] image;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "map_type_id",

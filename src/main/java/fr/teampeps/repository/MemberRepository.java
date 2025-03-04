@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
 
+    @Query("SELECT m FROM Member m WHERE m.roster = :roster")
     List<Member> findByRoster(Roster roster);
 
     @Query("SELECT m FROM PepsMember m")
@@ -18,4 +19,5 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     @Query("SELECT m FROM OpponentMember m")
     List<OpponentMember> findAllOpponentMember();
+
 }

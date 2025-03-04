@@ -33,8 +33,8 @@ public class Game {
             orphanRemoval = true)
     private List<Map> maps;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id",
-            nullable = true)
-    private Image image;
+    @Lob
+    @Column(name = "image",
+            nullable = false)
+    private byte[] image;
 }

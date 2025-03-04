@@ -1,7 +1,6 @@
 package fr.teampeps.model.hero;
 
 import fr.teampeps.model.Game;
-import fr.teampeps.model.Image;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,8 +30,8 @@ public class Hero {
             nullable = false)
     private Game game;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id",
-            nullable = true)
-    private Image image;
+    @Lob
+    @Column(name = "image",
+            nullable = false)
+    private byte[] image;
 }

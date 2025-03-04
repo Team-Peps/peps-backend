@@ -5,7 +5,9 @@ import fr.teampeps.dto.OpponentMemberDto;
 import fr.teampeps.dto.PepsMemberDto;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.model.member.PepsMember;
+import fr.teampeps.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -13,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MemberMapper {
@@ -21,9 +24,6 @@ public class MemberMapper {
         return MemberDto.builder()
                 .id(member.getId())
                 .role(member.getRole())
-                //.dpi(member.getDpi())
-                //.dateOfBirth(member.getDateOfBirth().toString())
-                //.age(member.getDateOfBirth().until(LocalDate.now()).getYears())
                 .lastname(member.getLastname())
                 .firstname(member.getFirstname())
                 .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
@@ -32,7 +32,13 @@ public class MemberMapper {
                 .build();
     }
 
-    public PepsMemberDto toPepsMemberDto(PepsMember member){
+    public PepsMemberDto toPepsMemberDto(PepsMember member) {
+        try {
+            member.setImage(ImageUtils.decompressImage(member.getImage()));
+        } catch (Exception e) {
+            log.error("Error decompressing image for member with ID: {}", member.getId(), e);
+        }
+
         return PepsMemberDto.builder()
                 .id(member.getId())
                 .role(member.getRole())
@@ -44,6 +50,7 @@ public class MemberMapper {
                 .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
                 .nationality(member.getNationality())
                 .pseudo(member.getPseudo())
+                .image(member.getImage())
                 .build();
     }
 
