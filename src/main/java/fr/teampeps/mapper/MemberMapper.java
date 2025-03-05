@@ -26,7 +26,7 @@ public class MemberMapper {
                 .role(member.getRole())
                 .lastname(member.getLastname())
                 .firstname(member.getFirstname())
-                .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
+                .roster(member.getRoster() != null ? member.getRoster().getName() : null)
                 .nationality(member.getNationality())
                 .pseudo(member.getPseudo())
                 .build();
@@ -47,7 +47,7 @@ public class MemberMapper {
                 .age(member.getDateOfBirth().until(LocalDate.now()).getYears())
                 .lastname(member.getLastname())
                 .firstname(member.getFirstname())
-                .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
+                .roster(member.getRoster() != null ? member.getRoster().getName() : null)
                 .nationality(member.getNationality())
                 .pseudo(member.getPseudo())
                 .image(member.getImage())
@@ -60,7 +60,7 @@ public class MemberMapper {
                 .role(member.getRole())
                 .lastname(member.getLastname())
                 .firstname(member.getFirstname())
-                .roster(member.getRoster() != null ? member.getRoster().getGame().getName() : null)
+                .roster(member.getRoster() != null ? member.getRoster().getName() : null)
                 .build();
     }
 

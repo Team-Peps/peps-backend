@@ -13,5 +13,5 @@ public class RosterShortDto {
 
     private String id;
     private String name;
-    private GameDto game;
+    private String game;
 }

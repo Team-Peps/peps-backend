@@ -1,4 +1,4 @@
-package fr.teampeps.model.map;
+package fr.teampeps.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,13 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "maps")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "map_types")
-public class MapType {
+public class Map {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,4 +23,17 @@ public class MapType {
     @Column(name = "name",
             nullable = false)
     private String name;
+
+    @Lob
+    @Column(name = "image",
+            nullable = false)
+    private byte[] image;
+
+    @Column(name = "type",
+            nullable = false)
+    private String type;
+
+    @Column(name = "game",
+            nullable = false)
+    private String game;
 }
