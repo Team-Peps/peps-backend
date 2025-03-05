@@ -15,7 +15,7 @@ public class RosterDto {
 
     private String id;
     private String name;
-    private GameDto game;
+    private String game;
     private List<MemberDto> members;
 }
 

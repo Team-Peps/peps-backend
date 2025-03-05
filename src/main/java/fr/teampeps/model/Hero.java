@@ -1,37 +1,36 @@
 package fr.teampeps.model;
 
-import fr.teampeps.model.map.Map;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Entity
-@Table(name = "games")
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Game {
+@NoArgsConstructor
+@Entity
+@Table(name = "heroes")
+public class Hero {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",
             nullable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "name",
             nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "game",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
-    private List<Map> maps;
+    @Column(name = "game",
+            nullable = false)
+    private String game;
+
+    @Column(name = "role",
+            nullable = false)
+    private String role;
 
     @Lob
     @Column(name = "image",

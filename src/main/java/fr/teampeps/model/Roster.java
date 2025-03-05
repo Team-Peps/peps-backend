@@ -22,8 +22,9 @@ public class Roster {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Game game;
+    @Column(name = "game",
+            nullable = false)
+    private String game;
 
     @Column(name = "is_opponent",
             nullable = false)

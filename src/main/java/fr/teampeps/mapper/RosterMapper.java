@@ -14,14 +14,13 @@ import java.util.List;
 public class RosterMapper {
 
     private final MemberMapper memberMapper;
-    private final GameMapper gameMapper;
 
     public RosterDto map(Roster roster, List<Member> members){
         return RosterDto.builder()
                 .id(roster.getId())
                 .name(roster.getName())
                 .members(memberMapper.mapList(members))
-                .game(gameMapper.map(roster.getGame()))
+                .game(roster.getGame())
                 .build();
     }
 
@@ -29,7 +28,7 @@ public class RosterMapper {
         return RosterShortDto.builder()
                 .id(roster.getId())
                 .name(roster.getName())
-                .game(gameMapper.map(roster.getGame()))
+                .game(roster.getGame())
                 .build();
     }
 }
