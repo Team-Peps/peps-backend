@@ -20,4 +20,6 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     @Query("SELECT m FROM OpponentMember m")
     List<OpponentMember> findAllOpponentMember();
 
+    @Query("SELECT m FROM Member m WHERE m.roster IS NULL")
+    List<Member> findAllWithoutRoster();
 }

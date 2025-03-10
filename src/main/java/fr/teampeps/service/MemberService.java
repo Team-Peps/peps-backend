@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.MemberDto;
+import fr.teampeps.dto.MemberShortDto;
 import fr.teampeps.dto.OpponentMemberDto;
 import fr.teampeps.dto.PepsMemberDto;
 import fr.teampeps.mapper.MemberMapper;
@@ -9,6 +10,7 @@ import fr.teampeps.model.Roster;
 import fr.teampeps.model.member.PepsMember;
 import fr.teampeps.repository.MemberRepository;
 import fr.teampeps.repository.PepsMemberRepository;
+import fr.teampeps.repository.RosterRepository;
 import fr.teampeps.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
     private final PepsMemberRepository pepsMemberRepository;
+    private final RosterRepository rosterRepository;
 
     @Transactional
     public MemberDto updatePepsMember(PepsMember pepsMember, MultipartFile imageFile) {
@@ -89,6 +92,51 @@ public class MemberService {
     public Set<OpponentMemberDto> getAllOpponentMembers() {
         return memberRepository.findAllOpponentMember().stream()
                 .map(memberMapper::toOpponentMemberDto)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean removeMemberFromRoster(String id) {
+        log.info("🔄 Tentative de suppression du membre {} du roster", id);
+
+        return memberRepository.findById(id)
+            .map(member -> {
+                if (member.getRoster() == null) {
+                    log.warn("⚠️ Le membre {} n'appartient déjà à aucun roster", id);
+                    return false;
+                }
+                member.setRoster(null);
+                memberRepository.save(member);
+                log.info("✅ Membre {} retiré du roster avec succès", id);
+                return true;
+            })
+            .orElseGet(() -> {
+                log.warn("⚠️ Membre {} introuvable, suppression impossible", id);
+                return false;
+            });
+    }
+
+    public boolean addMemberToRoster(String id, String rosterId) {
+        log.info("🔄 Tentative d'ajout du membre {} au roster {}", id, rosterId);
+
+        return memberRepository.findById(id)
+            .map(member -> {
+                Roster roster = rosterRepository.findById(rosterId)
+                        .orElseThrow(() -> new IllegalArgumentException("Roster introuvable avec l'ID: " + rosterId));
+                member.setRoster(roster);
+                memberRepository.save(member);
+                log.info("✅ Membre {} ajouté au roster {} avec succès", id, rosterId);
+                return true;
+            })
+            .orElseGet(() -> {
+                log.warn("⚠️ Membre {} introuvable, ajout au roster impossible", id);
+                return false;
+            });
+    }
+
+    @Transactional
+    public Set<MemberShortDto> getAllMembersWithoutRoster() {
+        return memberRepository.findAllWithoutRoster().stream()
+                .map(memberMapper::toShortMemberDto)
                 .collect(Collectors.toSet());
     }
 }
