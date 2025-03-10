@@ -1,6 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.MemberDto;
+import fr.teampeps.dto.MemberShortDto;
 import fr.teampeps.dto.OpponentMemberDto;
 import fr.teampeps.dto.PepsMemberDto;
 import fr.teampeps.model.member.Member;
@@ -70,5 +71,12 @@ public class MemberMapper {
                 .sorted(Comparator.comparing(MemberDto::getRole))
                 .collect(Collectors.toList());
 
+    }
+
+    public MemberShortDto toShortMemberDto(Member member) {
+        return MemberShortDto.builder()
+                .id(member.getId())
+                .pseudo(member.getPseudo())
+                .build();
     }
 }
