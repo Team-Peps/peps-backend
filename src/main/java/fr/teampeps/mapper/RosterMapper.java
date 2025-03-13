@@ -24,11 +24,12 @@ public class RosterMapper {
                 .build();
     }
 
-    public RosterShortDto mapShort(Roster roster){
+    public RosterShortDto mapShort(Roster roster, Long matchCount){
         return RosterShortDto.builder()
                 .id(roster.getId())
                 .name(roster.getName())
                 .game(roster.getGame())
+                .matchCount(matchCount)
                 .build();
     }
 }

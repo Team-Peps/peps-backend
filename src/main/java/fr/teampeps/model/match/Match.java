@@ -1,5 +1,6 @@
 package fr.teampeps.model.match;
 
+import fr.teampeps.model.Roster;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Table(name = "matches")
 @Entity
@@ -49,4 +52,14 @@ public class Match {
     @Enumerated(EnumType.STRING)
     private MatchType type;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Roster team;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "opponent_team_id", nullable = false)
+    private Roster opponentTeam;
+
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
+    private Set<TeamMatch> teamMatches = new HashSet<>();
 }

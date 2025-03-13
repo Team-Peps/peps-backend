@@ -22,18 +22,15 @@ public class TeamMatch {
             nullable = false)
     private String id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roster_id",
-            nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "roster_id", nullable = false)
     private Roster roster;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "match_id",
-            nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id", nullable = false)
     private Match match;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id",
-            nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 }

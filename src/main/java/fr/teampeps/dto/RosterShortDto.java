@@ -14,4 +14,5 @@ public class RosterShortDto {
     private String id;
     private String name;
     private String game;
+    private Long matchCount;
 }
