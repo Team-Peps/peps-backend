@@ -33,12 +33,10 @@ public class Match {
             nullable = false)
     private LocalDateTime date;
 
-    @Column(name = "score",
-            nullable = false)
+    @Column(name = "score")
     private Integer score;
 
-    @Column(name = "opponent_score",
-            nullable = false)
+    @Column(name = "opponent_score")
     private Integer opponentScore;
 
     @Column(name = "competition_name",
@@ -56,12 +54,12 @@ public class Match {
     private MatchType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false)
-    private Roster team;
+    @JoinColumn(name = "roster_id", nullable = false)
+    private Roster roster;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "opponent_team_id", nullable = false)
-    private Roster opponentTeam;
+    @JoinColumn(name = "opponent_roster_id", nullable = false)
+    private Roster opponentRoster;
 
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
     private Set<TeamMatch> teamMatches = new HashSet<>();
