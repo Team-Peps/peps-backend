@@ -2,18 +2,15 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.RosterDto;
 import fr.teampeps.dto.RosterShortDto;
-import fr.teampeps.exceptions.DatabaseException;
 import fr.teampeps.model.Roster;
 import fr.teampeps.service.RosterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,24 +37,30 @@ public class RosterController {
         return ResponseEntity.ok(rosterService.getRoster(id));
     }
 
-    @PostMapping("/opponent")
+    @PostMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RosterShortDto> createOpponentRoster(@RequestBody Roster roster) {
-        RosterShortDto createdRoster = rosterService.createOpponentRoster(roster);
+    public ResponseEntity<RosterShortDto> creatRoster(
+            @RequestPart("roster") Roster roster,
+            @RequestPart(value = "imageFile") MultipartFile imageFile
+    ) {
+        RosterShortDto createdRoster = rosterService.createRoster(roster, imageFile);
         return ResponseEntity.status(201).body(createdRoster);
     }
 
-    @DeleteMapping("/opponent/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> deleteOpponentRoster(@PathVariable String id) {
-        rosterService.deleteOpponentRoster(id);
+    public ResponseEntity<Map<String, Object>> deleteRoster(@PathVariable String id) {
+        rosterService.deleteRoster(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/opponent/{id}")
+    @PutMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RosterShortDto> updateOpponentRoster(@PathVariable String id, @RequestBody Roster roster) {
-        RosterShortDto updatedRoster = rosterService.updateOpponentRoster(id, roster);
+    public ResponseEntity<RosterShortDto> updateRoster(
+            @RequestPart("roster") Roster roster,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+    ) {
+        RosterShortDto updatedRoster = rosterService.updateRoster(roster, imageFile);
         return ResponseEntity.ok(updatedRoster);
     }
 

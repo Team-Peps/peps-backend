@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Table(
         name = "rosters",
@@ -40,4 +38,8 @@ public class Roster {
     @Column(name = "name_lower",
             nullable = false)
     private String nameLower;
+
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
 }

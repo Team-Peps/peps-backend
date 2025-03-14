@@ -17,6 +17,10 @@ public class RosterDto {
     private String name;
     private String game;
     private List<MemberDto> members;
+    private byte[] image;
+    private Long matchCount;
+    private boolean isOpponent;
+
 }
 
 
