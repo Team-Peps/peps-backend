@@ -15,4 +15,6 @@ public class RosterShortDto {
     private String name;
     private String game;
     private Long matchCount;
+    private byte[] image;
+    private boolean isOpponent;
 }
