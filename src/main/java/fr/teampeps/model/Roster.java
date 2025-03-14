@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table(name = "rosters")
+@Table(
+        name = "rosters",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"game", "name_lower"}, name = "rosters_unique")
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -33,4 +36,8 @@ public class Roster {
     @Column(name = "name",
             nullable = false)
     private String name;
+
+    @Column(name = "name_lower",
+            nullable = false)
+    private String nameLower;
 }
