@@ -49,11 +49,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        jwt = authHeader.substring(7); // substring after "Bearer "
+        jwt = authHeader.substring(7);
 
-        usernameOrEmail = jwtService.extractUsernameOrEmail(jwt);
+        try {
+            usernameOrEmail = jwtService.extractUsernameOrEmail(jwt);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{ \"error\": \"Token expiré\", \"status\": 401 }");
+            return;
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{ \"error\": \"Erreur d'authentification\", \"status\": 401 }");
+            return;
+        }
 
-        if (usernameOrEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {// ... and verify if the user is already connected
+        if (usernameOrEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(usernameOrEmail);
             boolean isTokenValid = tokenRepository.findByHex(jwt)
                     .map(t -> !t.isRevoked() && !t.isExpired())
@@ -73,6 +85,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
-
     }
+
 }

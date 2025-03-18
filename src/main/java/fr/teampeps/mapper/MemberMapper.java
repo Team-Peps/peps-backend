@@ -1,9 +1,6 @@
 package fr.teampeps.mapper;
 
-import fr.teampeps.dto.MemberDto;
-import fr.teampeps.dto.MemberShortDto;
-import fr.teampeps.dto.OpponentMemberDto;
-import fr.teampeps.dto.PepsMemberDto;
+import fr.teampeps.dto.*;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.model.member.PepsMember;
 import fr.teampeps.utils.ImageUtils;
@@ -65,18 +62,32 @@ public class MemberMapper {
                 .build();
     }
 
-    public List<MemberDto> mapList(List<Member> members){
+    public List<MemberMediumDto> mapList(List<Member> members){
         return members.stream()
-            .map(this::map)
-                .sorted(Comparator.comparing(MemberDto::getRole))
+            .map(this::toMediumMemberDto)
+                .sorted(Comparator.comparing(MemberMediumDto::getRole))
                 .collect(Collectors.toList());
+    }
 
+    public List<MemberMediumDto> sortByRole(List<MemberMediumDto> members){
+        return members.stream()
+                .sorted(Comparator.comparing(MemberMediumDto::getRole))
+                .collect(Collectors.toList());
     }
 
     public MemberShortDto toShortMemberDto(Member member) {
         return MemberShortDto.builder()
                 .id(member.getId())
                 .pseudo(member.getPseudo())
+                .build();
+    }
+
+    public MemberMediumDto toMediumMemberDto(Member member) {
+        return MemberMediumDto.builder()
+                .pseudo(member.getPseudo())
+                .firstname(member.getFirstname())
+                .lastname(member.getLastname())
+                .role(member.getRole())
                 .build();
     }
 }

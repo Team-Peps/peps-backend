@@ -1,6 +1,8 @@
 package fr.teampeps.mapper;
 
+import fr.teampeps.dto.MemberMediumDto;
 import fr.teampeps.dto.RosterDto;
+import fr.teampeps.dto.RosterMediumDto;
 import fr.teampeps.dto.RosterShortDto;
 import fr.teampeps.model.Roster;
 import fr.teampeps.model.member.Member;
@@ -18,7 +20,7 @@ public class RosterMapper {
 
     private final MemberMapper memberMapper;
 
-    public RosterDto toRosterDto(Roster roster, List<Member> members, Long matchCount){
+    public RosterMediumDto toRosterMediumDto(Roster roster, List<MemberMediumDto> members, Long matchCount){
 
         try {
             roster.setImage(ImageUtils.decompressImage(roster.getImage()));
@@ -26,10 +28,10 @@ public class RosterMapper {
             log.error("Error decompressing image for roster with ID: {}", roster.getId(), e);
         }
 
-        return RosterDto.builder()
+        return RosterMediumDto.builder()
                 .id(roster.getId())
                 .name(roster.getName())
-                .members(memberMapper.mapList(members))
+                .members(memberMapper.sortByRole(members))
                 .game(roster.getGame())
                 .image(roster.getImage())
                 .matchCount(matchCount)
