@@ -1,6 +1,8 @@
 package fr.teampeps.service;
 
+import fr.teampeps.dto.MemberMediumDto;
 import fr.teampeps.dto.RosterDto;
+import fr.teampeps.dto.RosterMediumDto;
 import fr.teampeps.dto.RosterShortDto;
 import fr.teampeps.mapper.RosterMapper;
 import fr.teampeps.model.Roster;
@@ -43,14 +45,14 @@ public class RosterService {
     }
 
     @Transactional
-    public RosterDto getRoster(String id) {
+    public RosterMediumDto getRoster(String id) {
         Optional<Roster> roster = rosterRepository.findById(id);
         if (roster.isEmpty()) {
             throw new RuntimeException("Roster not found");
         }
-        List<Member> memberList = memberRepository.findByRoster(roster.get());
+        List<MemberMediumDto> memberList = memberRepository.findMemberByRoster(roster.get());
 
-        return rosterMapper.toRosterDto(roster.get(), memberList, matchRepository.countMatchesByTeam(id));
+        return rosterMapper.toRosterMediumDto(roster.get(), memberList, matchRepository.countMatchesByTeam(id));
     }
 
     @Transactional

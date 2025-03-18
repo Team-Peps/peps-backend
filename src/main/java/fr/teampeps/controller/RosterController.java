@@ -1,6 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.RosterDto;
+import fr.teampeps.dto.RosterMediumDto;
 import fr.teampeps.dto.RosterShortDto;
 import fr.teampeps.model.Roster;
 import fr.teampeps.service.RosterService;
@@ -33,7 +34,7 @@ public class RosterController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RosterDto> getRoster(@PathVariable String id) {
+    public ResponseEntity<RosterMediumDto> getRoster(@PathVariable String id) {
         return ResponseEntity.ok(rosterService.getRoster(id));
     }
 
