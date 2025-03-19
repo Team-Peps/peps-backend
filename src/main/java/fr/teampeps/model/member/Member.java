@@ -6,6 +6,7 @@ import fr.teampeps.utils.RosterDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Getter
 @Setter
@@ -13,6 +14,8 @@ import lombok.Setter;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "member_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "members")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "memberCache")
 public class Member {
 
     @Id

@@ -3,6 +3,20 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        cache:
+          missing_cache_strategy: create
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        javax:
+          cache:
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+  cache:
+    ehcache:
+      config: classpath:ehcache.xml
   servlet:
     multipart:
       max-file-size: 5MB
