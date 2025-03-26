@@ -2,10 +2,7 @@ package fr.teampeps.model.match;
 
 import fr.teampeps.model.Roster;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
@@ -13,7 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Table(name = "matches")
+@Table(name = "match", indexes = {
+        @Index(name = "idx_match_date", columnList = "date"),
+        @Index(name = "idx_match_type", columnList = "type"),
+        @Index(name = "idx_match_roster", columnList = "roster_id"),
+        @Index(name = "idx_match_opponent", columnList = "opponent_roster_id")
+})
 @Entity
 @Data
 @Builder
@@ -24,31 +26,24 @@ import java.util.Set;
 public class Match {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",
             nullable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "date",
             nullable = false)
     private LocalDateTime date;
 
-    @Column(name = "score",
-            nullable = false)
+    @Column(name = "score")
     private Integer score;
 
-    @Column(name = "opponent_score",
-            nullable = false)
+    @Column(name = "opponent_score")
     private Integer opponentScore;
 
     @Column(name = "competition_name",
             nullable = false)
     private String competitionName;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "match_id",
-            nullable = false)
-    private List<MapMatch> maps;
 
     @Column(name = "type",
             nullable = false)
@@ -56,13 +51,20 @@ public class Match {
     private MatchType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false)
-    private Roster team;
+    @JoinColumn(name = "roster_id", nullable = false)
+    private Roster roster;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "opponent_team_id", nullable = false)
-    private Roster opponentTeam;
+    @JoinColumn(name = "opponent_roster_id", nullable = false)
+    private Roster opponentRoster;
 
-    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
-    private Set<TeamMatch> teamMatches = new HashSet<>();
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<MapMatch> maps;
+
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<TeamMatch> teamMatches;
 }

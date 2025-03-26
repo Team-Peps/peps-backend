@@ -11,11 +11,11 @@ import java.util.List;
 @Repository
 public interface MatchRepository extends JpaRepository<Match, String > {
 
-    @Query("SELECT COUNT(m) FROM Match m WHERE m.team.id = :id OR m.opponentTeam.id = :id")
-    Long countMatchesByTeam(@Param("id") String id);
+    @Query("SELECT COUNT(m) FROM Match m WHERE m.roster.id = :id OR m.opponentRoster.id = :id")
+    Long countMatchesByRoster(@Param("id") String id);
 
     @Query("SELECT r.id,r .name, COUNT(m) FROM Roster r " +
-            "LEFT JOIN Match m ON r.id = m.team.id OR r.id = m.opponentTeam.id " +
+            "LEFT JOIN Match m ON r.id = m.roster.id OR r.id = m.opponentRoster.id " +
             "GROUP BY r.id, r.name ORDER BY COUNT(m) DESC")
-    List<Object[]> countMatchesPerTeam();
+    List<Object[]> countMatchesPerRoster();
 }

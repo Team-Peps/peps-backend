@@ -139,4 +139,8 @@ public class MemberService {
                 .map(memberMapper::toShortMemberDto)
                 .collect(Collectors.toSet());
     }
+
+    public Set<MemberShortDto> getMemberByRosterId(String rosterId) {
+        return memberRepository.findByRosterId(rosterId);
+    }
 }

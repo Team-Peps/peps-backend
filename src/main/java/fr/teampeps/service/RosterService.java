@@ -1,12 +1,11 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.MemberMediumDto;
-import fr.teampeps.dto.RosterDto;
 import fr.teampeps.dto.RosterMediumDto;
 import fr.teampeps.dto.RosterShortDto;
+import fr.teampeps.dto.RosterTinyDto;
 import fr.teampeps.mapper.RosterMapper;
 import fr.teampeps.model.Roster;
-import fr.teampeps.model.member.Member;
 import fr.teampeps.repository.MatchRepository;
 import fr.teampeps.repository.MemberRepository;
 import fr.teampeps.repository.RosterRepository;
@@ -38,13 +37,6 @@ public class RosterService {
     private final MatchRepository matchRepository;
 
     @Transactional
-    public Set<RosterShortDto> getAllPepsRosters() {
-        return rosterRepository.findAllPepsRosters().stream()
-                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByTeam(roster.getId())))
-                .collect(Collectors.toSet());
-    }
-
-    @Transactional
     public RosterMediumDto getRoster(String id) {
         Optional<Roster> roster = rosterRepository.findById(id);
         if (roster.isEmpty()) {
@@ -52,14 +44,32 @@ public class RosterService {
         }
         List<MemberMediumDto> memberList = memberRepository.findMemberByRoster(roster.get());
 
-        return rosterMapper.toRosterMediumDto(roster.get(), memberList, matchRepository.countMatchesByTeam(id));
+        return rosterMapper.toRosterMediumDto(roster.get(), memberList, matchRepository.countMatchesByRoster(id));
+    }
+
+    @Transactional
+    public Set<RosterShortDto> getAllPepsRosters() {
+        return rosterRepository.findAllPepsRosters().stream()
+                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByRoster(roster.getId())))
+                .collect(Collectors.toSet());
     }
 
     @Transactional
     public Set<RosterShortDto> getAllOpponentRosters() {
         return rosterRepository.findAllOpponentRosters().stream()
-                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByTeam(roster.getId())))
+                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByRoster(roster.getId())))
                 .collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public Set<RosterTinyDto> getAllPepsRostersTiny() {
+        return rosterRepository.findAllRostersTinyWhereOpponent(false);
+    }
+
+    @Transactional
+    public Set<RosterTinyDto> getAllOpponentRostersTiny() {
+        return rosterRepository.findAllRostersTinyWhereOpponent(true);
+
     }
 
     @Transactional
@@ -124,7 +134,7 @@ public class RosterService {
 
             log.info("✅ Roster updated successfully with ID: {}", roster.getId());
 
-            Long matchCount = matchRepository.countMatchesByTeam(roster.getId());
+            Long matchCount = matchRepository.countMatchesByRoster(roster.getId());
 
             return rosterMapper.toRosterShortDto(updatedRoster, matchCount);
 

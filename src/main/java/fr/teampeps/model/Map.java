@@ -24,11 +24,6 @@ public class Map {
             nullable = false)
     private String name;
 
-    @Lob
-    @Column(name = "image",
-            nullable = false)
-    private byte[] image;
-
     @Column(name = "type",
             nullable = false)
     private String type;

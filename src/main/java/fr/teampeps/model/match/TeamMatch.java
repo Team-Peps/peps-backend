@@ -3,10 +3,7 @@ package fr.teampeps.model.match;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.model.Roster;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Data
@@ -14,7 +11,13 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "team_matches")
+@Table(name = "team_match", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"member_id", "match_id"})
+}, indexes = {
+        @Index(name = "idx_team_match_match", columnList = "match_id"),
+        @Index(name = "idx_team_match_roster", columnList = "roster_id"),
+        @Index(name = "idx_team_match_member", columnList = "member_id")
+})
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class TeamMatch {
@@ -29,11 +32,16 @@ public class TeamMatch {
     @JoinColumn(name = "roster_id", nullable = false)
     private Roster roster;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "match_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Match match;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @Column(name = "is_substitute", nullable = false)
+    private boolean isSubstitute;
 }
