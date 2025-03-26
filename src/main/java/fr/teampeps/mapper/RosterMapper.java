@@ -1,9 +1,6 @@
 package fr.teampeps.mapper;
 
-import fr.teampeps.dto.MemberMediumDto;
-import fr.teampeps.dto.RosterDto;
-import fr.teampeps.dto.RosterMediumDto;
-import fr.teampeps.dto.RosterShortDto;
+import fr.teampeps.dto.*;
 import fr.teampeps.model.Roster;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.utils.ImageUtils;
@@ -53,6 +50,14 @@ public class RosterMapper {
                 .matchCount(matchCount)
                 .image(roster.getImage())
                 .isOpponent(roster.getIsOpponent())
+                .build();
+    }
+
+    public RosterTinyDto toRosterTinyDto(Roster roster){
+        return RosterTinyDto.builder()
+                .id(roster.getId())
+                .name(roster.getName())
+                .game(roster.getGame())
                 .build();
     }
 }

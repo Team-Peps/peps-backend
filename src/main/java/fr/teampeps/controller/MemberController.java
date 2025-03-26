@@ -162,6 +162,11 @@ public class MemberController {
         return handleMemberOperation(member, "Saving opponent member", "Membre enregistré avec succès", memberService::saveMember);
     }
 
+    @GetMapping("/roster/{rosterId}")
+    public ResponseEntity<Set<MemberShortDto>> getMembersByRosterId(@PathVariable String rosterId) {
+        return ResponseEntity.ok(memberService.getMemberByRosterId(rosterId));
+    }
+
     /**
      * Handle member operation.
      * @param member

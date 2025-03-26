@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class Hero {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",
             nullable = false)
     private String id;
@@ -32,8 +31,4 @@ public class Hero {
             nullable = false)
     private String role;
 
-    @Lob
-    @Column(name = "image",
-            nullable = false)
-    private byte[] image;
 }

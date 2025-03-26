@@ -1,8 +1,8 @@
 package fr.teampeps.controller;
 
-import fr.teampeps.dto.RosterDto;
 import fr.teampeps.dto.RosterMediumDto;
 import fr.teampeps.dto.RosterShortDto;
+import fr.teampeps.dto.RosterTinyDto;
 import fr.teampeps.model.Roster;
 import fr.teampeps.service.RosterService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +32,17 @@ public class RosterController {
     public ResponseEntity<Set<RosterShortDto>> getAllOpponentRosters() {
         return ResponseEntity.ok(rosterService.getAllOpponentRosters());
     }
+
+    @GetMapping("/peps/tiny")
+    public ResponseEntity<Set<RosterTinyDto>> getAllPepsRostersTiny() {
+        return ResponseEntity.ok(rosterService.getAllPepsRostersTiny());
+    }
+
+    @GetMapping("/opponent/tiny")
+    public ResponseEntity<Set<RosterTinyDto>> getAllOpponentRostersTiny() {
+        return ResponseEntity.ok(rosterService.getAllOpponentRostersTiny());
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<RosterMediumDto> getRoster(@PathVariable String id) {

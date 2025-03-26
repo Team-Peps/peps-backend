@@ -3,14 +3,13 @@ package fr.teampeps.model.match;
 import fr.teampeps.model.Hero;
 import fr.teampeps.model.Map;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Table
+@Table(name = "map_match", indexes = {
+        @Index(name = "idx_map_match_match", columnList = "match_id")
+})
 @Builder
 @Data
 @AllArgsConstructor
@@ -24,10 +23,9 @@ public class MapMatch {
             nullable = false)
     private String id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "map_id",
+    @Column(name = "map",
             nullable = false)
-    private Map map;
+    private String map;
 
     @Column(name = "score",
             nullable = false)
@@ -41,15 +39,20 @@ public class MapMatch {
             nullable = false)
     private Integer rounds;
 
-    @ManyToOne
-    @JoinColumn(name = "hero_ban_id")
-    private Hero heroBan;
+    @Column(name = "hero_ban",
+            nullable = false)
+    private String heroBan;
 
-    @ManyToOne
-    @JoinColumn(name = "opponent_hero_ban_id")
-    private Hero opponentHeroBan;
+    @Column(name = "opponent_hero_ban",
+            nullable = false)
+    private String opponentHeroBan;
 
     @Column(name = "game_code")
     private String gameCode;
 
+    @ManyToOne
+    @JoinColumn(name = "match_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Match match;
 }

@@ -3,6 +3,7 @@ package fr.teampeps.service;
 import fr.teampeps.dto.MemberMediumDto;
 import fr.teampeps.dto.RosterMediumDto;
 import fr.teampeps.dto.RosterShortDto;
+import fr.teampeps.dto.RosterTinyDto;
 import fr.teampeps.mapper.RosterMapper;
 import fr.teampeps.model.Roster;
 import fr.teampeps.repository.MatchRepository;
@@ -36,13 +37,6 @@ public class RosterService {
     private final MatchRepository matchRepository;
 
     @Transactional
-    public Set<RosterShortDto> getAllPepsRosters() {
-        return rosterRepository.findAllPepsRosters().stream()
-                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByRoster(roster.getId())))
-                .collect(Collectors.toSet());
-    }
-
-    @Transactional
     public RosterMediumDto getRoster(String id) {
         Optional<Roster> roster = rosterRepository.findById(id);
         if (roster.isEmpty()) {
@@ -54,10 +48,28 @@ public class RosterService {
     }
 
     @Transactional
+    public Set<RosterShortDto> getAllPepsRosters() {
+        return rosterRepository.findAllPepsRosters().stream()
+                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByRoster(roster.getId())))
+                .collect(Collectors.toSet());
+    }
+
+    @Transactional
     public Set<RosterShortDto> getAllOpponentRosters() {
         return rosterRepository.findAllOpponentRosters().stream()
                 .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByRoster(roster.getId())))
                 .collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public Set<RosterTinyDto> getAllPepsRostersTiny() {
+        return rosterRepository.findAllRostersTinyWhereOpponent(false);
+    }
+
+    @Transactional
+    public Set<RosterTinyDto> getAllOpponentRostersTiny() {
+        return rosterRepository.findAllRostersTinyWhereOpponent(true);
+
     }
 
     @Transactional
