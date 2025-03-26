@@ -7,6 +7,7 @@ import fr.teampeps.model.match.MapMatch;
 import fr.teampeps.model.match.Match;
 import fr.teampeps.model.match.TeamMatch;
 import fr.teampeps.model.record.MatchCreateFinishedRequest;
+import fr.teampeps.model.record.MatchListItemResponse;
 import fr.teampeps.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -28,8 +29,6 @@ public class MatchService {
 
     private final MatchRepository matchRepository;
     private final RosterRepository rosterRepository;
-    private final HeroRepository heroRepository;
-    private final MapRepository mapRepository;
     private final MemberRepository memberRepository;
 
     public boolean createUpcomingMatch(Match match) {
@@ -87,6 +86,27 @@ public class MatchService {
         matchRepository.save(match);
 
         return true;
+    }
+
+    @Transactional
+    public List<MatchListItemResponse> getAllMatchesSortedByDate() {
+        return matchRepository.findAllByOrderByDateDesc().stream()
+                .map(this::mapToMatchListItem)
+                .toList();
+    }
+
+    private MatchListItemResponse mapToMatchListItem(Match match) {
+        return new MatchListItemResponse(
+                match.getId(),
+                match.getDate(),
+                match.getCompetitionName(),
+                match.getType().name(),
+                match.getRoster().getName(),
+                match.getOpponentRoster().getName(),
+                match.getRoster().getGame(),
+                match.getScore(),
+                match.getOpponentScore()
+        );
     }
 
     private Set<TeamMatch> mapPlayersToTeamMatches(Set<String> playerIds, Match savedMatch) {
