@@ -29,7 +29,7 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     @Query("SELECT m FROM Member m WHERE m.roster IS NULL")
     List<Member> findAllWithoutRoster();
 
-    @Query("SELECT new fr.teampeps.dto.MemberMediumDto(m.pseudo, m.firstname, m.lastname, m.role) FROM Member m WHERE m.roster = :roster")
+    @Query("SELECT new fr.teampeps.dto.MemberMediumDto(m.id, m.pseudo, m.firstname, m.lastname, m.role) FROM Member m WHERE m.roster = :roster")
     List<MemberMediumDto> findMemberByRoster(Roster roster);
 
 }

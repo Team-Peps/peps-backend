@@ -1,7 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.HeroeDto;
-import fr.teampeps.model.Heroe;
+import fr.teampeps.model.heroe.Heroe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ public class HeroeMapper {
         return HeroeDto.builder()
                 .id(heroe.getId())
                 .name(heroe.getName())
-                .role(heroe.getRole())
+                .role(heroe.getRole().name())
                 .imageKey(heroe.getImageKey())
                 .build();
     }
