@@ -1,5 +1,6 @@
-package fr.teampeps.model;
+package fr.teampeps.model.map;
 
+import fr.teampeps.model.Game;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,9 +27,13 @@ public class Map {
 
     @Column(name = "type",
             nullable = false)
-    private String type;
+    private MapType type;
 
     @Column(name = "game",
             nullable = false)
-    private String game;
+    private Game game;
+
+    @Column(name = "image_key",
+            nullable = false)
+    private String imageKey;
 }

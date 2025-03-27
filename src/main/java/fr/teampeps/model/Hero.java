@@ -31,4 +31,7 @@ public class Hero {
             nullable = false)
     private String role;
 
+    @Column(name = "image_key",
+            nullable = false)
+    private String imageKey;
 }

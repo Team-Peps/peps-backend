@@ -1,7 +1,5 @@
 package fr.teampeps.model.match;
 
-import fr.teampeps.model.Hero;
-import fr.teampeps.model.Map;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
