@@ -3,7 +3,6 @@ package fr.teampeps.mapper;
 import fr.teampeps.dto.*;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.model.member.PepsMember;
-import fr.teampeps.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -31,12 +30,6 @@ public class MemberMapper {
     }
 
     public PepsMemberDto toPepsMemberDto(PepsMember member) {
-        try {
-            member.setImage(ImageUtils.decompressImage(member.getImage()));
-        } catch (Exception e) {
-            log.error("Error decompressing image for member with ID: {}", member.getId(), e);
-        }
-
         return PepsMemberDto.builder()
                 .id(member.getId())
                 .role(member.getRole())
@@ -48,7 +41,7 @@ public class MemberMapper {
                 .roster(member.getRoster() != null ? member.getRoster().getName() : null)
                 .nationality(member.getNationality())
                 .pseudo(member.getPseudo())
-                .image(member.getImage())
+                .imageKey(member.getImageKey())
                 .build();
     }
 

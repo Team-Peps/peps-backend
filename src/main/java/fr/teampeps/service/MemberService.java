@@ -5,13 +5,12 @@ import fr.teampeps.dto.MemberShortDto;
 import fr.teampeps.dto.OpponentMemberDto;
 import fr.teampeps.dto.PepsMemberDto;
 import fr.teampeps.mapper.MemberMapper;
+import fr.teampeps.model.Bucket;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.model.Roster;
 import fr.teampeps.model.member.PepsMember;
 import fr.teampeps.repository.MemberRepository;
-import fr.teampeps.repository.PepsMemberRepository;
 import fr.teampeps.repository.RosterRepository;
-import fr.teampeps.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,8 +29,8 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-    private final PepsMemberRepository pepsMemberRepository;
     private final RosterRepository rosterRepository;
+    private final MinioService minioService;
 
     @Transactional
     public MemberDto updatePepsMember(PepsMember pepsMember, MultipartFile imageFile) {
@@ -39,18 +38,13 @@ public class MemberService {
 
         try {
 
-            if(imageFile != null){
-                pepsMember.setImage(ImageUtils.compressImage(imageFile.getBytes()));
-            }else{
-                pepsMember.setImage(pepsMemberRepository.findById(pepsMember.getId())
-                        .map(PepsMember::getImage)
-                        .orElse(null));
-            }
-
             Roster roster = memberRepository.findById(pepsMember.getId())
                    .map(Member::getRoster)
                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé avec l'ID: " + pepsMember.getId()));
             pepsMember.setRoster(roster);
+
+            String imageUrl = minioService.uploadImage(imageFile, pepsMember.getPseudo().toLowerCase(), Bucket.MEMBERS);
+            pepsMember.setImageKey(imageUrl);
 
             return memberMapper.map(memberRepository.save(pepsMember));
 
@@ -64,7 +58,10 @@ public class MemberService {
     public MemberDto savePepsMember(PepsMember pepsMember, MultipartFile imageFile) {
         log.info("Saving peps member : {}", pepsMember);
         try {
-            pepsMember.setImage(ImageUtils.compressImage(imageFile.getBytes()));
+
+            String imageKey = minioService.uploadImage(imageFile, pepsMember.getPseudo().toLowerCase(), Bucket.MEMBERS);
+            pepsMember.setImageKey(imageKey);
+
             return memberMapper.map(memberRepository.save(pepsMember));
         } catch (Exception e) {
             log.error("Error saving member", e);

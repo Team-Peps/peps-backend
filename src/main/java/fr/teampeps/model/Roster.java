@@ -42,7 +42,6 @@ public class Roster {
             nullable = false)
     private String nameLower;
 
-    @Lob
-    @Column(name = "image")
-    private byte[] image;
+    @Column(name = "image_key")
+    private String imageKey;
 }

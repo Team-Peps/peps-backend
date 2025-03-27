@@ -19,9 +19,6 @@ public class PepsMember extends Member {
     @Column(name = "dpi")
     private Integer dpi;
 
-    @Lob
-    @Column(name = "image",
-            nullable = false)
-    private byte[] image;
-
+    @Column(name = "image_key")
+    private String imageKey;
 }

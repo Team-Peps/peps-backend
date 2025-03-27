@@ -30,6 +30,12 @@ application:
       refresh-token:
         expiration: 604800000 #7 days
 
+minio:
+  endpoint: http://localhost:9000
+  access-key: admin
+  secret-key: password123
+  bucket: members
+
 ---
 spring:
   config:
