@@ -1,6 +1,5 @@
 package fr.teampeps.model.map;
 
-import fr.teampeps.model.Game;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,11 +26,12 @@ public class Map {
 
     @Column(name = "type",
             nullable = false)
+    @Enumerated(EnumType.STRING)
     private MapType type;
 
     @Column(name = "game",
             nullable = false)
-    private Game game;
+    private String game;
 
     @Column(name = "image_key",
             nullable = false)
