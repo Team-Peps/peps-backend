@@ -88,6 +88,12 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-jcache</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.12</version>
+        </dependency>
+
     </dependencies>
 
     <build>

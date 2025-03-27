@@ -5,11 +5,11 @@ import fr.teampeps.dto.RosterMediumDto;
 import fr.teampeps.dto.RosterShortDto;
 import fr.teampeps.dto.RosterTinyDto;
 import fr.teampeps.mapper.RosterMapper;
+import fr.teampeps.model.Bucket;
 import fr.teampeps.model.Roster;
 import fr.teampeps.repository.MatchRepository;
 import fr.teampeps.repository.MemberRepository;
 import fr.teampeps.repository.RosterRepository;
-import fr.teampeps.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -35,6 +35,7 @@ public class RosterService {
     private final RosterMapper rosterMapper;
     private final MemberRepository memberRepository;
     private final MatchRepository matchRepository;
+    private final MinioService minioService;
 
     @Transactional
     public RosterMediumDto getRoster(String id) {
@@ -78,7 +79,10 @@ public class RosterService {
             Objects.requireNonNull(roster, "Roster cannot be null");
 
             roster.setNameLower(transformRosterName(roster.getName()));
-            roster.setImage(ImageUtils.compressImage(imageFile.getBytes()));
+
+            String imageKey = minioService.uploadImage(imageFile, roster.getNameLower(), Bucket.ROSTERS);
+            roster.setImageKey(imageKey);
+
             Roster savedRoster = rosterRepository.save(roster);
 
             log.info("✅ Roster created successfully with ID: {}", savedRoster.getId());
@@ -122,9 +126,8 @@ public class RosterService {
             Roster existingRoster = rosterRepository.findById(roster.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Roster not found"));
 
-            if(imageFile != null){
-                existingRoster.setImage(ImageUtils.compressImage(imageFile.getBytes()));
-            }
+            String imageKey = minioService.uploadImage(imageFile, roster.getNameLower(), Bucket.ROSTERS);
+            roster.setImageKey(imageKey);
 
             existingRoster.setName(roster.getName());
             existingRoster.setGame(roster.getGame());

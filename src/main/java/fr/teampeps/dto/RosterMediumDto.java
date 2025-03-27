@@ -17,7 +17,7 @@ public class RosterMediumDto {
     private String name;
     private String game;
     private List<MemberMediumDto> members;
-    private byte[] image;
+    private String imageKey;
     private Long matchCount;
     private boolean isOpponent;
 
