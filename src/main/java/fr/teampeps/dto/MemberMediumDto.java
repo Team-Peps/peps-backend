@@ -7,12 +7,14 @@ import lombok.Data;
 @Data
 @Builder
 public class MemberMediumDto {
+    private String id;
     private String pseudo;
     private String firstname;
     private String lastname;
     private MemberRole role;
 
-    public MemberMediumDto(String pseudo, String firstname, String lastname, MemberRole role) {
+    public MemberMediumDto(String id, String pseudo, String firstname, String lastname, MemberRole role) {
+        this.id = id;
         this.pseudo = pseudo;
         this.firstname = firstname;
         this.lastname = lastname;

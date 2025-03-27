@@ -1,6 +1,6 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.Heroe;
+import fr.teampeps.model.heroe.Heroe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

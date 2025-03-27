@@ -1,4 +1,4 @@
-package fr.teampeps.model;
+package fr.teampeps.model.heroe;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,8 @@ public class Heroe {
 
     @Column(name = "role",
             nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private HeroeRole role;
 
     @Column(name = "image_key",
             nullable = false)
