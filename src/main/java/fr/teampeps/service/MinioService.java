@@ -5,7 +5,6 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,7 +23,7 @@ public class MinioService {
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
             }
-            String key = fileName.replace(" ", "_") + extension;
+            String key = formatKey(fileName) + extension;
             log.info("Uploading file to Minio: {}", key);
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -41,5 +40,14 @@ public class MinioService {
             throw new RuntimeException("Error uploading image", e);
         }
     }
+
+    private String formatKey(String key) {
+        if (key == null) return null;
+        return key
+                .toLowerCase()
+                .replaceAll("[\\s'\\-]", "_")
+                .replaceAll("[^a-z0-9_]", "");
+    }
+
 
 }

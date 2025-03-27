@@ -1,7 +1,5 @@
 package fr.teampeps.service;
 
-import fr.teampeps.model.Hero;
-import fr.teampeps.model.Map;
 import fr.teampeps.model.Roster;
 import fr.teampeps.model.match.MapMatch;
 import fr.teampeps.model.match.Match;
