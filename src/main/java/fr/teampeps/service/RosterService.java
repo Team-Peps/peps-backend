@@ -45,20 +45,20 @@ public class RosterService {
         }
         List<MemberMediumDto> memberList = memberRepository.findMemberByRoster(roster.get());
 
-        return rosterMapper.toRosterMediumDto(roster.get(), memberList, matchRepository.countMatchesByRoster(id));
+        return rosterMapper.toRosterMediumDto(roster.get(), memberList, matchRepository.countMatchesByGame(roster.get().getGame()));
     }
 
     @Transactional
     public Set<RosterShortDto> getAllPepsRosters() {
         return rosterRepository.findAllPepsRosters().stream()
-                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByRoster(roster.getId())))
+                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByGame(roster.getGame())))
                 .collect(Collectors.toSet());
     }
 
     @Transactional
     public Set<RosterShortDto> getAllOpponentRosters() {
         return rosterRepository.findAllOpponentRosters().stream()
-                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByRoster(roster.getId())))
+                .map(roster -> rosterMapper.toRosterShortDto(roster, matchRepository.countMatchesByGame(roster.getGame())))
                 .collect(Collectors.toSet());
     }
 
@@ -137,7 +137,7 @@ public class RosterService {
 
             log.info("✅ Roster updated successfully with ID: {}", roster.getId());
 
-            Long matchCount = matchRepository.countMatchesByRoster(roster.getId());
+            Long matchCount = matchRepository.countMatchesByGame(roster.getGame());
 
             return rosterMapper.toRosterShortDto(updatedRoster, matchCount);
 
