@@ -1,20 +1,14 @@
 package fr.teampeps.model.match;
 
-import fr.teampeps.model.Roster;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Table(name = "match", indexes = {
-        @Index(name = "idx_match_date", columnList = "date"),
-        @Index(name = "idx_match_type", columnList = "type"),
-        @Index(name = "idx_match_roster", columnList = "roster_id"),
-        @Index(name = "idx_match_opponent", columnList = "opponent_roster_id")
+        @Index(name = "idx_match_datetime", columnList = "datetime"),
+        @Index(name = "idx_match_competitionName", columnList = "competition_name")
 })
 @Entity
 @Data
@@ -31,40 +25,33 @@ public class Match {
             nullable = false)
     private String id;
 
-    @Column(name = "date",
+    @Column(name = "datetime",
             nullable = false)
-    private LocalDateTime date;
+    private LocalDateTime datetime;
 
     @Column(name = "score")
-    private Integer score;
+    private String score;
 
     @Column(name = "opponent_score")
-    private Integer opponentScore;
+    private String opponentScore;
 
     @Column(name = "competition_name",
             nullable = false)
     private String competitionName;
 
-    @Column(name = "type",
+    @Column(name = "opponent",
             nullable = false)
-    @Enumerated(EnumType.STRING)
-    private MatchType type;
+    private String opponent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roster_id", nullable = false)
-    private Roster roster;
+    @Column(name = "vod_url",
+            nullable = false)
+    private String vodUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "opponent_roster_id", nullable = false)
-    private Roster opponentRoster;
+    @Column(name = "stream_url",
+            nullable = false)
+    private String streamUrl;
 
-    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<MapMatch> maps;
-
-    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<TeamMatch> teamMatches;
+    @Column(name = "game",
+            nullable = false)
+    private String game;
 }
