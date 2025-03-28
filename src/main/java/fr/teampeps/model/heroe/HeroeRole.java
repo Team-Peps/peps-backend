@@ -2,7 +2,7 @@ package fr.teampeps.model.heroe;
 
 public enum HeroeRole {
     // Overwatch
-    DPS,
+    DAMAGE,
     SUPPORT,
     TANK,
 
