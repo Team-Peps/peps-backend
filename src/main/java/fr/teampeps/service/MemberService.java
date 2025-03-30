@@ -1,26 +1,20 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.MemberDto;
-import fr.teampeps.dto.MemberShortDto;
-import fr.teampeps.dto.OpponentMemberDto;
-import fr.teampeps.dto.PepsMemberDto;
 import fr.teampeps.mapper.MemberMapper;
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.member.Member;
-import fr.teampeps.model.Roster;
-import fr.teampeps.model.member.PepsMember;
 import fr.teampeps.repository.MemberRepository;
-import fr.teampeps.repository.RosterRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,115 +23,69 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-    private final RosterRepository rosterRepository;
     private final MinioService minioService;
 
-    @Transactional
-    public MemberDto updatePepsMember(PepsMember pepsMember, MultipartFile imageFile) {
-        log.info("Updating peps member : {}", pepsMember);
+    public MemberDto saveOrUpdateMember(Member member, MultipartFile imageFile) {
+        log.info("Updating member : {}", member);
 
         try {
+            if (imageFile != null) {
+                String imageUrl = minioService.uploadImage(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
+                member.setImageKey(imageUrl);
+            }
 
-            Roster roster = memberRepository.findById(pepsMember.getId())
-                   .map(Member::getRoster)
-                   .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé avec l'ID: " + pepsMember.getId()));
-            pepsMember.setRoster(roster);
-
-            String imageUrl = minioService.uploadImage(imageFile, pepsMember.getPseudo().toLowerCase(), Bucket.MEMBERS);
-            pepsMember.setImageKey(imageUrl);
-
-            return memberMapper.map(memberRepository.save(pepsMember));
+            return memberMapper.toMemberDto(memberRepository.save(member));
 
         } catch (Exception e) {
-            log.error("Error saving member with ID: {}", pepsMember.getId(), e);
+            log.error("Error saving member with ID: {}", member.getId(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du membre", e);
         }
     }
 
-    @Transactional
-    public MemberDto savePepsMember(PepsMember pepsMember, MultipartFile imageFile) {
-        log.info("Saving peps member : {}", pepsMember);
+    public Map<String,List<MemberDto>> getAllActiveMembers() {
+
+        List<MemberDto> members = memberRepository.findAllActive().stream()
+                .map(memberMapper::toMemberDto)
+                .toList();
+
+        List<MemberDto> substitutes = memberRepository.findAllSubstitute().stream()
+                .map(memberMapper::toMemberDto)
+                .toList();
+
+        List<MemberDto> coaches = memberRepository.findAllCoach().stream()
+                .map(memberMapper::toMemberDto)
+                .toList();
+
+        return Map.of(
+                "members", members,
+                "substitutes", substitutes,
+                "coaches", coaches
+        );
+    }
+
+    public void deleteMember(String id) {
         try {
-
-            String imageKey = minioService.uploadImage(imageFile, pepsMember.getPseudo().toLowerCase(), Bucket.MEMBERS);
-            pepsMember.setImageKey(imageKey);
-
-            return memberMapper.map(memberRepository.save(pepsMember));
-        } catch (Exception e) {
-            log.error("Error saving member", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de l'enregistrement du membre", e);
+            memberRepository.deleteById(id);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé", e);
         }
     }
 
-    @Transactional
-    public Set<PepsMemberDto> getAllPepsMembers() {
-        return memberRepository.findAllPepsMember().stream()
-                .map(memberMapper::toPepsMemberDto)
-                .collect(Collectors.toSet());
+    public MemberDto setActive(String id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
+
+        member.setIsSubstitute(false);
+
+        return memberMapper.toMemberDto(memberRepository.save(member));
     }
 
-    public MemberDto saveMember(Member member) {
-        log.info("Saving member : {}", member);
-        try {
-            return memberMapper.map(memberRepository.save(member));
-        } catch (Exception e) {
-            log.error("Error saving member", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de l'enregistrement du membre", e);
-        }
-    }
+    public MemberDto setSubstitute(String id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
 
-    public Set<OpponentMemberDto> getAllOpponentMembers() {
-        return memberRepository.findAllOpponentMember().stream()
-                .map(memberMapper::toOpponentMemberDto)
-                .collect(Collectors.toSet());
-    }
+        member.setIsSubstitute(true);
 
-    public boolean removeMemberFromRoster(String id) {
-        log.info("🔄 Tentative de suppression du membre {} du roster", id);
-
-        return memberRepository.findById(id)
-            .map(member -> {
-                if (member.getRoster() == null) {
-                    log.warn("⚠️ Le membre {} n'appartient déjà à aucun roster", id);
-                    return false;
-                }
-                member.setRoster(null);
-                memberRepository.save(member);
-                log.info("✅ Membre {} retiré du roster avec succès", id);
-                return true;
-            })
-            .orElseGet(() -> {
-                log.warn("⚠️ Membre {} introuvable, suppression impossible", id);
-                return false;
-            });
-    }
-
-    public boolean addMemberToRoster(String id, String rosterId) {
-        log.info("🔄 Tentative d'ajout du membre {} au roster {}", id, rosterId);
-
-        return memberRepository.findById(id)
-            .map(member -> {
-                Roster roster = rosterRepository.findById(rosterId)
-                        .orElseThrow(() -> new IllegalArgumentException("Roster introuvable avec l'ID: " + rosterId));
-                member.setRoster(roster);
-                memberRepository.save(member);
-                log.info("✅ Membre {} ajouté au roster {} avec succès", id, rosterId);
-                return true;
-            })
-            .orElseGet(() -> {
-                log.warn("⚠️ Membre {} introuvable, ajout au roster impossible", id);
-                return false;
-            });
-    }
-
-    @Transactional
-    public Set<MemberShortDto> getAllMembersWithoutRoster() {
-        return memberRepository.findAllWithoutRoster().stream()
-                .map(memberMapper::toShortMemberDto)
-                .collect(Collectors.toSet());
-    }
-
-    public Set<MemberShortDto> getMemberByRosterId(String rosterId) {
-        return memberRepository.findByRosterId(rosterId);
+        return memberMapper.toMemberDto(memberRepository.save(member));
     }
 }

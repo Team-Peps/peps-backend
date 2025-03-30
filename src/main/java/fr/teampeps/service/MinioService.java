@@ -27,14 +27,14 @@ public class MinioService {
             log.info("Uploading file to Minio: {}", key);
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket(bucket.name())
+                            .bucket(bucket.name().toLowerCase())
                             .object(key)
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build()
             );
 
-            return key;
+            return bucket.name().toLowerCase() + "/" + key;
 
         } catch (Exception e) {
             throw new RuntimeException("Error uploading image", e);
@@ -48,6 +48,4 @@ public class MinioService {
                 .replaceAll("[\\s'\\-]", "_")
                 .replaceAll("[^a-z0-9_]", "");
     }
-
-
 }

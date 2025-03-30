@@ -1,18 +1,15 @@
 package fr.teampeps.model.member;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import fr.teampeps.model.Roster;
-import fr.teampeps.utils.RosterDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "member_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "members")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "memberCache")
@@ -37,6 +34,13 @@ public class Member {
             nullable = false)
     private String lastname;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "date_of_birth",
+            nullable = false)
+    private LocalDate dateOfBirth;
+
     @Column(name = "nationality",
             nullable = false)
     private String nationality;
@@ -46,8 +50,24 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roster_id")
-    @JsonDeserialize(using = RosterDeserializer.class)
-    private Roster roster;
+    @Column(name = "is_substitute")
+    private Boolean isSubstitute;
+
+    @Column(name = "image_key")
+    private String imageKey;
+
+    @Column(name = "x_username")
+    private String xUsername;
+
+    @Column(name = "instagram_username")
+    private String instagramUsername;
+
+    @Column(name = "tiktok_username")
+    private String tiktokUsername;
+
+    @Column(name = "youtube_username")
+    private String youtubeUsername;
+
+    @Column(name = "twitch_username")
+    private String twitchUsername;
 }
