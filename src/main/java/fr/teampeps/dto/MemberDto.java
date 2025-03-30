@@ -1,5 +1,6 @@
 package fr.teampeps.dto;
 
+import fr.teampeps.model.Game;
 import fr.teampeps.model.member.MemberRole;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +25,5 @@ public class MemberDto {
     private String tiktokUsername;
     private String youtubeUsername;
     private String twitchUsername;
+    private Game game;
 }
