@@ -43,7 +43,7 @@ public class MemberService {
         }
     }
 
-    public Map<String,List<MemberDto>> getAllActiveMembers(Game game) {
+    public Map<String, List<MemberDto>> getAllActiveMembers(Game game) {
 
         List<MemberDto> members = memberRepository.findAllActiveByGame(game).stream()
                 .map(memberMapper::toMemberDto)
