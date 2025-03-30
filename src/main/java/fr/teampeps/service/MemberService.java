@@ -3,6 +3,7 @@ package fr.teampeps.service;
 import fr.teampeps.dto.MemberDto;
 import fr.teampeps.mapper.MemberMapper;
 import fr.teampeps.model.Bucket;
+import fr.teampeps.model.Game;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -42,17 +43,17 @@ public class MemberService {
         }
     }
 
-    public Map<String,List<MemberDto>> getAllActiveMembers() {
+    public Map<String,List<MemberDto>> getAllActiveMembers(Game game) {
 
-        List<MemberDto> members = memberRepository.findAllActive().stream()
+        List<MemberDto> members = memberRepository.findAllActiveByGame(game).stream()
                 .map(memberMapper::toMemberDto)
                 .toList();
 
-        List<MemberDto> substitutes = memberRepository.findAllSubstitute().stream()
+        List<MemberDto> substitutes = memberRepository.findAllSubstituteByGame(game).stream()
                 .map(memberMapper::toMemberDto)
                 .toList();
 
-        List<MemberDto> coaches = memberRepository.findAllCoach().stream()
+        List<MemberDto> coaches = memberRepository.findAllCoachByGame(game).stream()
                 .map(memberMapper::toMemberDto)
                 .toList();
 

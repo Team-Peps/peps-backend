@@ -32,6 +32,7 @@ public class MemberMapper {
                 .tiktokUsername(member.getTiktokUsername())
                 .youtubeUsername(member.getYoutubeUsername())
                 .twitchUsername(member.getTwitchUsername())
+                .game(member.getGame())
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.MemberDto;
+import fr.teampeps.model.Game;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,9 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping
-    public ResponseEntity<Map<String, List<MemberDto>>> getAllActiveMembers() {
-        return ResponseEntity.ok(memberService.getAllActiveMembers());
+    @GetMapping("/{game}")
+    public ResponseEntity<Map<String, List<MemberDto>>> getAllActiveMembers(@PathVariable Game game) {
+        return ResponseEntity.ok(memberService.getAllActiveMembers(game));
     }
 
     @PutMapping

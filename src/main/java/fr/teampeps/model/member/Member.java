@@ -1,5 +1,6 @@
 package fr.teampeps.model.member;
 
+import fr.teampeps.model.Game;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,4 +71,9 @@ public class Member {
 
     @Column(name = "twitch_username")
     private String twitchUsername;
+
+    @Column(name = "game",
+            nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Game game;
 }
