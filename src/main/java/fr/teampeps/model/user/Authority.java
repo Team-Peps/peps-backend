@@ -5,8 +5,8 @@ import org.springframework.security.core.GrantedAuthority;
 public enum Authority implements GrantedAuthority {
 
     ADMIN(0),
-    TECH(1),
-    STAFF(2),
+    STAFF(1),
+    USER(2),
     LOCKED(3);
 
     final int role;

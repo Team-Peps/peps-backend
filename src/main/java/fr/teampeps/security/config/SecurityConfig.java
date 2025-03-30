@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                     //Everybody are able to access to the application patterns bellow
                     .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                    .requestMatchers("/api/v1/auth/authenticate").permitAll()
+                    .requestMatchers("/api/v1/auth/authenticate/**").permitAll()
                     .requestMatchers("/api/v1/auth/refresh-token").permitAll()
                 //For all the others, everybody need to be authenticated with a JWT token
                 .anyRequest().authenticated()
