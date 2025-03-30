@@ -66,7 +66,7 @@ public class AuthenticationService {
      * @return AuthenticationResponse with access and refresh tokens.
      */
     public Optional<AuthenticationResponse> authenticate(AuthenticationRequest request) {
-        Optional<User> user;
+        Optional<User> userOptional;
         // Authenticate the user based on provided credentials.
         if(request.getEmail() == null){
             authenticationManager.authenticate(
@@ -75,7 +75,7 @@ public class AuthenticationService {
                             request.getPassword()
                     )
             );
-            user = userRepository.findByUsername(request.getUsername());
+            userOptional = userRepository.findByUsername(request.getUsername());
         }else{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -83,22 +83,35 @@ public class AuthenticationService {
                             request.getPassword()
                     )
             );
-            user = userRepository.findByEmail(request.getEmail());
+            userOptional = userRepository.findByEmail(request.getEmail());
         }
 
-        if(user.isEmpty())
+        if (userOptional.isEmpty()) {
             return Optional.empty();
+        }
+
+        User user = userOptional.get();
+
+
+        boolean isEnabled = user.isEnabled();
+        boolean hasStaffAuthority = user.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("STAFF"));
+
+        if (!isEnabled || !hasStaffAuthority) {
+            log.info("User is not enabled or does not have the required authorities.");
+            return Optional.empty();
+        }
 
         // Generate new JWT and refresh tokens for the user.
-        String jwtToken = jwtService.generateToken(user.get());
-        String refreshToken = jwtService.generateRefreshToken(user.get());
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         // Revoke old tokens and save the new tokens.
-        revokeAllUserTokens(user.get());
-        saveUserToken(user.get(), jwtToken);
+        revokeAllUserTokens(user);
+        saveUserToken(user, jwtToken);
 
         // Save the tokens and return the response.
-        saveUserToken(user.get(), refreshToken);
+        saveUserToken(user, refreshToken);
 
         // Update the last connection time.
 
