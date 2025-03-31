@@ -45,7 +45,6 @@ public class MinioService {
         if (key == null) return null;
         return key
                 .toLowerCase()
-                .replaceAll("[\\s'\\-]", "_")
-                .replaceAll("[^a-z0-9_]", "");
+                .replaceAll("[\\s'\\-]", "_");
     }
 }

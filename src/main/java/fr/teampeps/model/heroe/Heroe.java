@@ -1,5 +1,6 @@
 package fr.teampeps.model.heroe;
 
+import fr.teampeps.model.Game;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ public class Heroe {
     @Id
     @Column(name = "id",
             nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "name",
@@ -25,7 +27,8 @@ public class Heroe {
 
     @Column(name = "game",
             nullable = false)
-    private String game;
+    @Enumerated(EnumType.STRING)
+    private Game game;
 
     @Column(name = "role",
             nullable = false)

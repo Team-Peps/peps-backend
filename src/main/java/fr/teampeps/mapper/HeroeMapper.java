@@ -15,6 +15,7 @@ public class HeroeMapper {
                 .name(heroe.getName())
                 .role(heroe.getRole().name())
                 .imageKey(heroe.getImageKey())
+                .game(heroe.getGame())
                 .build();
     }
 }

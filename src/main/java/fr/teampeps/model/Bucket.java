@@ -5,6 +5,5 @@ public enum Bucket {
     MEMBERS,
     ROSTERS,
     HEROES,
-    MAPS,
     PARTNERS,
 }
