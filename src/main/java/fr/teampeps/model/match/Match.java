@@ -6,9 +6,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
 
-@Table(name = "match", indexes = {
-        @Index(name = "idx_match_datetime", columnList = "datetime"),
-        @Index(name = "idx_match_competitionName", columnList = "competition_name")
+@Table(name = "matchs", indexes = {
+    @Index(name = "idx_match_datetime", columnList = "datetime"),
+    @Index(name = "idx_match_competitionName", columnList = "competition_name")
 })
 @Entity
 @Data
