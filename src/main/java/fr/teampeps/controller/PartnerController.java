@@ -34,7 +34,6 @@ public class PartnerController {
             @RequestPart("partner") Partner partner,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
-        log.info("Updating partner : {}", partner);
         try {
             PartnerDto updatedPartner = partnerService.saveOrUpdatePartner(partner, imageFile);
             return ResponseEntity.ok(Map.of(

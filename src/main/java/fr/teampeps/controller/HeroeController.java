@@ -33,7 +33,6 @@ public class HeroeController {
             @RequestPart("heroe") Heroe heroe,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
-        log.info("Updating partner : {}", heroe);
         try {
             HeroeDto updatedHeroe = heroeService.saveOrUpdateHeroe(heroe, imageFile);
             return ResponseEntity.ok(Map.of(
