@@ -31,7 +31,7 @@ public class MemberService {
 
         try {
             if (imageFile != null) {
-                String imageUrl = minioService.uploadImage(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
                 member.setImageKey(imageUrl);
             }
 

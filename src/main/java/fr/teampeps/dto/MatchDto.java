@@ -1,5 +1,6 @@
 package fr.teampeps.dto;
 
+import fr.teampeps.model.Game;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ public class MatchDto {
     private String datetime;
     private String competitionName;
     private String opponent;
-    private String game;
+    private Game game;
     private String score;
     private String opponentScore;
     private String vodUrl;

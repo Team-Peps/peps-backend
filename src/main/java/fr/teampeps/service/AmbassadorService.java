@@ -27,7 +27,7 @@ public class AmbassadorService {
     public AmbassadorDto saveOrUpdateAmbassador(Ambassador ambassador, MultipartFile imageFile) {
         try {
             if (imageFile != null) {
-                String imageUrl = minioService.uploadImage(imageFile, ambassador.getName().toLowerCase(), Bucket.AMBASSADORS);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, ambassador.getName().toLowerCase(), Bucket.AMBASSADORS);
                 ambassador.setImageKey(imageUrl);
             }
 

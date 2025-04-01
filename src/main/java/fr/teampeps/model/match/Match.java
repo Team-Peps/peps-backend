@@ -1,5 +1,6 @@
 package fr.teampeps.model.match;
 
+import fr.teampeps.model.Game;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -16,11 +17,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "matchCache")
 public class Match {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",
             nullable = false)
     private String id;
@@ -39,19 +39,26 @@ public class Match {
             nullable = false)
     private String competitionName;
 
+    @Column(name = "competition_image_key",
+            nullable = false)
+    private String competitionImageKey;
+
     @Column(name = "opponent",
             nullable = false)
     private String opponent;
 
-    @Column(name = "vod_url",
+    @Column(name = "opponent_image_key",
             nullable = false)
+    private String opponentImageKey;
+
+    @Column(name = "vod_url")
     private String vodUrl;
 
-    @Column(name = "stream_url",
-            nullable = false)
+    @Column(name = "stream_url")
     private String streamUrl;
 
     @Column(name = "game",
             nullable = false)
-    private String game;
+    @Enumerated(EnumType.STRING)
+    private Game game;
 }
