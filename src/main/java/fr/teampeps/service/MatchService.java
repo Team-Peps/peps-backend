@@ -2,10 +2,12 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.MatchDto;
 import fr.teampeps.mapper.MatchMapper;
+import fr.teampeps.model.Game;
 import fr.teampeps.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,12 +24,12 @@ public class MatchService {
     @Transactional
     public Map<String, List<MatchDto>> getAllMatchesSortedByDateGroupByGame() {
 
-        List<MatchDto> overwatchMatches = matchRepository.findAllByGameByOrderByDatetimeDesc("overwatch")
+        List<MatchDto> overwatchMatches = matchRepository.findAllByGameByOrderByDatetimeDesc(Game.OVERWATCH)
                 .stream()
                 .map(matchMapper::toMatchDto)
                 .toList();
 
-        List<MatchDto> marvelRivalsMatch = matchRepository.findAllByGameByOrderByDatetimeDesc("marvel-rivals")
+        List<MatchDto> marvelRivalsMatch = matchRepository.findAllByGameByOrderByDatetimeDesc(Game.MARVEL_RIVALS)
                 .stream()
                 .map(matchMapper::toMatchDto)
                 .toList();
@@ -37,4 +39,5 @@ public class MatchService {
                 "marvel-rivals", marvelRivalsMatch
         );
     }
+
 }

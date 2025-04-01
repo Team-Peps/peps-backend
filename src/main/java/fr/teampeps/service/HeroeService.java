@@ -49,7 +49,7 @@ public class HeroeService {
             if (imageFile != null) {
                 String fileName = heroe.getGame() + "/" + heroe.getName().toLowerCase();
                 log.info("Saving heroe : {}", fileName);
-                String imageUrl = minioService.uploadImage(imageFile, fileName, Bucket.HEROES);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.HEROES);
                 heroe.setImageKey(imageUrl);
             }
 

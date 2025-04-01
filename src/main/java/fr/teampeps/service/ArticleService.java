@@ -35,7 +35,7 @@ public class ArticleService {
         try {
             if (imageFile != null) {
                 String fileName = article.getTitle().toLowerCase();
-                String imageUrl = minioService.uploadImage(imageFile, fileName, Bucket.ARTICLES);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
                 article.setImageKey(imageUrl);
             }
 
@@ -52,7 +52,7 @@ public class ArticleService {
         try {
             if (imageFile != null) {
                 String fileName = article.getTitle().toLowerCase();
-                String imageUrl = minioService.uploadImage(imageFile, fileName, Bucket.ARTICLES);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
                 article.setImageKey(imageUrl);
             }
 

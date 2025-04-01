@@ -46,7 +46,7 @@ public class PartnerService {
 
         try {
             if (imageFile != null) {
-                String imageUrl = minioService.uploadImage(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
                 partner.setImageKey(imageUrl);
             }
 
