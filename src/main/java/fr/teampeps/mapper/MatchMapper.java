@@ -1,7 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.MatchDto;
-import fr.teampeps.model.match.Match;
+import fr.teampeps.model.Match;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ public class MatchMapper {
     public MatchDto toMatchDto(Match match) {
         return MatchDto.builder()
                 .id(match.getId())
-                .datetime(String.valueOf(match.getDatetime()))
+                .datetime(match.getDatetime())
                 .competitionName(match.getCompetitionName())
                 .opponent(match.getOpponent())
                 .game(match.getGame())
@@ -20,6 +20,8 @@ public class MatchMapper {
                 .opponentScore(match.getOpponentScore())
                 .vodUrl(match.getVodUrl())
                 .streamUrl(match.getStreamUrl())
+                .opponentImageKey(match.getOpponentImageKey())
+                .competitionImageKey(match.getCompetitionImageKey())
                 .build();
     }
 }

@@ -1,6 +1,5 @@
-package fr.teampeps.model.match;
+package fr.teampeps.model;
 
-import fr.teampeps.model.Game;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;

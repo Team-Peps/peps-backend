@@ -2,7 +2,7 @@ package fr.teampeps.service;
 
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.Game;
-import fr.teampeps.model.match.Match;
+import fr.teampeps.model.Match;
 import fr.teampeps.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class CronService {
     @Scheduled(cron = "${cron.expression}")
     public Map<String, List<Match>> fetchAndSaveMatches() {
 
-        matchRepository.deleteAll();
+        matchRepository.deleteAllWhereScoreIsNull();
 
         List<Match> upcomingOverwatchMatches = fetchAndSaveUpcomingMatches(Game.OVERWATCH, "/overwatch/Team_Peps", urlStreamOverwatch);
         List<Match> upcomingMarvelRivalsMatches = fetchAndSaveUpcomingMatches(Game.MARVEL_RIVALS, "/marvelrivals/Team_Peps", urlStreamMarvelRivals);
@@ -126,15 +126,20 @@ public class CronService {
 
                 LocalDateTime parsedDate = parseToDateTime(date);
 
-                String matchId = ((parsedDate != null ? parsedDate.toString() : date) + "-" + competitionName.replace(" - ", "-").replace(" ","-") + "-" + opponent).toLowerCase();
+                if(parsedDate.isBefore(LocalDateTime.now())) {
+                    log.info("Match is in the past: {}", date);
+                    continue;
+                }
+
+                String matchId = generateMatchId(date, competitionName, opponent);
 
                 if(matchRepository.existsById(matchId)) {
                     log.info("Match already exists: {}", matchId);
                     continue;
                 }
 
-                competitionLogoKey = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, competitionName, client);
-                opponentLogoKey = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, opponent, client);
+                competitionLogoKey = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, reformatString(competitionName), client);
+                opponentLogoKey = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, reformatString(opponent), client);
 
                 Match match = Match.builder()
                         .id(matchId)
@@ -196,30 +201,34 @@ public class CronService {
                 String[] scores = score.split(":");
                 LocalDateTime parsedDate = parseToDateTime(date);
 
-                String matchId = ((parsedDate != null ? parsedDate.toString() : date) + "-" + competitionName.replace(" - ", "-").replace(" ","-") + "-" + opponent).toLowerCase();
+                String matchId = generateMatchId(date, competitionName, opponent);
 
-                if(matchRepository.existsById(matchId) && matchRepository.isMatchScoreIsNotNull(matchId).isEmpty()) {
-                    log.info("Match already exists: {}", matchId);
-                    continue;
+                if(matchRepository.existsById(matchId) && matchRepository.isMatchScoreIsNull(matchId).isEmpty()) {
+                    log.info("Match already exists and updating score: {}", matchId);
+                    Match match = matchRepository.findById(matchId).get();
+                    match.setScore(scores[0]);
+                    match.setOpponentScore(scores[1]);
+                    matches.add(match);
+
+                }else{
+
+                    competitionLogoKey = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, reformatString(competitionName), client);
+                    opponentLogoKey = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, reformatString(opponent), client);
+                    Match match = Match.builder()
+                            .id(matchId)
+                            .datetime(parsedDate)
+                            .competitionName(competitionName)
+                            .score(scores[0])
+                            .opponentScore(scores[1])
+                            .opponent(opponent)
+                            .competitionImageKey(competitionLogoKey)
+                            .opponentImageKey(opponentLogoKey)
+                            .game(game)
+                            .streamUrl(streamUrl)
+                            .build();
+                    matches.add(match);
+
                 }
-
-                competitionLogoKey = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, competitionName, client);
-                opponentLogoKey = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, opponent, client);
-
-                Match match = Match.builder()
-                        .id(matchId)
-                        .datetime(parsedDate)
-                        .competitionName(competitionName)
-                        .score(scores[0])
-                        .opponentScore(scores[1])
-                        .opponent(opponent)
-                        .competitionImageKey(competitionLogoKey)
-                        .opponentImageKey(opponentLogoKey)
-                        .game(game)
-                        .streamUrl(streamUrl)
-                        .build();
-
-                matches.add(match);
 
             }
             matchRepository.saveAll(matches);
@@ -249,7 +258,6 @@ public class CronService {
     }
 
     private LocalDateTime parseToDateTime(String date) {
-        log.info("DATE: {}",date);
         LocalDateTime parsedDate = null;
         String[] patterns = {
                 "MMM d, yyyy - HH:mm z",
@@ -275,6 +283,14 @@ public class CronService {
             }
         }
         return parsedDate;
+    }
+
+    private String reformatString(String str) {
+        return str.toLowerCase().replaceAll("[^a-zA-Z0-9_-]", "");
+    }
+
+    private String generateMatchId(String date, String competitionName, String opponent) {
+        return (date + "-" + competitionName.replace(" - ", "-").replace(" ","-") + "-" + opponent).toLowerCase();
     }
 
 }
