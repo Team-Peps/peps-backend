@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.ArticleDto;
+import fr.teampeps.dto.ArticleTinyDto;
 import fr.teampeps.mapper.ArticleMapper;
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.article.Article;
@@ -69,5 +70,11 @@ public class ArticleService {
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Article non trouvé", e);
         }
+    }
+
+    public List<ArticleTinyDto> getRecentArticles() {
+        return articleRepository.findThreeRecentArticles().stream()
+                .map(articleMapper::toArticleTinyDto)
+                .toList();
     }
 }

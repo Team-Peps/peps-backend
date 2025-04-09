@@ -10,4 +10,7 @@ public interface ArticleRepository extends JpaRepository<Article, String> {
 
     @Query("SELECT a FROM Article a ORDER BY a.createdAt DESC")
     List<Article> findAllOrderByCreatedAtDesc();
+
+    @Query("SELECT a FROM Article a ORDER BY a.createdAt DESC LIMIT 3")
+    List<Article> findThreeRecentArticles();
 }

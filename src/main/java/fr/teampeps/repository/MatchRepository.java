@@ -1,5 +1,6 @@
 package fr.teampeps.repository;
 
+import fr.teampeps.mapper.UserMapper;
 import fr.teampeps.model.Game;
 import fr.teampeps.model.Match;
 import jakarta.transaction.Transactional;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +31,10 @@ public interface MatchRepository extends JpaRepository<Match, String > {
     @Transactional
     @Query("DELETE FROM Match m WHERE m.score IS NULL")
     void deleteAllWhereScoreIsNull();
+
+    Optional<Match> findFirstByDatetimeBetweenAndScoreIsNullOrderByDatetimeAsc(LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT m FROM Match m WHERE m.score IS NULL ORDER BY m.datetime ASC LIMIT 5")
+    List<Match> findAllByScoreIsNullOrderByDatetimeAsc();
+
 }
