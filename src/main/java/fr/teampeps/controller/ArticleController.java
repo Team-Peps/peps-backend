@@ -1,6 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.ArticleDto;
+import fr.teampeps.dto.ArticleTinyDto;
 import fr.teampeps.model.article.Article;
 import fr.teampeps.service.ArticleService;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +83,12 @@ public class ArticleController {
                     "error", e.getMessage()
             ));
         }
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<ArticleTinyDto>> getRecentArticles() {
+        List<ArticleTinyDto> recentArticles = articleService.getRecentArticles();
+        return ResponseEntity.ok(recentArticles);
     }
 
 }
