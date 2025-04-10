@@ -35,13 +35,25 @@ public class User implements UserDetails {
     private String username;
 
     @Column(name = "password",
-            nullable = false)
+            nullable = true)
     private String password;
 
     @Column(name = "email",
             nullable = false,
             unique=true)
     private String email;
+
+    @Column(name = "discord_id",
+            unique=true)
+    private String discordId = null;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl = null;
+
+    @Column(name = "auth_type",
+            nullable = true)
+    @Enumerated(EnumType.STRING)
+    private AuthType authType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "authorities",

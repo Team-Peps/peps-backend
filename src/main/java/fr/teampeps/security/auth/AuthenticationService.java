@@ -1,5 +1,6 @@
 package fr.teampeps.security.auth;
 
+import fr.teampeps.model.user.AuthType;
 import fr.teampeps.model.user.Authority;
 import fr.teampeps.model.user.User;
 import fr.teampeps.model.token.Token;
@@ -53,10 +54,65 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .authorities(List.of(Authority.STAFF))
+                .authType(AuthType.LOCAL)
                 .build();
 
         userRepository.save(user);
         return true;
+    }
+
+    /**
+     * Register a new user with Discord.
+     *
+     * @param request The registration request.
+     */
+    public void registerDiscord(DiscordRegisterRequest request) {
+        if (!isValidDiscordRegisterRequest(request)) {
+            return;
+        }
+
+        User user = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .discordId(request.getDiscordId())
+                .authorities(List.of(Authority.USER))
+                .avatarUrl(request.getAvatarUrl())
+                .authType(AuthType.DISCORD)
+                .enable(true)
+                .build();
+
+        userRepository.save(user);
+    }
+
+    public Optional<AuthenticationResponse> authenticateDiscord(String discordId) {
+        Optional<User> userOptional = userRepository.findByDiscordId(discordId);
+
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = userOptional.get();
+
+        boolean isEnabled = user.isEnabled();
+
+        if (!isEnabled) {
+            log.info("User with discordId={} is not enabled", discordId);
+            return Optional.empty();
+        }
+
+        // Génère access + refresh tokens
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        // Révoque les anciens tokens + enregistre les nouveaux
+        revokeAllUserTokens(user);
+        saveUserToken(user, accessToken);
+        saveUserToken(user, refreshToken);
+
+        return Optional.of(AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build());
     }
 
     /**
@@ -112,8 +168,6 @@ public class AuthenticationService {
 
         // Save the tokens and return the response.
         saveUserToken(user, refreshToken);
-
-        // Update the last connection time.
 
         return Optional.of(AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -208,5 +262,13 @@ public class AuthenticationService {
                 !registerRequest.getPassword().isEmpty() &&
                 userRepository.findByEmail(registerRequest.getEmail()).isEmpty() &&
                 userRepository.findByUsername(registerRequest.getUsername()).isEmpty();
+    }
+
+    private boolean isValidDiscordRegisterRequest(DiscordRegisterRequest registerRequest) {
+        return userRepository.findByDiscordId(registerRequest.getDiscordId()).isEmpty();
+    }
+
+    public boolean isUserRegistered(String discordId) {
+        return userRepository.findByDiscordId(discordId).isPresent();
     }
 }
