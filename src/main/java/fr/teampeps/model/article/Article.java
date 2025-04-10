@@ -28,6 +28,9 @@ public class Article {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "thumbnail_image_key")
+    private String thumbnailImageKey;
+
     @Column(name = "image_key")
     private String imageKey;
 

@@ -17,18 +17,19 @@ public class ArticleMapper {
                 .content(article.getContent())
                 .createdAt(article.getCreatedAt().toString())
                 .id(article.getId())
+                .thumbnailImageKey(article.getThumbnailImageKey())
                 .imageKey(article.getImageKey())
                 .title(article.getTitle())
                 .build();
     }
 
     public ArticleTinyDto toArticleTinyDto(Article article) {
-        String plainTextContent = Jsoup.parse(article.getContent()).text(); // Remove HTML tags
+        String plainTextContent = Jsoup.parse(article.getContent()).text();
         return ArticleTinyDto.builder()
                 .id(article.getId())
                 .title(article.getTitle())
-                .imageKey(article.getImageKey())
-                .shortContent(plainTextContent.substring(0, 134) + "...")
+                .thumbnailImageKey(article.getThumbnailImageKey())
+                .shortContent(plainTextContent.length() > 133 ? plainTextContent.substring(0, 134) + "..." : plainTextContent)
                 .build();
     }
 }
