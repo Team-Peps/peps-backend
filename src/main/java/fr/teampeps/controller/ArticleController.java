@@ -6,6 +6,7 @@ import fr.teampeps.model.article.Article;
 import fr.teampeps.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +24,7 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<ArticleDto>> getAllArticles() {
         return ResponseEntity.ok(articleService.getAllArticles());
     }
@@ -90,5 +91,15 @@ public class ArticleController {
         List<ArticleTinyDto> recentArticles = articleService.getRecentArticles();
         return ResponseEntity.ok(recentArticles);
     }
+
+    @GetMapping
+    public ResponseEntity<Page<ArticleTinyDto>> getArticles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam String filter
+    ) {
+        Page<ArticleTinyDto> articles = articleService.getArticles(page, filter);
+        return ResponseEntity.ok(articles);
+    }
+
 
 }
