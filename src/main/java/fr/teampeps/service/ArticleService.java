@@ -5,16 +5,22 @@ import fr.teampeps.dto.ArticleTinyDto;
 import fr.teampeps.mapper.ArticleMapper;
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.article.Article;
+import fr.teampeps.model.article.ArticleType;
 import fr.teampeps.repository.ArticleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -76,5 +82,18 @@ public class ArticleService {
         return articleRepository.findThreeRecentArticles().stream()
                 .map(articleMapper::toArticleTinyDto)
                 .toList();
+    }
+
+    public Page<ArticleTinyDto> getArticles(int page, String filter) {
+        Pageable pageable = PageRequest.of(page, 9, Sort.by("createdAt").descending());
+
+        List<ArticleType> types = Arrays.stream(filter.split(","))
+                .map(String::toUpperCase)
+                .filter(ArticleType::contains)
+                .map(ArticleType::valueOf)
+                .toList();
+
+        return articleRepository.findAllByArticleTypeIn(types, pageable)
+                .map(articleMapper::toArticleTinyDto);
     }
 }
