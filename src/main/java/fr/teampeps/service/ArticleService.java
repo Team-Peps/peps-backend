@@ -38,12 +38,20 @@ public class ArticleService {
                 .toList();
     }
 
-    public ArticleDto createArticle(Article article, MultipartFile imageFile) {
+    public ArticleDto createArticle(Article article, MultipartFile thumbnailImageFile, MultipartFile imageFile) {
         try {
             if (imageFile != null) {
                 String fileName = article.getTitle().toLowerCase();
                 String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
                 article.setImageKey(imageUrl);
+                log.info("Image key: " + imageUrl);
+            }
+
+            if (thumbnailImageFile != null) {
+                String fileName = article.getTitle().toLowerCase() + "_thumbnail";
+                String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, fileName, Bucket.ARTICLES);
+                article.setThumbnailImageKey(thumbnailImageUrl);
+                log.info("Thumbnail image key: " + thumbnailImageUrl);
             }
 
             article.setCreatedAt(LocalDate.now());
@@ -54,13 +62,19 @@ public class ArticleService {
         }
     }
 
-    public ArticleDto updateArticle(Article article, MultipartFile imageFile) {
+    public ArticleDto updateArticle(Article article, MultipartFile thumbnailImageFile, MultipartFile imageFile) {
         log.info(article.toString());
         try {
             if (imageFile != null) {
                 String fileName = article.getTitle().toLowerCase();
                 String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
                 article.setImageKey(imageUrl);
+            }
+
+            if (thumbnailImageFile != null) {
+                String fileName = article.getTitle().toLowerCase() + "_thumbnail";
+                String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, fileName, Bucket.ARTICLES);
+                article.setThumbnailImageKey(thumbnailImageUrl);
             }
 
             return articleMapper.toArticleDto(articleRepository.save(article));
@@ -95,5 +109,11 @@ public class ArticleService {
 
         return articleRepository.findAllByArticleTypeIn(types, pageable)
                 .map(articleMapper::toArticleTinyDto);
+    }
+
+    public ArticleDto getArticleById(String id) {
+        return articleRepository.findById(id)
+                .map(articleMapper::toArticleDto)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Article non trouvé"));
     }
 }

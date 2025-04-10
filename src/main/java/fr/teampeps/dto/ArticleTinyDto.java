@@ -9,5 +9,5 @@ public class ArticleTinyDto {
     private String id;
     private String title;
     private String shortContent;
-    private String imageKey;
+    private String thumbnailImageKey;
 }

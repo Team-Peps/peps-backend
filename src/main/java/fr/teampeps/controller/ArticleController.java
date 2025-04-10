@@ -33,10 +33,11 @@ public class ArticleController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateArticle(
             @RequestPart("article") Article article,
-            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+            @RequestPart(value = "imageFileThumbnail", required = false) MultipartFile imageFileThumbnail,
+            @RequestPart(value = "imageFileBackground", required = false) MultipartFile imageFileBackground
     ) {
         try {
-            ArticleDto updatedArticle = articleService.updateArticle(article, imageFile);
+            ArticleDto updatedArticle = articleService.updateArticle(article, imageFileThumbnail, imageFileBackground);
             return ResponseEntity.ok(Map.of(
                     "message", "Article mis à jour avec succès",
                     "article", updatedArticle
@@ -54,10 +55,13 @@ public class ArticleController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> saveArticle(
             @RequestPart("article") Article article,
-            @RequestPart("imageFile") MultipartFile imageFile
+            @RequestPart("imageFileThumbnail") MultipartFile imageFileThumbnail,
+            @RequestPart("imageFileBackground") MultipartFile imageFileBackground
     ) {
+        log.info("Bg: {}", imageFileBackground.getOriginalFilename());
+        log.info("Th: {}", imageFileThumbnail.getOriginalFilename());
         try {
-            ArticleDto updatedArticle = articleService.createArticle(article, imageFile);
+            ArticleDto updatedArticle = articleService.createArticle(article, imageFileThumbnail, imageFileBackground);
             return ResponseEntity.ok(Map.of(
                     "message", "Article enregistré avec succès",
                     "article", updatedArticle
@@ -99,6 +103,12 @@ public class ArticleController {
     ) {
         Page<ArticleTinyDto> articles = articleService.getArticles(page, filter);
         return ResponseEntity.ok(articles);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable String id) {
+        ArticleDto article = articleService.getArticleById(id);
+        return ResponseEntity.ok(article);
     }
 
 
