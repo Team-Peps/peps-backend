@@ -2,9 +2,14 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.MatchDto;
 import fr.teampeps.dto.MatchGroupByDate;
+import fr.teampeps.model.Game;
 import fr.teampeps.service.MatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,10 +40,28 @@ public class MatchController {
         return ResponseEntity.ok(currentMatch);
     }
 
+    @GetMapping("/upcoming/5")
+    public ResponseEntity<List<MatchGroupByDate>> getNext5Matches() {
+        List<MatchGroupByDate> next5Matches = matchService.getNext5Matches();
+        return ResponseEntity.ok(next5Matches);
+    }
+
     @GetMapping("/upcoming")
-    public ResponseEntity<List<MatchGroupByDate>> getUpcomingMatches() {
-        List<MatchGroupByDate> upcomingMatches = matchService.getNext5Matches();
+    public ResponseEntity<Page<MatchGroupByDate>> getUpcomingMatches(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "filter", defaultValue = "OVERWATCH, MARVEL_RIVALS") String filter
+    ) {
+        Page<MatchGroupByDate> upcomingMatches = matchService.getUpcomingMatches(page, filter);
         return ResponseEntity.ok(upcomingMatches);
+    }
+
+    @GetMapping("/result")
+    public ResponseEntity<Page<MatchGroupByDate>> getMatchResults(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "filter", defaultValue = "OVERWATCH, MARVEL_RIVALS") String filter
+    ) {
+        Page<MatchGroupByDate> matchGroups = matchService.getResultsMatches(page, filter);
+        return ResponseEntity.ok(matchGroups);
     }
 
 }
