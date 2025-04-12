@@ -28,6 +28,11 @@ public class PartnerController {
         return ResponseEntity.ok(partnerService.getAllPartners());
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<List<PartnerDto>> getAllActivePartners() {
+        return ResponseEntity.ok(partnerService.getAllActivePartners());
+    }
+
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updatePartner(
