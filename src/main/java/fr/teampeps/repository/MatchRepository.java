@@ -4,6 +4,8 @@ import fr.teampeps.mapper.UserMapper;
 import fr.teampeps.model.Game;
 import fr.teampeps.model.Match;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,4 +39,7 @@ public interface MatchRepository extends JpaRepository<Match, String > {
     @Query("SELECT m FROM Match m WHERE m.score IS NULL ORDER BY m.datetime ASC LIMIT 5")
     List<Match> findAllByScoreIsNullOrderByDatetimeAsc();
 
+    Page<Match> findAllByScoreIsNotNullAndGameInOrderByDatetimeDesc(List<Game> games, Pageable pageable);
+
+    Page<Match> findAllByScoreIsNullAndGameInOrderByDatetimeDesc(List<Game> games, Pageable pageable);
 }
