@@ -74,4 +74,10 @@ public class PartnerService {
 
         return partnerMapper.toPartnerDto(partnerRepository.save(partner));
     }
+
+    public List<PartnerDto> getAllActivePartners() {
+        return partnerRepository.findAllByIsActive(true).stream()
+                .map(partnerMapper::toPartnerDto)
+                .toList();
+    }
 }
