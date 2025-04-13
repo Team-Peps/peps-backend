@@ -5,6 +5,8 @@ import fr.teampeps.model.member.MemberRole;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class MemberDto {
@@ -26,4 +28,5 @@ public class MemberDto {
     private String youtubeUsername;
     private String twitchUsername;
     private Game game;
+    private List<AchievementDto> achievements;
 }

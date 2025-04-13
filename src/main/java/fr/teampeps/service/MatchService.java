@@ -114,11 +114,9 @@ public class MatchService {
                 .map(Game::valueOf)
                 .toList();
 
-        // Étape 1 : paginer les matchs scorés
         Page<Match> matchPage = matchRepository.findAllByScoreIsNullAndGameInOrderByDatetimeDesc(games, pageable);
         List<Match> matches = matchPage.getContent();
 
-        // Étape 2 : grouper les matchs paginés par date
         Map<LocalDate, List<Match>> matchesByDate = matches.stream()
                 .collect(Collectors.groupingBy(
                         match -> match.getDatetime().toLocalDate(),
@@ -126,7 +124,6 @@ public class MatchService {
                         Collectors.toList()
                 ));
 
-        // Étape 3 : transformer chaque groupe en MatchGroupByDate
         List<MatchGroupByDate> grouped = matchesByDate.entrySet().stream()
                 .map(entry -> new MatchGroupByDate(
                         entry.getKey(),
@@ -136,7 +133,24 @@ public class MatchService {
                 ))
                 .collect(Collectors.toList());
 
-        // Étape 4 : retourner une Page avec les groupes créés à partir des matchs paginés
         return new PageImpl<>(grouped, pageable, matchPage.getTotalElements());
+    }
+
+    public List<MatchGroupByDate> getUpcomingMatchesByGame(Game game) {
+        List<Match> matches = matchRepository.findAllByGameAndScoreIsNullOrderByDatetimeDesc(game);
+
+        Map<LocalDate, List<Match>> matchesByDate = matches.stream()
+                .collect(Collectors.groupingBy(
+                        match -> match.getDatetime().toLocalDate(),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+
+        return matchesByDate.entrySet().stream()
+                .map(entry -> new MatchGroupByDate(entry.getKey(), entry.getValue()
+                        .stream()
+                        .map(matchMapper::toMatchDto)
+                        .collect(Collectors.toList())))
+                .collect(Collectors.toList());
     }
 }

@@ -46,6 +46,12 @@ public class MatchController {
         return ResponseEntity.ok(next5Matches);
     }
 
+    @GetMapping("/upcoming/game/{game}")
+    public ResponseEntity<List<MatchGroupByDate>> getUpcomingMatchesByGame(@PathVariable Game game) {
+        List<MatchGroupByDate> upcomingMatchesByGame = matchService.getUpcomingMatchesByGame(game);
+        return ResponseEntity.ok(upcomingMatchesByGame);
+    }
+
     @GetMapping("/upcoming")
     public ResponseEntity<Page<MatchGroupByDate>> getUpcomingMatches(
             @RequestParam(value = "page", defaultValue = "0") int page,

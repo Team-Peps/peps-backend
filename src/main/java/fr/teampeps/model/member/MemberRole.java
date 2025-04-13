@@ -2,7 +2,7 @@ package fr.teampeps.model.member;
 
 public enum MemberRole {
 
-    DPS("DAMAGE"),
+    DAMAGE("DAMAGE"),
     TANK("TANK"),
     SUPPORT("SUPPORT"),
     DUELIST("DUELIST"),
