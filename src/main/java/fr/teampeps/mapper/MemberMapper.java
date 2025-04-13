@@ -14,6 +14,8 @@ import java.time.Period;
 @RequiredArgsConstructor
 public class MemberMapper {
 
+    private final AchievementMapper achievementMapper;
+
     public MemberDto toMemberDto(Member member){
         return MemberDto.builder()
                 .id(member.getId())
@@ -33,6 +35,17 @@ public class MemberMapper {
                 .youtubeUsername(member.getYoutubeUsername())
                 .twitchUsername(member.getTwitchUsername())
                 .game(member.getGame())
+                .achievements(achievementMapper.toAchievementDtoList(member.getAchievements()))
+                .build();
+    }
+
+    public MemberTinyDto toMemberTinyDto(Member member){
+        return MemberTinyDto.builder()
+                .id(member.getId())
+                .pseudo(member.getPseudo())
+                .role(member.getRole())
+                .isSubstitute(member.getIsSubstitute())
+                .imageKey(member.getImageKey())
                 .build();
     }
 

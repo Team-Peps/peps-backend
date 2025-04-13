@@ -1,5 +1,6 @@
 package fr.teampeps.model.member;
 
+import fr.teampeps.model.Achievement;
 import fr.teampeps.model.Game;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -76,4 +79,8 @@ public class Member {
             nullable = false)
     @Enumerated(EnumType.STRING)
     private Game game;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Achievement> achievements = new ArrayList<>();
+
 }

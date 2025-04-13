@@ -1,6 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.MemberDto;
+import fr.teampeps.dto.MemberTinyDto;
 import fr.teampeps.model.Game;
 import fr.teampeps.model.member.Member;
 import fr.teampeps.service.MemberService;
@@ -26,7 +27,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/{game}")
+    @GetMapping("/game/{game}/active")
     public ResponseEntity<Map<String, List<MemberDto>>> getAllActiveMembers(@PathVariable Game game) {
         return ResponseEntity.ok(memberService.getAllActiveMembers(game));
     }
@@ -122,6 +123,17 @@ public class MemberController {
                     "error", e.getMessage()
             ));
         }
+    }
+
+    @GetMapping("/game/{game}")
+    public ResponseEntity<Map<String, List<MemberTinyDto>>> getAllMembers(@PathVariable Game game) {
+        return ResponseEntity.ok(memberService.getAllActiveMembersByGame(game));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MemberDto> getMemberDetails(@PathVariable String id) {
+        MemberDto member = memberService.getMemberDetails(id);
+        return ResponseEntity.ok(member);
     }
 
 }

@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.MemberDto;
+import fr.teampeps.dto.MemberTinyDto;
 import fr.teampeps.mapper.MemberMapper;
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.Game;
@@ -88,5 +89,33 @@ public class MemberService {
         member.setIsSubstitute(true);
 
         return memberMapper.toMemberDto(memberRepository.save(member));
+    }
+
+    public Map<String, List<MemberTinyDto>> getAllActiveMembersByGame(Game game) {
+
+        List<MemberTinyDto> members = memberRepository.findAllActiveByGame(game).stream()
+                .map(memberMapper::toMemberTinyDto)
+                .toList();
+
+        List<MemberTinyDto> substitutes = memberRepository.findAllSubstituteByGame(game).stream()
+                .map(memberMapper::toMemberTinyDto)
+                .toList();
+
+        List<MemberTinyDto> coaches = memberRepository.findAllCoachByGame(game).stream()
+                .map(memberMapper::toMemberTinyDto)
+                .toList();
+
+        return Map.of(
+                "members", members,
+                "substitutes", substitutes,
+                "coaches", coaches
+        );
+    }
+
+    public MemberDto getMemberDetails(String id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
+
+        return memberMapper.toMemberDto(member);
     }
 }
