@@ -2,6 +2,7 @@ package fr.teampeps.model.member;
 
 import fr.teampeps.model.Achievement;
 import fr.teampeps.model.Game;
+import fr.teampeps.model.heroe.Heroe;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -82,5 +83,13 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Achievement> achievements = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "member_favorite_heroes",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "hero_id")
+    )
+    private List<Heroe> favoriteHeroes = new ArrayList<>();
 
 }
