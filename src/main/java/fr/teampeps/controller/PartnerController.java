@@ -90,7 +90,6 @@ public class PartnerController {
         }
     }
 
-
     @PostMapping("/{id}/active")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> toggleActive(@PathVariable String id) {

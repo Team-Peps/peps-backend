@@ -9,4 +9,5 @@ public enum Bucket {
     ROSTERS,
     HEROES,
     PARTNERS,
+    SLIDERS,
 }
