@@ -5,6 +5,9 @@ import fr.teampeps.model.heroe.Heroe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class HeroeMapper {
@@ -17,5 +20,11 @@ public class HeroeMapper {
                 .imageKey(heroe.getImageKey())
                 .game(heroe.getGame())
                 .build();
+    }
+
+    public List<HeroeDto> toHeroeDtoList(List<Heroe> heroes) {
+        return heroes.stream()
+                .map(this::toHeroeDto)
+                .collect(Collectors.toList());
     }
 }

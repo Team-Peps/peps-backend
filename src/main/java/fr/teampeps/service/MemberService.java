@@ -5,7 +5,9 @@ import fr.teampeps.dto.MemberTinyDto;
 import fr.teampeps.mapper.MemberMapper;
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.Game;
+import fr.teampeps.model.heroe.Heroe;
 import fr.teampeps.model.member.Member;
+import fr.teampeps.repository.HeroeRepository;
 import fr.teampeps.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
     private final MinioService minioService;
+    private final HeroeRepository heroeRepository;
 
     public MemberDto saveOrUpdateMember(Member member, MultipartFile imageFile) {
         log.info("Updating member : {}", member);
@@ -34,6 +37,19 @@ public class MemberService {
             if (imageFile != null) {
                 String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
                 member.setImageKey(imageUrl);
+            }
+
+            if (member.getFavoriteHeroes() != null && member.getFavoriteHeroes().size() > 3) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un membre ne peut avoir plus de 3 héros favoris");
+            }
+
+            if (member.getFavoriteHeroes() != null) {
+                List<Heroe> validatedHeroes = member.getFavoriteHeroes().stream()
+                        .map(hero -> heroeRepository.findById(hero.getId())
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Héros introuvable : " + hero.getId())))
+                        .toList();
+
+                member.setFavoriteHeroes(validatedHeroes);
             }
 
             return memberMapper.toMemberDto(memberRepository.save(member));

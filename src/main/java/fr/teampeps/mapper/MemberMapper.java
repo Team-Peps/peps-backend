@@ -15,6 +15,7 @@ import java.time.Period;
 public class MemberMapper {
 
     private final AchievementMapper achievementMapper;
+    private final HeroeMapper heroeMapper;
 
     public MemberDto toMemberDto(Member member){
         return MemberDto.builder()
@@ -36,6 +37,7 @@ public class MemberMapper {
                 .twitchUsername(member.getTwitchUsername())
                 .game(member.getGame())
                 .achievements(achievementMapper.toAchievementDtoList(member.getAchievements()))
+                .favoriteHeroes(heroeMapper.toHeroeDtoList(member.getFavoriteHeroes()))
                 .build();
     }
 

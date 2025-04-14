@@ -29,4 +29,5 @@ public class MemberDto {
     private String twitchUsername;
     private Game game;
     private List<AchievementDto> achievements;
+    private List<HeroeDto> favoriteHeroes;
 }
