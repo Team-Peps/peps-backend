@@ -30,8 +30,7 @@ public class Achievement {
             nullable = false)
     private Integer ranking;
 
-    @Column(name = "game",
-            nullable = false)
+    @Column(name = "game")
     @Enumerated(EnumType.STRING)
     private Game game;
 
