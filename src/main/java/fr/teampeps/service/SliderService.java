@@ -77,12 +77,12 @@ public class SliderService {
         try {
 
             if(imageFile != null) {
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, slider.getId(), Bucket.ARTICLES);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, slider.getId(), Bucket.SLIDERS);
                 slider.setImageKey(imageUrl);
             }
 
             if(mobileImageFile != null) {
-                String mobileImageUrl = minioService.uploadImageFromMultipartFile(mobileImageFile, slider.getId() + "_mobile", Bucket.ARTICLES);
+                String mobileImageUrl = minioService.uploadImageFromMultipartFile(mobileImageFile, slider.getId() + "_mobile", Bucket.SLIDERS);
                 slider.setMobileImageKey(mobileImageUrl);
             }
 
