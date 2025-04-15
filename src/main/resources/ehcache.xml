@@ -4,29 +4,52 @@
 
     <cache alias="defaultCache">
         <expiry>
-            <ttl unit="seconds">600</ttl>  <!-- Expiration après 10 min -->
+            <ttl unit="minutes">10</ttl> <!-- Expiration après 10 min -->
         </expiry>
         <resources>
-            <heap unit="entries">1000</heap>  <!-- Nombre d'entrées en mémoire -->
+            <heap unit="entries">500</heap> <!-- Nombre d'entrées en mémoire -->
         </resources>
     </cache>
 
-    <cache alias="memberCache">
+    <cache-template name="defaultTemplate">
         <expiry>
-            <ttl unit="seconds">600</ttl>
+            <ttl unit="minutes">60</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">500</heap>
+        </resources>
+    </cache-template>
+
+    <cache alias="achievementCache" uses-template="defaultTemplate"/>
+    <cache alias="partnerCache" uses-template="defaultTemplate"/>
+    <cache alias="ambassadorCache" uses-template="defaultTemplate"/>
+    <cache alias="memberCache" uses-template="defaultTemplate"/>
+    <cache alias="heroeCache" uses-template="defaultTemplate"/>
+
+    <cache alias="matchCache">
+        <expiry>
+            <ttl unit="minutes">30</ttl>
         </expiry>
         <resources>
             <heap unit="entries">1000</heap>
         </resources>
     </cache>
 
-    <cache alias="rosterCache">
+    <cache alias="sliderCache">
         <expiry>
-            <ttl unit="seconds">600</ttl>
+            <ttl unit="minutes">15</ttl>
         </expiry>
         <resources>
-            <heap unit="entries">1000</heap>
+            <heap unit="entries">500</heap>
         </resources>
     </cache>
 
+    <cache alias="articleCache">
+        <expiry>
+            <ttl unit="minutes">15</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">500</heap>
+        </resources>
+    </cache>
 </config>

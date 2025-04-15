@@ -54,7 +54,6 @@ public class ArticleService {
                 log.info("Thumbnail image key: " + thumbnailImageUrl);
             }
 
-            article.setCreatedAt(LocalDate.now());
             return articleMapper.toArticleDto(articleRepository.save(article));
 
         } catch (Exception e) {

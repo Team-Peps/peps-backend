@@ -9,7 +9,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Getter
 @Setter
-@Table(name = "sliders")
+@Table(name = "sliders", indexes = {
+        @Index(name = "idx_slider_order", columnList = "order_index")
+})
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "sliderCache")
 public class Slider {

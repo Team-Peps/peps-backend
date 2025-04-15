@@ -3,15 +3,22 @@ package fr.teampeps.model;
 
 import fr.teampeps.model.member.Member;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "achievements")
+@Table(
+        name = "achievements",
+        indexes = {
+                @Index(name = "idx_achievement_game", columnList = "game"),
+        }
+)
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "achievementCache")
 public class Achievement {
@@ -36,6 +43,8 @@ public class Achievement {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Member member;
 
 }

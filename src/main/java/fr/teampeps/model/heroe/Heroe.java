@@ -6,13 +6,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "heroes")
+@Table(
+        name = "heroes",
+        indexes = {
+                @Index(name = "idx_heroe_game", columnList = "game"),
+                @Index(name = "idx_heroe_role", columnList = "role")
+        }
+)
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "heroeCache")
 public class Heroe {
 
     @Id
