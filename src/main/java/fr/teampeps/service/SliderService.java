@@ -29,7 +29,7 @@ public class SliderService {
 
     public Map<String, List<SliderDto>> getAllSliders() {
 
-        List<SliderDto> slidersActive = sliderRepository.findAllByIsActive(true).stream()
+        List<SliderDto> slidersActive = sliderRepository.findAllByIsActiveOrderByOrder((true)).stream()
                 .map(sliderMapper::toSliderDto)
                 .toList();
 
@@ -44,7 +44,7 @@ public class SliderService {
     }
 
     public List<SliderTinyDto> getAllActiveSlider() {
-        return sliderRepository.findAllByIsActive(true).stream()
+        return sliderRepository.findAllByIsActiveOrderByOrder(true).stream()
                 .map(sliderMapper::toSliderTinyDto)
                 .toList();
     }
@@ -111,6 +111,22 @@ public class SliderService {
 
         slider.setIsActive(!slider.getIsActive());
 
+        if(!slider.getIsActive()) {
+            slider.setOrder(-1L);
+        }
+
         return sliderMapper.toSliderDto(sliderRepository.save(slider));
     }
+
+    public void updateSliderOrder(List<String> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            String id = orderedIds.get(i);
+            int finalI = i;
+            sliderRepository.findById(id).ifPresent(slider -> {
+                slider.setOrder((long) finalI);
+                sliderRepository.save(slider);
+            });
+        }
+    }
+
 }
