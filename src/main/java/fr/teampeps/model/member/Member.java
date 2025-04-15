@@ -81,10 +81,10 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Game game;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Achievement> achievements = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "member_favorite_heroes",
             joinColumns = @JoinColumn(name = "member_id"),
