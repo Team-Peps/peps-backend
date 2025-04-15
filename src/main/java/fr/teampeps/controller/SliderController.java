@@ -109,4 +109,19 @@ public class SliderController {
             ));
         }
     }
+
+    @PutMapping("/reorder")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> updateSliderOrder(@RequestBody List<String> orderedIds) {
+        try {
+            sliderService.updateSliderOrder(orderedIds);
+            return ResponseEntity.ok(Map.of("message", "Ordre des sliders mis à jour avec succès"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Erreur lors de la mise à jour de l'ordre",
+                    "error", e.getMessage()
+            ));
+        }
+    }
+
 }
