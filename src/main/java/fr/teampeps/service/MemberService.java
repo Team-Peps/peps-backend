@@ -60,18 +60,44 @@ public class MemberService {
         }
     }
 
-    public Map<String, List<MemberDto>> getAllActiveMembers(Game game) {
+    public Map<String, List<MemberDto>> getAllMembers(Game game) {
 
-        List<MemberDto> members = memberRepository.findAllActiveByGame(game).stream()
+        List<MemberDto> members = memberRepository.findAllActiveHolderByGame(game).stream()
                 .map(memberMapper::toMemberDto)
                 .toList();
 
-        List<MemberDto> substitutes = memberRepository.findAllSubstituteByGame(game).stream()
+        List<MemberDto> substitutes = memberRepository.findAllActiveSubstituteByGame(game).stream()
                 .map(memberMapper::toMemberDto)
                 .toList();
 
-        List<MemberDto> coaches = memberRepository.findAllCoachByGame(game).stream()
+        List<MemberDto> coaches = memberRepository.findAllActiveCoachByGame(game).stream()
                 .map(memberMapper::toMemberDto)
+                .toList();
+
+        List<MemberDto> inactives = memberRepository.findAllInactiveByGame(game).stream()
+                .map(memberMapper::toMemberDto)
+                .toList();
+
+        return Map.of(
+                "members", members,
+                "substitutes", substitutes,
+                "coaches", coaches,
+                "inactives", inactives
+        );
+    }
+
+    public Map<String, List<MemberTinyDto>> getAllActiveMembersByGame(Game game) {
+
+        List<MemberTinyDto> members = memberRepository.findAllActiveHolderByGame(game).stream()
+                .map(memberMapper::toMemberTinyDto)
+                .toList();
+
+        List<MemberTinyDto> substitutes = memberRepository.findAllActiveSubstituteByGame(game).stream()
+                .map(memberMapper::toMemberTinyDto)
+                .toList();
+
+        List<MemberTinyDto> coaches = memberRepository.findAllActiveCoachByGame(game).stream()
+                .map(memberMapper::toMemberTinyDto)
                 .toList();
 
         return Map.of(
@@ -89,43 +115,22 @@ public class MemberService {
         }
     }
 
-    public MemberDto setActive(String id) {
+    public MemberDto toggleActive(String id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
 
-        member.setIsSubstitute(false);
+        member.setIsActive(!member.getIsActive());
 
         return memberMapper.toMemberDto(memberRepository.save(member));
     }
 
-    public MemberDto setSubstitute(String id) {
+    public MemberDto toggleSubstitute(String id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
 
-        member.setIsSubstitute(true);
+        member.setIsSubstitute(!member.getIsSubstitute());
 
         return memberMapper.toMemberDto(memberRepository.save(member));
-    }
-
-    public Map<String, List<MemberTinyDto>> getAllActiveMembersByGame(Game game) {
-
-        List<MemberTinyDto> members = memberRepository.findAllActiveByGame(game).stream()
-                .map(memberMapper::toMemberTinyDto)
-                .toList();
-
-        List<MemberTinyDto> substitutes = memberRepository.findAllSubstituteByGame(game).stream()
-                .map(memberMapper::toMemberTinyDto)
-                .toList();
-
-        List<MemberTinyDto> coaches = memberRepository.findAllCoachByGame(game).stream()
-                .map(memberMapper::toMemberTinyDto)
-                .toList();
-
-        return Map.of(
-                "members", members,
-                "substitutes", substitutes,
-                "coaches", coaches
-        );
     }
 
     public MemberDto getMemberDetails(String id) {

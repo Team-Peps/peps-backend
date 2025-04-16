@@ -56,7 +56,10 @@ public class Member {
     private MemberRole role;
 
     @Column(name = "is_substitute")
-    private Boolean isSubstitute;
+    private Boolean isSubstitute = true;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 
     @Column(name = "image_key")
     private String imageKey;
