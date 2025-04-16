@@ -27,9 +27,20 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @GetMapping("/game/{game}")
+    public ResponseEntity<Map<String, List<MemberDto>>> getAllMembers(@PathVariable Game game) {
+        return ResponseEntity.ok(memberService.getAllMembers(game));
+    }
+
     @GetMapping("/game/{game}/active")
-    public ResponseEntity<Map<String, List<MemberDto>>> getAllActiveMembers(@PathVariable Game game) {
-        return ResponseEntity.ok(memberService.getAllActiveMembers(game));
+    public ResponseEntity<Map<String, List<MemberTinyDto>>> getAllActiveMembers(@PathVariable Game game) {
+        return ResponseEntity.ok(memberService.getAllActiveMembersByGame(game));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MemberDto> getMemberDetails(@PathVariable String id) {
+        MemberDto member = memberService.getMemberDetails(id);
+        return ResponseEntity.ok(member);
     }
 
     @PutMapping
@@ -91,9 +102,9 @@ public class MemberController {
 
     @PostMapping("/{id}/active")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> setActive(@PathVariable String id) {
+    public ResponseEntity<Map<String, Object>> toggleActive(@PathVariable String id) {
         try {
-            MemberDto updatedMember = memberService.setActive(id);
+            MemberDto updatedMember = memberService.toggleActive(id);
             return ResponseEntity.ok(Map.of(
                     "message", "Membre activé avec succès",
                     "member", updatedMember
@@ -109,9 +120,9 @@ public class MemberController {
 
     @PostMapping("/{id}/substitute")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> setSubstitute(@PathVariable String id) {
+    public ResponseEntity<Map<String, Object>> toggleSubstitute(@PathVariable String id) {
         try {
-            MemberDto updatedMember = memberService.setSubstitute(id);
+            MemberDto updatedMember = memberService.toggleSubstitute(id);
             return ResponseEntity.ok(Map.of(
                     "message", "Membre changé en remplacant avec succès",
                     "member", updatedMember
@@ -123,17 +134,6 @@ public class MemberController {
                     "error", e.getMessage()
             ));
         }
-    }
-
-    @GetMapping("/game/{game}")
-    public ResponseEntity<Map<String, List<MemberTinyDto>>> getAllMembers(@PathVariable Game game) {
-        return ResponseEntity.ok(memberService.getAllActiveMembersByGame(game));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<MemberDto> getMemberDetails(@PathVariable String id) {
-        MemberDto member = memberService.getMemberDetails(id);
-        return ResponseEntity.ok(member);
     }
 
 }

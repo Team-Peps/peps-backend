@@ -29,6 +29,7 @@ public class MemberMapper {
                 .dateOfBirth(member.getDateOfBirth().toString())
                 .role(member.getRole())
                 .isSubstitute(member.getIsSubstitute())
+                .isActive(member.getIsActive())
                 .imageKey(member.getImageKey())
                 .xUsername(member.getXUsername())
                 .instagramUsername(member.getInstagramUsername())

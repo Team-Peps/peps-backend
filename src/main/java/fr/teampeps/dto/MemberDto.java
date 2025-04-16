@@ -21,6 +21,7 @@ public class MemberDto {
     private String dateOfBirth;
     private MemberRole role;
     private Boolean isSubstitute;
+    private Boolean isActive;
     private String imageKey;
     private String xUsername;
     private String instagramUsername;
