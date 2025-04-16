@@ -53,8 +53,9 @@ public class AuthenticationService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .authorities(List.of(Authority.STAFF))
+                .authorities(List.of(Authority.ADMIN))
                 .authType(AuthType.LOCAL)
+                .enable(true)
                 .build();
 
         userRepository.save(user);
@@ -151,7 +152,7 @@ public class AuthenticationService {
 
         boolean isEnabled = user.isEnabled();
         boolean hasStaffAuthority = user.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("STAFF"));
+                .anyMatch(auth -> auth.getAuthority().equals("ADMIN"));
 
         if (!isEnabled || !hasStaffAuthority) {
             log.info("User is not enabled or does not have the required authorities.");

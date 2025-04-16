@@ -1,5 +1,6 @@
 package fr.teampeps.dto;
 
+import fr.teampeps.model.user.AuthType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +17,7 @@ public class UserDto {
     private String email;
     private List<String> authorities;
     private Boolean isEnable;
+    private String discordId;
+    private AuthType authType;
+    private String createdAt;
 }
