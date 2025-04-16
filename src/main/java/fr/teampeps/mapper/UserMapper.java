@@ -19,6 +19,9 @@ public class UserMapper {
                 .authorities(mapAuthorities(user.getAuthorities()))
                 .username(user.getUsername())
                 .isEnable(user.getEnable())
+                .discordId(user.getDiscordId())
+                .authType(user.getAuthType())
+                .createdAt(user.getCreatedAt().toString())
                 .build();
     }
 

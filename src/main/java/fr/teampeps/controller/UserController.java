@@ -37,11 +37,12 @@ public class UserController {
 
     @PutMapping("/disable")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> disableUser(@RequestBody UserRequest request) {
-        UserDto disabledUser = userService.disableUser(request.id());
+    public ResponseEntity<Map<String, Object>> disableUser(@RequestBody UserRequest request, @AuthenticationPrincipal User authenticatedUser)
+    {
+        UserDto disabledUser = userService.disableUser(request.id(), authenticatedUser.getId());
 
         return ResponseEntity.ok(Map.of(
-                "message", "Utilisateur désactivé avec succès",
+                "message", "Utilisateur bloqué avec succès",
                 "user", disabledUser
         ));
     }
@@ -52,18 +53,25 @@ public class UserController {
         UserDto enabledUser = userService.enableUser(request.id());
 
         return ResponseEntity.ok(Map.of(
-                "message", "Utilisateur activé avec succès",
+                "message", "Utilisateur débloqué avec succès",
                 "user", enabledUser
         ));
     }
 
-    @PutMapping("/change-role")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> changeRole(@RequestBody UserRequest request) {
-        UserDto user = userService.changeRole(request.id(), request.role());
+    public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable String id, @AuthenticationPrincipal User authenticatedUser) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable"));
+
+        if (user.getId().equals(authenticatedUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous ne pouvez pas supprimer votre propre compte");
+        }
+
+        userRepository.delete(user);
 
         return ResponseEntity.ok(Map.of(
-                "message", "Rôle de l'utilisateur modifié avec succès",
+                "message", "Utilisateur supprimé avec succès",
                 "user", user
         ));
     }

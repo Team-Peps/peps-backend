@@ -33,9 +33,13 @@ public class UserService {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public UserDto disableUser(String userId) {
+    public UserDto disableUser(String userId, String authenticatedUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé avec l'ID: " + userId));
+
+        if (user.getId().equals(authenticatedUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous ne pouvez pas bloquer votre propre compte.");
+        }
 
         user.setEnable(false);
         tokenRepository.deleteAll(tokenRepository.findAllValidTokensByUser(user.getId()));
@@ -49,16 +53,6 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé avec l'ID: " + userId));
 
         user.setEnable(true);
-        userRepository.save(user);
-
-        return userMapper.map(user);
-    }
-
-    public UserDto changeRole(String userId, String role) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé avec l'ID: " + userId));
-
-        user.setAuthorities(Collections.singletonList(Authority.valueOf(role)));
         userRepository.save(user);
 
         return userMapper.map(user);
