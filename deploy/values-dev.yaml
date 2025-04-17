@@ -1,3 +1,11 @@
+releaseName: peps-api-dev
+namespace: peps-dev
+
+image:
+  repository: serkox/peps-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
 ingress:
   className: nginx
   host: api.2.11.47.69.nip.io
@@ -5,14 +13,10 @@ ingress:
 service:
   port: 80
   type: ClusterIP
-  targetPort: 80
+  targetPort: 8080
   protocol: TCP
   name: http
 
 replicaCount: 1
-image:
-  repository: peps-backend
-  tag: "latest"
-  pullPolicy: IfNotPresent
 
 springProfile: dev

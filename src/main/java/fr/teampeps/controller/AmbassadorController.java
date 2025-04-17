@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/ambassador")
+@RequestMapping("/v1/ambassador")
 @RequiredArgsConstructor
 @Slf4j
 public class AmbassadorController {

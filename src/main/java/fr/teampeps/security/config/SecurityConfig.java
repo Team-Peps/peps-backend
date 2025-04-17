@@ -45,8 +45,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                     //Everybody are able to access to the application patterns bellow
                     .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                    .requestMatchers("/api/v1/auth/authenticate/**").permitAll()
-                    .requestMatchers("/api/v1/auth/refresh-token").permitAll()
+                    .requestMatchers("/v1/auth/authenticate/**").permitAll()
+                    .requestMatchers("/v1/auth/refresh-token").permitAll()
                 //For all the others, everybody need to be authenticated with a JWT token
                 .anyRequest().authenticated()
                 .and()
@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout()
-                    .logoutUrl("/api/v1/auth/logout")
+                    .logoutUrl("/v1/auth/logout")
                     .addLogoutHandler(logoutHandler)
                     .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()));
 
@@ -66,7 +66,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4300"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4300", "http://backoffice.2.11.47.69.nip.io", "http://frontend.2.11.47.69.nip.io"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
         configuration.addAllowedHeader("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

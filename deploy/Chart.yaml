@@ -1,6 +1,6 @@
 apiVersion: v2
-name: peps-backend
-description: A Helm chart for peps-backend
+name: peps-api
+description: A Helm chart for peps-api
 
 # A chart can be either an 'application' or a 'library' chart.
 #

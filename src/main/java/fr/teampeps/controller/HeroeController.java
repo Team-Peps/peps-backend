@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/heroe")
+@RequestMapping("/v1/heroe")
 @RequiredArgsConstructor
 @Slf4j
 public class HeroeController {

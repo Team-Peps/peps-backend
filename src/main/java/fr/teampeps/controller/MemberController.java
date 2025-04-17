@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 @RestController
-@RequestMapping("/api/v1/member")
+@RequestMapping("/v1/member")
 @RequiredArgsConstructor
 @Slf4j
 public class MemberController {

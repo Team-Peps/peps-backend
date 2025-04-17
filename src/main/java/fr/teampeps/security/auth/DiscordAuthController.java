@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/auth/discord")
+@RequestMapping("/v1/auth/discord")
 @RequiredArgsConstructor
 public class DiscordAuthController {
 

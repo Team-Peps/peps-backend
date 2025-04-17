@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/slider")
+@RequestMapping("/v1/slider")
 @RequiredArgsConstructor
 @Slf4j
 public class SliderController {

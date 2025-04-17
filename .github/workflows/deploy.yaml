@@ -2,11 +2,17 @@ name: Deploy existing Docker image with Helm
 
 on:
   workflow_dispatch:
-
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - prod
 env:
-  IMAGE_NAME: serkox/peps-backend
-  RELEASE_NAME: peps-backend
-  NAMESPACE: peps-dev
+  IMAGE_NAME: serkox/peps-api
 
 jobs:
   deploy:
@@ -25,11 +31,34 @@ jobs:
       - name: Configure Kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG_CONTENT }}" > ~/.kube/config
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
-      - name: Deploy with Helm
+      - name: 📥 Download image tag artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tag
+
+      - name: 📦 Read image tag
+        id: read-tag
         run: |
-          helm upgrade --install $RELEASE_NAME ./deploy \
-            --namespace $NAMESPACE \
-            --set image.repository=${{ env.IMAGE_NAME }} \
-            --set image.tag=latest
+          TAG=$(cat tag.txt)
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+
+      - name: 📦 Set variables based on environment
+        id: set-vars
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+            echo "release_name=peps-api-prod" >> $GITHUB_OUTPUT
+            echo "namespace=peps-prod" >> $GITHUB_OUTPUT
+            echo "values_file=values-prod.yaml" >> $GITHUB_OUTPUT
+          else
+            echo "release_name=peps-api-dev" >> $GITHUB_OUTPUT
+            echo "namespace=peps-dev" >> $GITHUB_OUTPUT
+            echo "values_file=values-dev.yaml" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚀 Deploy with Helm
+        run: |
+          helm upgrade --install ${{ steps.set-vars.outputs.release_name }} ./deploy \
+            --namespace ${{ steps.set-vars.outputs.namespace }} \
+            -f deploy/${{ steps.set-vars.outputs.values_file }}

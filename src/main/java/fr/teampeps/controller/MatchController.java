@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/match")
+@RequestMapping("/v1/match")
 @RequiredArgsConstructor
 public class MatchController {
 

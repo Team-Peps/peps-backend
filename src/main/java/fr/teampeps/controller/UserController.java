@@ -21,7 +21,7 @@ import java.util.Set;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/v1/user")
 @RequiredArgsConstructor
 public class UserController {
 

@@ -1,0 +1,22 @@
+releaseName: peps-api-prod
+namespace: peps-prod
+
+image:
+  repository: serkox/peps-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+ingress:
+  className: nginx
+  host: api.2.11.47.69.nip.io
+
+service:
+  port: 80
+  type: ClusterIP
+  targetPort: 8080
+  protocol: TCP
+  name: http
+
+replicaCount: 1
+
+springProfile: prod

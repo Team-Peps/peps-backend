@@ -40,7 +40,10 @@ spec:
                   key: POSTGRES_PASSWORD
                   name: postgres-credentials
             - name: MINIO_ENDPOINT
-              value: {{ .Values.minio.endpoint }}
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ENDPOINT
+                  name: minio-credentials
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
