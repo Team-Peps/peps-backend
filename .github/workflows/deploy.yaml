@@ -1,0 +1,35 @@
+name: Deploy existing Docker image with Helm
+
+on:
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: serkox/peps-backend
+  RELEASE_NAME: peps-backend
+  NAMESPACE: peps-dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+
+      - name: Configure Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_CONTENT }}" > ~/.kube/config
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install $RELEASE_NAME ./deploy \
+            --namespace $NAMESPACE \
+            --set image.repository=${{ env.IMAGE_NAME }} \
+            --set image.tag=latest

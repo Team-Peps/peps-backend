@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+      matchLabels:
+        app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.springProfile }}
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_URL
+                  name: postgres-credentials
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_USER
+                  name: postgres-credentials
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: postgres-credentials
+            - name: MINIO_ENDPOINT
+              value: {{ .Values.minio.endpoint }}
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ACCESS_KEY
+                  name: minio-credentials
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_SECRET_KEY
+                  name: minio-credentials
+            - name: DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: DISCORD_CLIENT_ID
+                  name: discord-credentials
+            - name: DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: DISCORD_CLIENT_SECRET
+                  name: discord-credentials
+            - name: DISCORD_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  key: DISCORD_REDIRECT_URI
+                  name: discord-credentials
+            - name: FRONTEND_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  key: FRONTEND_REDIRECT_URI
+                  name: discord-credentials
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: SECRET_KEY
+                  name: secret-key

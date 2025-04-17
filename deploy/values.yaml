@@ -1,0 +1,18 @@
+ingress:
+  className: nginx
+  host: api.2.11.47.69.nip.io
+
+service:
+  port: 80
+  type: ClusterIP
+  targetPort: 80
+  protocol: TCP
+  name: http
+
+replicaCount: 1
+image:
+  repository: peps-backend
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+springProfile: dev

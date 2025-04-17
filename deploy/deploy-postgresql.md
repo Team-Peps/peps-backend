@@ -1,0 +1,1 @@
+helm install peps-postgresql bitnami/postgresql --namespace postgresql --set auth.postgresPassword=MDP --set primary.service.type=NodePort --set.primary.persistence.size=8Gi

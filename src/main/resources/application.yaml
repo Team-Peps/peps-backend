@@ -1,6 +1,6 @@
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     properties:
@@ -31,9 +31,9 @@ application:
         expiration: 604800000 #7 days
 
 minio:
-  endpoint: http://localhost:9000
-  access-key: admin
-  secret-key: password123
+  endpoint: ${MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
 
 cron:
   expression: "0 0 0 * * *"
@@ -56,9 +56,27 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/teampeps
+    url: ${DB_URL}
     username: ${DB_USERNAME}
-    password: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    jpa:
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    jpa:
+      show-sql: true
+      hibernate:
+        ddl-auto: update
 
 ---
 spring:
