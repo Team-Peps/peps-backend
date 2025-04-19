@@ -16,8 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 
 @RestController
 @RequestMapping("/v1/member")
@@ -26,6 +24,9 @@ import java.util.function.Function;
 public class MemberController {
 
     private final MemberService memberService;
+    private static final String MESSAGE_PLACEHOLDER = "message";
+    private static final String ERROR_PLACEHOLDER = "error";
+    private static final String MEMBER_PLACEHOLDER = "member";
 
     @GetMapping("/game/{game}")
     public ResponseEntity<Map<String, List<MemberDto>>> getAllMembers(@PathVariable Game game) {
@@ -52,14 +53,14 @@ public class MemberController {
         try {
             MemberDto updatedMember = memberService.saveOrUpdateMember(member, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Membre mis à jour avec succès",
-                    "member", updatedMember
+                    MESSAGE_PLACEHOLDER, "Membre mis à jour avec succès",
+                    MEMBER_PLACEHOLDER, updatedMember
             ));
         } catch (Exception e) {
             log.error("❌ Error processing member with ID: {}", member.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement du membre",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement du membre",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -73,14 +74,14 @@ public class MemberController {
         try {
             MemberDto updatedMember = memberService.saveOrUpdateMember(member, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Membre enregistré avec succès",
-                    "member", updatedMember
+                    MESSAGE_PLACEHOLDER, "Membre enregistré avec succès",
+                    MEMBER_PLACEHOLDER, updatedMember
             ));
         } catch (Exception e) {
             log.error("❌ Error processing member with ID: {}", member.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement du membre",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement du membre",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -90,12 +91,12 @@ public class MemberController {
     public ResponseEntity<Map<String, Object>> deleteMember(@PathVariable String id) {
         try {
             memberService.deleteMember(id);
-            return ResponseEntity.ok(Map.of("message", "Membre supprimé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Membre supprimé avec succès"));
         } catch (DataAccessException e) {
             log.error("❌ Error deleting member with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de la suppression du membre",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la suppression du membre",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -106,14 +107,14 @@ public class MemberController {
         try {
             MemberDto updatedMember = memberService.toggleActive(id);
             return ResponseEntity.ok(Map.of(
-                    "message", "Membre activé avec succès",
-                    "member", updatedMember
+                    MESSAGE_PLACEHOLDER, "Membre activé avec succès",
+                    MEMBER_PLACEHOLDER, updatedMember
             ));
         } catch (DataAccessException e) {
             log.error("❌ Error activating member with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de l'activation du membre",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de l'activation du membre",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -124,14 +125,14 @@ public class MemberController {
         try {
             MemberDto updatedMember = memberService.toggleSubstitute(id);
             return ResponseEntity.ok(Map.of(
-                    "message", "Membre changé en remplacant avec succès",
-                    "member", updatedMember
+                    MESSAGE_PLACEHOLDER, "Membre changé en remplacant avec succès",
+                    MEMBER_PLACEHOLDER, updatedMember
             ));
         } catch (DataAccessException e) {
             log.error("❌ Error activating member with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de l'activation du membre",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de l'activation du membre",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }

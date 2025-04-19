@@ -1,6 +1,5 @@
 package fr.teampeps.model.user;
 
-import fr.teampeps.model.token.Token;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,8 +35,7 @@ public class User implements UserDetails {
             unique=true)
     private String username;
 
-    @Column(name = "password",
-            nullable = true)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "email",
@@ -52,8 +50,7 @@ public class User implements UserDetails {
     @Column(name = "avatar_url")
     private String avatarUrl = null;
 
-    @Column(name = "auth_type",
-            nullable = true)
+    @Column(name = "auth_type")
     @Enumerated(EnumType.STRING)
     private AuthType authType;
 
@@ -61,13 +58,6 @@ public class User implements UserDetails {
     @Column(name = "authorities",
             nullable = false)
     private List<Authority> authorities;
-
-    @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
-    @Transient
-    private List<Token> tokens;
 
     @Column(name = "enable",
             nullable = false)

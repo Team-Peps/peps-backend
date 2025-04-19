@@ -65,8 +65,7 @@ public class MatchService {
                 .map(entry -> new MatchGroupByDate(entry.getKey(), entry.getValue()
                         .stream()
                         .map(matchMapper::toMatchDto)
-                        .collect(Collectors.toList())))
-                .collect(Collectors.toList());
+                        .collect(Collectors.toList()))).toList();
     }
 
     public Page<MatchGroupByDate> getResultsMatches(int page, String filter) {
@@ -98,7 +97,7 @@ public class MatchService {
                                 .map(matchMapper::toMatchDto)
                                 .collect(Collectors.toList())
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
         // Étape 4 : retourner une Page avec les groupes créés à partir des matchs paginés
         return new PageImpl<>(grouped, pageable, matchPage.getTotalElements());
@@ -131,7 +130,7 @@ public class MatchService {
                                 .map(matchMapper::toMatchDto)
                                 .collect(Collectors.toList())
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(grouped, pageable, matchPage.getTotalElements());
     }
@@ -151,6 +150,6 @@ public class MatchService {
                         .stream()
                         .map(matchMapper::toMatchDto)
                         .collect(Collectors.toList())))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

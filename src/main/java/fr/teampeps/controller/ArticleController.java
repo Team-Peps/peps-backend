@@ -23,6 +23,8 @@ import java.util.Map;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private static final String MESSAGE_PLACEHOLDER = "message";
+    private static final String ERROR_PLACEHOLDER = "error";
 
     @GetMapping("/all")
     public ResponseEntity<List<ArticleDto>> getAllArticles() {
@@ -39,14 +41,14 @@ public class ArticleController {
         try {
             ArticleDto updatedArticle = articleService.updateArticle(article, imageFileThumbnail, imageFileBackground);
             return ResponseEntity.ok(Map.of(
-                    "message", "Article mis à jour avec succès",
+                    MESSAGE_PLACEHOLDER, "Article mis à jour avec succès",
                     "article", updatedArticle
             ));
         } catch (Exception e) {
             log.error("❌ Error processing article with ID: {}", article.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement de l'article",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'article",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -63,14 +65,14 @@ public class ArticleController {
         try {
             ArticleDto updatedArticle = articleService.createArticle(article, imageFileThumbnail, imageFileBackground);
             return ResponseEntity.ok(Map.of(
-                    "message", "Article enregistré avec succès",
+                    MESSAGE_PLACEHOLDER, "Article enregistré avec succès",
                     "article", updatedArticle
             ));
         } catch (Exception e) {
             log.error("❌ Error processing article with ID: {}", article.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement de l'article",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'article",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -80,12 +82,12 @@ public class ArticleController {
     public ResponseEntity<Map<String, Object>> deleteArticle(@PathVariable String id) {
         try {
             articleService.deleteArticle(id);
-            return ResponseEntity.ok(Map.of("message", "Article supprimé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Article supprimé avec succès"));
         } catch (Exception e) {
             log.error("❌ Error deleting article with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de la suppression de l'article",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la suppression de l'article",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }

@@ -22,7 +22,10 @@ import java.util.Map;
 public class PartnerController {
 
     private final PartnerService partnerService;
-
+    private static final String MESSAGE_PLACEHOLDER = "message";
+    private static final String ERROR_PLACEHOLDER = "error";
+    private static final String PARTNER_PLACEHOLDER = "partner";
+    
     @GetMapping
     public ResponseEntity<Map<String, List<PartnerDto>>> getAllPartners() {
         return ResponseEntity.ok(partnerService.getAllPartners());
@@ -42,14 +45,14 @@ public class PartnerController {
         try {
             PartnerDto updatedPartner = partnerService.saveOrUpdatePartner(partner, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Partenaire mis à jour avec succès",
-                    "partner", updatedPartner
+                    MESSAGE_PLACEHOLDER, "Partenaire mis à jour avec succès",
+                    PARTNER_PLACEHOLDER, updatedPartner
             ));
         } catch (Exception e) {
             log.error("❌ Error processing partner with ID: {}", partner.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement du partenaire",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement du partenaire",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -63,14 +66,14 @@ public class PartnerController {
         try {
             PartnerDto updatedPartner = partnerService.saveOrUpdatePartner(partner, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Partenaire enregistré avec succès",
-                    "partner", updatedPartner
+                    MESSAGE_PLACEHOLDER, "Partenaire enregistré avec succès",
+                    PARTNER_PLACEHOLDER, updatedPartner
             ));
         } catch (Exception e) {
             log.error("❌ Error processing partner with ID: {}", partner.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement du partenaire",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement du partenaire",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -80,12 +83,12 @@ public class PartnerController {
     public ResponseEntity<Map<String, Object>> deletePartner(@PathVariable String id) {
         try {
             partnerService.deletePartner(id);
-            return ResponseEntity.ok(Map.of("message", "Partenaire supprimé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Partenaire supprimé avec succès"));
         } catch (DataAccessException e) {
             log.error("❌ Error deleting partner with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de la suppression du partenaire",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la suppression du partenaire",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -96,14 +99,14 @@ public class PartnerController {
         try {
             PartnerDto updatedPartner = partnerService.toggleActive(id);
             return ResponseEntity.ok(Map.of(
-                    "message", "Partenaire activé avec succès",
-                    "partner", updatedPartner
+                    MESSAGE_PLACEHOLDER, "Partenaire activé avec succès",
+                    PARTNER_PLACEHOLDER, updatedPartner
             ));
         } catch (DataAccessException e) {
             log.error("❌ Error activating partner with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de l'activation du partenaire",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de l'activation du partenaire",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }

@@ -50,11 +50,11 @@ public class SliderService {
     }
 
     public SliderDto saveSlider(Slider slider, MultipartFile imageFile, MultipartFile mobileImageFile) {
-        try {
+        if(imageFile == null || mobileImageFile == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il faut fournir les deux images");
+        }
 
-            if(imageFile == null || mobileImageFile == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il faut fournir les deux images");
-            }
+        try {
             String sliderId = UUID.randomUUID().toString();
 
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, sliderId, Bucket.SLIDERS);
@@ -69,31 +69,31 @@ public class SliderService {
 
         } catch (Exception e) {
             log.error("Error saving slider with ID: {}", slider.getId(), e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du slider", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la sauvegarde du slider", e);
         }
     }
 
     public SliderDto updateSlider(Slider slider, MultipartFile imageFile, MultipartFile mobileImageFile) {
+
+        if(imageFile == null || mobileImageFile == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il faut fournir les deux images");
+        }
+
+        Slider existingSlider = sliderRepository.findById(slider.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Slider non trouvé"));
+        slider.setOrder(existingSlider.getOrder());
+
         try {
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, slider.getId(), Bucket.SLIDERS);
+            slider.setImageKey(imageUrl);
 
-            if(imageFile != null) {
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, slider.getId(), Bucket.SLIDERS);
-                slider.setImageKey(imageUrl);
-            }
-
-            if(mobileImageFile != null) {
-                String mobileImageUrl = minioService.uploadImageFromMultipartFile(mobileImageFile, slider.getId() + "_mobile", Bucket.SLIDERS);
-                slider.setMobileImageKey(mobileImageUrl);
-            }
-
-            Slider existingSlider = sliderRepository.findById(slider.getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Slider non trouvé"));
-            slider.setOrder(existingSlider.getOrder());
+            String mobileImageUrl = minioService.uploadImageFromMultipartFile(mobileImageFile, slider.getId() + "_mobile", Bucket.SLIDERS);
+            slider.setMobileImageKey(mobileImageUrl);
 
             return sliderMapper.toSliderDto(sliderRepository.save(slider));
 
         } catch (Exception e) {
-            throw new RuntimeException("Error updating slider with ID: " + slider.getId(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du slider", e);
         }
     }
 

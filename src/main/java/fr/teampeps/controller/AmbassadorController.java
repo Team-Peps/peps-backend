@@ -22,7 +22,9 @@ import java.util.Map;
 public class AmbassadorController {
 
     private final AmbassadorService ambassadorService;
-
+    private static final String MESSAGE_PLACEHOLDER = "message";
+    private static final String ERROR_PLACEHOLDER = "error";
+    
     @GetMapping
     public ResponseEntity<List<AmbassadorDto>> getAllAmbassadors() {
         return ResponseEntity.ok(ambassadorService.getAllAmbassadors());
@@ -38,14 +40,14 @@ public class AmbassadorController {
         try {
             AmbassadorDto updatedAmbassador = ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Ambassadeur mis à jour avec succès",
+                    MESSAGE_PLACEHOLDER, "Ambassadeur mis à jour avec succès",
                     "ambassador", updatedAmbassador
             ));
         } catch (Exception e) {
             log.error("❌ Error processing ambassador with ID: {}", ambassador.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement de l'ambassadeur",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'ambassadeur",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -59,14 +61,14 @@ public class AmbassadorController {
         try {
             AmbassadorDto updatedAmbassador = ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Ambassadeur enregistré avec succès",
+                    MESSAGE_PLACEHOLDER, "Ambassadeur enregistré avec succès",
                     "ambassador", updatedAmbassador
             ));
         } catch (Exception e) {
             log.error("❌ Error processing ambassador with ID: {}", ambassador.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement de l'ambassadeur",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'ambassadeur",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -76,12 +78,12 @@ public class AmbassadorController {
     public ResponseEntity<Map<String, Object>> deleteAmbassador(@PathVariable String id) {
         try {
             ambassadorService.deleteAmbassador(id);
-                return ResponseEntity.ok(Map.of("message", "Ambassadeur supprimé avec succès"));
+                return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Ambassadeur supprimé avec succès"));
         } catch (DataAccessException e) {
             log.error("❌ Error deleting ambassador with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de la suppression de l'ambassadeur",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la suppression de l'ambassadeur",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }

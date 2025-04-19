@@ -42,13 +42,14 @@ public class PartnerService {
     }
 
     public PartnerDto saveOrUpdatePartner(Partner partner, MultipartFile imageFile) {
-        log.info("Updating partner : {}", partner);
+
+        if(imageFile == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image non fournie");
+        }
 
         try {
-            if (imageFile != null) {
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
-                partner.setImageKey(imageUrl);
-            }
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
+            partner.setImageKey(imageUrl);
 
             return partnerMapper.toPartnerDto(partnerRepository.save(partner));
 

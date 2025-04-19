@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -21,6 +22,8 @@ import java.util.Optional;
 @RequestMapping("/v1/auth/discord")
 @RequiredArgsConstructor
 public class DiscordAuthController {
+
+    private static final String LOCATION_PLACEHOLDER = "Location";
 
     @Value("${discord.client.id}")
     private String clientId;
@@ -44,7 +47,7 @@ public class DiscordAuthController {
                 "&client_id=" + clientId +
                 "&scope=identify%20email" +
                 "&redirect_uri=" + redirectUri;
-        return ResponseEntity.status(HttpStatus.FOUND).header("Location", discordUrl).build();
+        return ResponseEntity.status(HttpStatus.FOUND).header(LOCATION_PLACEHOLDER, discordUrl).build();
     }
 
     @GetMapping("/callback")
@@ -69,7 +72,7 @@ public class DiscordAuthController {
                 Map.class
         );
 
-        String accessToken = (String) response.getBody().get("access_token");
+        String accessToken = (String) Objects.requireNonNull(response.getBody()).get("access_token");
 
         // Étape 2 : Utilise access_token pour récupérer l’utilisateur
         HttpHeaders userHeaders = new HttpHeaders();
@@ -83,7 +86,7 @@ public class DiscordAuthController {
                 Map.class
         );
 
-        String discordId = (String) userInfo.getBody().get("id");
+        String discordId = (String) Objects.requireNonNull(userInfo.getBody()).get("id");
 
         if (!authenticationService.isUserRegistered(discordId)) {
 
@@ -105,7 +108,7 @@ public class DiscordAuthController {
         if (authResponseOpt.isEmpty()) {
             // tu peux rediriger vers une page d’erreur front, ou afficher une info
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .header("Location", frontendRedirect + "?error=unauthorized")
+                    .header(LOCATION_PLACEHOLDER, frontendRedirect + "?error=unauthorized")
                     .build();
         }
 
@@ -119,7 +122,7 @@ public class DiscordAuthController {
                 .toUriString();
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", redirectUrl)
+                .header(LOCATION_PLACEHOLDER, redirectUrl)
                 .build();
 
     }

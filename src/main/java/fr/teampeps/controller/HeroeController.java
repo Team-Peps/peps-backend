@@ -21,6 +21,7 @@ import java.util.Map;
 public class HeroeController {
 
     private final HeroeService heroeService;
+    private static final String MESSAGE_PLACEHOLDER = "message";
 
     @GetMapping
     public ResponseEntity<Map<String, List<HeroeDto>>> getAllHeroesByGame() {
@@ -36,13 +37,13 @@ public class HeroeController {
         try {
             HeroeDto updatedHeroe = heroeService.saveOrUpdateHeroe(heroe, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Héro mis à jour avec succès",
+                    MESSAGE_PLACEHOLDER, "Héro mis à jour avec succès",
                     "heroe", updatedHeroe
             ));
         } catch (Exception e) {
             log.error("❌ Error processing heroe with ID: {}", heroe.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement du héro",
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement du héro",
                     "error", e.getMessage()
             ));
         }
@@ -57,13 +58,13 @@ public class HeroeController {
         try {
             HeroeDto updatedHeroe = heroeService.saveOrUpdateHeroe(heroe, imageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Héro enregistré avec succès",
+                    MESSAGE_PLACEHOLDER, "Héro enregistré avec succès",
                     "heroe", updatedHeroe
             ));
         } catch (Exception e) {
             log.error("❌ Error processing heroe with ID: {}", heroe.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement du partenaire",
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement du partenaire",
                     "error", e.getMessage()
             ));
         }
