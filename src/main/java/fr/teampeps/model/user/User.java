@@ -62,13 +62,6 @@ public class User implements UserDetails {
             nullable = false)
     private List<Authority> authorities;
 
-    @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
-    @Transient
-    private List<Token> tokens;
-
     @Column(name = "enable",
             nullable = false)
     private Boolean enable = false;

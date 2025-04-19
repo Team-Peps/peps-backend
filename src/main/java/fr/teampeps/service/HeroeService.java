@@ -25,6 +25,8 @@ public class HeroeService {
     private final HeroeMapper heroeMapper;
     private final MinioService minioService;
 
+    private static final String SLASH_DELIMITER = "/";
+
     public Map<String, List<HeroeDto>> getAllHeroes() {
 
         List<HeroeDto> heroesOverwatch = heroeRepository.findAllByGameOrderByNameAsc(Game.OVERWATCH).stream()
@@ -43,12 +45,10 @@ public class HeroeService {
     }
 
     public HeroeDto saveOrUpdateHeroe(Heroe heroe, MultipartFile imageFile) {
-        log.info("Updating heroe : {}", heroe);
 
         try {
             if (imageFile != null) {
-                String fileName = heroe.getGame() + "/" + heroe.getName().toLowerCase();
-                log.info("Saving heroe : {}", fileName);
+                String fileName = heroe.getGame() + SLASH_DELIMITER + heroe.getName().toLowerCase();
                 String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.HEROES);
                 heroe.setImageKey(imageUrl);
             }
