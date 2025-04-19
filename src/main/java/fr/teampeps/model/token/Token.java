@@ -1,5 +1,6 @@
 package fr.teampeps.model.token;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.teampeps.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,13 +8,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "tokens")
-public class Token {
+public class Token implements Serializable {
 
     @Id
     @GeneratedValue
@@ -40,5 +43,6 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 }

@@ -22,6 +22,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DiscordAuthController {
 
+    private static final String LOCATION_PLACEHOLDER = "Location";
+
     @Value("${discord.client.id}")
     private String clientId;
 
@@ -44,7 +46,7 @@ public class DiscordAuthController {
                 "&client_id=" + clientId +
                 "&scope=identify%20email" +
                 "&redirect_uri=" + redirectUri;
-        return ResponseEntity.status(HttpStatus.FOUND).header("Location", discordUrl).build();
+        return ResponseEntity.status(HttpStatus.FOUND).header(LOCATION_PLACEHOLDER, discordUrl).build();
     }
 
     @GetMapping("/callback")
@@ -105,7 +107,7 @@ public class DiscordAuthController {
         if (authResponseOpt.isEmpty()) {
             // tu peux rediriger vers une page d’erreur front, ou afficher une info
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .header("Location", frontendRedirect + "?error=unauthorized")
+                    .header(LOCATION_PLACEHOLDER, frontendRedirect + "?error=unauthorized")
                     .build();
         }
 
@@ -119,7 +121,7 @@ public class DiscordAuthController {
                 .toUriString();
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", redirectUrl)
+                .header(LOCATION_PLACEHOLDER, redirectUrl)
                 .build();
 
     }

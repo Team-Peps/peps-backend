@@ -5,7 +5,6 @@ import fr.teampeps.dto.UserTinyDto;
 import fr.teampeps.model.user.User;
 import fr.teampeps.model.user.UserRequest;
 import fr.teampeps.repository.UserRepository;
-import fr.teampeps.security.config.JwtService;
 import fr.teampeps.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,8 @@ public class UserController {
 
     private final UserService userService;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private static final String MESSAGE_PLACEHOLDER = "message";
+
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -42,7 +42,7 @@ public class UserController {
         UserDto disabledUser = userService.disableUser(request.id(), authenticatedUser.getId());
 
         return ResponseEntity.ok(Map.of(
-                "message", "Utilisateur bloqué avec succès",
+                MESSAGE_PLACEHOLDER, "Utilisateur bloqué avec succès",
                 "user", disabledUser
         ));
     }
@@ -53,7 +53,7 @@ public class UserController {
         UserDto enabledUser = userService.enableUser(request.id());
 
         return ResponseEntity.ok(Map.of(
-                "message", "Utilisateur débloqué avec succès",
+                MESSAGE_PLACEHOLDER, "Utilisateur débloqué avec succès",
                 "user", enabledUser
         ));
     }
@@ -71,7 +71,7 @@ public class UserController {
         userRepository.delete(user);
 
         return ResponseEntity.ok(Map.of(
-                "message", "Utilisateur supprimé avec succès",
+                MESSAGE_PLACEHOLDER, "Utilisateur supprimé avec succès",
                 "user", user
         ));
     }

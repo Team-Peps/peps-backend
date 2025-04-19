@@ -1,7 +1,5 @@
 package fr.teampeps.model;
 
-import fr.teampeps.model.article.ArticleType;
-
 public enum Game {
     OVERWATCH("overwatch"),
     MARVEL_RIVALS("marvel-rivals");

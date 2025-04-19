@@ -1,5 +1,7 @@
 package fr.teampeps.service;
 
+import fr.teampeps.exceptions.DateParsingException;
+import fr.teampeps.exceptions.ImageUploadException;
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.Game;
 import fr.teampeps.model.Match;
@@ -104,12 +106,9 @@ public class CronService {
                 }
 
                 Elements colsFirstRow = firstRow.select("td");
-                if (colsFirstRow.size() < 3) {
-                    continue;
-                }
-
                 Elements colsLastRow = lastRow.select("td");
-                if (colsLastRow.isEmpty()) {
+
+                if (colsFirstRow.size() < 3 || colsLastRow.isEmpty()) {
                     continue;
                 }
 
@@ -125,16 +124,10 @@ public class CronService {
                 String opponentLogoKey = "";
 
                 LocalDateTime parsedDate = parseToDateTime(date);
-
-                if(parsedDate.isBefore(LocalDateTime.now())) {
-                    log.info("Match is in the past: {}", date);
-                    continue;
-                }
-
                 String matchId = generateMatchId(date, competitionName, opponent);
 
-                if(matchRepository.existsById(matchId)) {
-                    log.info("Match already exists: {}", matchId);
+                if(parsedDate.isBefore(LocalDateTime.now()) || matchRepository.existsById(matchId)) {
+                    log.info("Match {} is in the past or already exist: {}", matchId, date);
                     continue;
                 }
 
@@ -250,15 +243,12 @@ public class CronService {
             String extension = url.substring(url.lastIndexOf('.'));
 
             return minioService.uploadImageFromBytes(imgResponse.body(), fileName, extension, bucket);
-
         } catch (Exception e) {
-            log.error("Error fetching image: {}", url, e);
+            throw new ImageUploadException("❌ Échec du téléchargement ou de l'upload de l'image depuis l'URL: " + url, e);
         }
-        return null;
     }
 
     private LocalDateTime parseToDateTime(String date) {
-        LocalDateTime parsedDate = null;
         String[] patterns = {
                 "MMM d, yyyy - HH:mm z",
                 "MMMM d, yyyy - HH:mm z",
@@ -272,17 +262,16 @@ public class CronService {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
                 if (pattern.contains("z")) {
                     ZonedDateTime zdt = ZonedDateTime.parse(date, formatter);
-                    parsedDate = zdt.toLocalDateTime();
+                    return zdt.toLocalDateTime();
                 } else {
                     LocalDate localDate = LocalDate.parse(date, formatter);
-                    parsedDate = LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
+                    return LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
                 }
-                break;
             } catch (DateTimeParseException e) {
-                log.debug("Could not parse date: {}", date, e);
+                log.error("Error parsing date: {} with pattern: {}", date, pattern);
             }
         }
-        return parsedDate;
+        throw new DateParsingException("❌ Impossible de parser la date : " + date);
     }
 
     private String reformatString(String str) {

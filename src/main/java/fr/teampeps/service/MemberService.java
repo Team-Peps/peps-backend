@@ -30,8 +30,9 @@ public class MemberService {
     private final MinioService minioService;
     private final HeroeRepository heroeRepository;
 
+    private static final String MEMBER_NOT_FOUND = "Membre non trouvé";
+
     public MemberDto saveOrUpdateMember(Member member, MultipartFile imageFile) {
-        log.info("Updating member : {}", member);
 
         try {
             if (imageFile != null) {
@@ -111,13 +112,13 @@ public class MemberService {
         try {
             memberRepository.deleteById(id);
         } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND, e);
         }
     }
 
     public MemberDto toggleActive(String id) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND));
 
         member.setIsActive(!member.getIsActive());
 
@@ -126,7 +127,7 @@ public class MemberService {
 
     public MemberDto toggleSubstitute(String id) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND));
 
         member.setIsSubstitute(!member.getIsSubstitute());
 
@@ -135,7 +136,7 @@ public class MemberService {
 
     public MemberDto getMemberDetails(String id) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND));
 
         return memberMapper.toMemberDto(member);
     }

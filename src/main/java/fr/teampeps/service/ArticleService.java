@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,20 +43,18 @@ public class ArticleService {
                 String fileName = article.getTitle().toLowerCase();
                 String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
                 article.setImageKey(imageUrl);
-                log.info("Image key: " + imageUrl);
             }
 
             if (thumbnailImageFile != null) {
                 String fileName = article.getTitle().toLowerCase() + "_thumbnail";
                 String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, fileName, Bucket.ARTICLES);
                 article.setThumbnailImageKey(thumbnailImageUrl);
-                log.info("Thumbnail image key: " + thumbnailImageUrl);
             }
 
             return articleMapper.toArticleDto(articleRepository.save(article));
 
         } catch (Exception e) {
-            throw new RuntimeException("Error creating article", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la création de l'article", e);
         }
     }
 
@@ -79,7 +76,7 @@ public class ArticleService {
             return articleMapper.toArticleDto(articleRepository.save(article));
 
         } catch (Exception e) {
-            throw new RuntimeException("Error updating article with ID: " + article.getId(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour de l'article", e);
         }
     }
 
