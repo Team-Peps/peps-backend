@@ -1,7 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.AmbassadorDto;
-import fr.teampeps.model.Ambassador;
+import fr.teampeps.models.Ambassador;
 import fr.teampeps.service.AmbassadorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.HeroeDto;
-import fr.teampeps.model.heroe.Heroe;
+import fr.teampeps.models.Heroe;
 import fr.teampeps.service.HeroeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

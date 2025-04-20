@@ -1,8 +1,8 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.AchievementDto;
-import fr.teampeps.model.Achievement;
-import fr.teampeps.model.Game;
+import fr.teampeps.models.Achievement;
+import fr.teampeps.enums.Game;
 import fr.teampeps.service.AchievementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

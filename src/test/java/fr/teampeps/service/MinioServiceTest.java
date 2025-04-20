@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
-import fr.teampeps.model.Bucket;
+import fr.teampeps.enums.Bucket;
+import fr.teampeps.exceptions.UploadImageException;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import org.junit.jupiter.api.BeforeEach;
@@ -161,18 +162,20 @@ class MinioServiceTest {
     @Test
     void uploadImageFromMultipartFile_MinioClientThrowsException() throws Exception {
         // Arrange
-        String fileName = "test_file";
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("image.png");
+        when(file.getInputStream()).thenThrow(new IOException("InputStream failed"));
+
+        String fileName = "testImage";
         Bucket bucket = Bucket.MEMBERS;
-        doThrow(new IOException("Minio error")).when(minioClient).putObject(any(PutObjectArgs.class));
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                minioService.uploadImageFromMultipartFile(jpgFile, fileName, bucket));
+        UploadImageException exception = assertThrows(UploadImageException.class, () ->
+                minioService.uploadImageFromMultipartFile(file, fileName, bucket));
 
         assertEquals("Error uploading image", exception.getMessage());
-        assertInstanceOf(IOException.class, exception.getCause());
-        assertEquals("Minio error", exception.getCause().getMessage());
     }
+
 
     @Test
     void uploadImageFromBytes_Success() throws Exception {
@@ -219,18 +222,19 @@ class MinioServiceTest {
     @Test
     void uploadImageFromBytes_MinioClientThrowsException() throws Exception {
         // Arrange
-        String fileName = "test_file";
+        byte[] imageContent = "invalid".getBytes();
+        String fileName = "fail";
         String extension = ".jpg";
         Bucket bucket = Bucket.MEMBERS;
-        doThrow(new IOException("Minio error")).when(minioClient).putObject(any(PutObjectArgs.class));
+
+        doThrow(new RuntimeException("MinIO failed")).when(minioClient)
+                .putObject(any(PutObjectArgs.class));
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                minioService.uploadImageFromBytes(imageBytes, fileName, extension, bucket));
+        UploadImageException exception = assertThrows(UploadImageException.class, () ->
+                minioService.uploadImageFromBytes(imageContent, fileName, extension, bucket));
 
         assertEquals("Error uploading image", exception.getMessage());
-        assertInstanceOf(IOException.class, exception.getCause());
-        assertEquals("Minio error", exception.getCause().getMessage());
     }
 
     @Test

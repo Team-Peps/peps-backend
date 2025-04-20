@@ -2,8 +2,8 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.PartnerDto;
 import fr.teampeps.mapper.PartnerMapper;
-import fr.teampeps.model.Bucket;
-import fr.teampeps.model.Partner;
+import fr.teampeps.enums.Bucket;
+import fr.teampeps.models.Partner;
 import fr.teampeps.repository.PartnerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

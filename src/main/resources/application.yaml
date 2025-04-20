@@ -91,4 +91,4 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: create
-    database-platform: postgresql
+    database-platform: org.hibernate.dialect.H2Dialect

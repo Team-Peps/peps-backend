@@ -1,7 +1,7 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.Game;
-import fr.teampeps.model.heroe.Heroe;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Heroe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,4 +1,4 @@
-package fr.teampeps.model.heroe;
+package fr.teampeps.enums;
 
 public enum HeroeRole {
     // Overwatch

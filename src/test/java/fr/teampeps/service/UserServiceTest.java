@@ -15,8 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import fr.teampeps.dto.UserDto;
 import fr.teampeps.mapper.UserMapper;
-import fr.teampeps.model.user.Authority;
-import fr.teampeps.model.user.User;
+import fr.teampeps.enums.Authority;
+import fr.teampeps.models.User;
 import fr.teampeps.repository.TokenRepository;
 import fr.teampeps.repository.UserRepository;
 

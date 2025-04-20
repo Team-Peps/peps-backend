@@ -1,5 +1,8 @@
-package fr.teampeps.model.member;
+package fr.teampeps.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum MemberRole {
 
     DAMAGE("DAMAGE"),
@@ -16,7 +19,4 @@ public enum MemberRole {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
 }

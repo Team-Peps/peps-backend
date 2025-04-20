@@ -2,8 +2,8 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.UserDto;
 import fr.teampeps.dto.UserTinyDto;
-import fr.teampeps.model.user.User;
-import fr.teampeps.model.user.UserRequest;
+import fr.teampeps.models.User;
+import fr.teampeps.record.UserRequest;
 import fr.teampeps.repository.UserRepository;
 import fr.teampeps.service.UserService;
 import lombok.RequiredArgsConstructor;

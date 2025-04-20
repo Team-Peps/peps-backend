@@ -2,9 +2,9 @@ package fr.teampeps.service;
 
 import fr.teampeps.exceptions.DateParsingException;
 import fr.teampeps.exceptions.ImageUploadException;
-import fr.teampeps.model.Bucket;
-import fr.teampeps.model.Game;
-import fr.teampeps.model.Match;
+import fr.teampeps.enums.Bucket;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Match;
 import fr.teampeps.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -241,7 +242,10 @@ public class CronService {
             String extension = url.substring(url.lastIndexOf('.'));
 
             return minioService.uploadImageFromBytes(imgResponse.body(), fileName, extension, bucket);
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
+            if(e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             throw new ImageUploadException("❌ Échec du téléchargement ou de l'upload de l'image depuis l'URL: " + url, e);
         }
     }

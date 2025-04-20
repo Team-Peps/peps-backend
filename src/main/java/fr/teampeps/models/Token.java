@@ -1,7 +1,7 @@
-package fr.teampeps.model.token;
+package fr.teampeps.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.teampeps.model.user.User;
+import fr.teampeps.enums.TokenType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

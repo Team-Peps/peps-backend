@@ -1,7 +1,6 @@
-package fr.teampeps.model;
+package fr.teampeps.models;
 
-
-import fr.teampeps.model.member.Member;
+import fr.teampeps.enums.Game;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

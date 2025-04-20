@@ -1,7 +1,7 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.article.Article;
-import fr.teampeps.model.article.ArticleType;
+import fr.teampeps.models.Article;
+import fr.teampeps.enums.ArticleType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

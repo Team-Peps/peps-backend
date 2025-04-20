@@ -2,8 +2,8 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.MemberDto;
 import fr.teampeps.dto.MemberTinyDto;
-import fr.teampeps.model.Game;
-import fr.teampeps.model.member.Member;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Member;
 import fr.teampeps.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

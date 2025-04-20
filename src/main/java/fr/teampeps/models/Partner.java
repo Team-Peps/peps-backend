@@ -1,4 +1,4 @@
-package fr.teampeps.model;
+package fr.teampeps.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;

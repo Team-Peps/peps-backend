@@ -2,7 +2,7 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.MatchDto;
 import fr.teampeps.dto.MatchGroupByDate;
-import fr.teampeps.model.Game;
+import fr.teampeps.enums.Game;
 import fr.teampeps.service.MatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

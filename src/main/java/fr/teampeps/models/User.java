@@ -1,5 +1,7 @@
-package fr.teampeps.model.user;
+package fr.teampeps.models;
 
+import fr.teampeps.enums.AuthType;
+import fr.teampeps.enums.Authority;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

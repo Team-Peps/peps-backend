@@ -25,16 +25,16 @@ public class DiscordAuthController {
 
     private static final String LOCATION_PLACEHOLDER = "Location";
 
-    @Value("${discord.client.id}")
+    @Value("${discord.client-id}")
     private String clientId;
 
-    @Value("${discord.client.secret}")
+    @Value("${discord.client-secret}")
     private String clientSecret;
 
-    @Value("${discord.redirect.uri}")
+    @Value("${discord.redirect-uri}")
     private String redirectUri;
 
-    @Value("${frontend.redirect.uri}")
+    @Value("${frontend.redirect-uri}")
     private String frontendRedirect;
 
     private final RestTemplate restTemplate = new RestTemplate();

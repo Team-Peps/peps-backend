@@ -1,7 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.UserDto;
-import fr.teampeps.model.user.User;
+import fr.teampeps.models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 

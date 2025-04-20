@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
-import fr.teampeps.model.Bucket;
+import fr.teampeps.enums.Bucket;
+import fr.teampeps.exceptions.UploadImageException;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class MinioService {
             return bucket.name().toLowerCase() + "/" + key;
 
         } catch (Exception e) {
-            throw new RuntimeException("Error uploading image", e);
+            throw new UploadImageException("Error uploading image", e);
         }
     }
 
@@ -74,7 +75,7 @@ public class MinioService {
             return bucket.name().toLowerCase() + "/" + key;
 
         } catch (Exception e) {
-            throw new RuntimeException("Error uploading image", e);
+            throw new UploadImageException("Error uploading image", e);
         }
     }
 }

@@ -1,6 +1,6 @@
 package fr.teampeps.dto;
 
-import fr.teampeps.model.Game;
+import fr.teampeps.enums.Game;
 import lombok.Builder;
 import lombok.Data;
 

@@ -2,7 +2,7 @@ package fr.teampeps.mapper;
 
 import fr.teampeps.dto.SliderDto;
 import fr.teampeps.dto.SliderTinyDto;
-import fr.teampeps.model.Slider;
+import fr.teampeps.models.Slider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

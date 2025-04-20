@@ -1,7 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.PartnerDto;
-import fr.teampeps.model.Partner;
+import fr.teampeps.models.Partner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

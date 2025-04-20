@@ -1,8 +1,7 @@
-package fr.teampeps.model.member;
+package fr.teampeps.models;
 
-import fr.teampeps.model.Achievement;
-import fr.teampeps.model.Game;
-import fr.teampeps.model.heroe.Heroe;
+import fr.teampeps.enums.Game;
+import fr.teampeps.enums.MemberRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

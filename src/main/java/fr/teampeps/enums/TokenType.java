@@ -1,4 +1,4 @@
-package fr.teampeps.model.token;
+package fr.teampeps.enums;
 
 public enum TokenType {
     BEARER

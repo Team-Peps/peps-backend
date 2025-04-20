@@ -1,6 +1,6 @@
 package fr.teampeps.controller;
 
-import fr.teampeps.model.Match;
+import fr.teampeps.models.Match;
 import fr.teampeps.service.CronService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

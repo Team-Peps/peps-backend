@@ -1,7 +1,7 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.Achievement;
-import fr.teampeps.model.Game;
+import fr.teampeps.models.Achievement;
+import fr.teampeps.enums.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

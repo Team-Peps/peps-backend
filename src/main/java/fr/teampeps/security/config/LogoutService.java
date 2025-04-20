@@ -1,6 +1,6 @@
 package fr.teampeps.security.config;
 
-import fr.teampeps.model.token.Token;
+import fr.teampeps.models.Token;
 import fr.teampeps.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

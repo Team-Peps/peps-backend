@@ -1,7 +1,7 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.Game;
-import fr.teampeps.model.Match;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Match;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

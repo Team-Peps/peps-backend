@@ -1,7 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.HeroeDto;
-import fr.teampeps.model.heroe.Heroe;
+import fr.teampeps.models.Heroe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
