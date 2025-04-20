@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import fr.teampeps.model.Game;
-import fr.teampeps.model.Match;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Match;
 import fr.teampeps.repository.MatchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

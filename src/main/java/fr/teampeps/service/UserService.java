@@ -2,8 +2,7 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.UserDto;
 import fr.teampeps.mapper.UserMapper;
-import fr.teampeps.model.user.Authority;
-import fr.teampeps.model.user.User;
+import fr.teampeps.models.User;
 import fr.teampeps.repository.TokenRepository;
 import fr.teampeps.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Set;

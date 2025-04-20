@@ -2,8 +2,8 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.AmbassadorDto;
 import fr.teampeps.mapper.AmbassadorMapper;
-import fr.teampeps.model.Ambassador;
-import fr.teampeps.model.Bucket;
+import fr.teampeps.models.Ambassador;
+import fr.teampeps.enums.Bucket;
 import fr.teampeps.repository.AmbassadorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

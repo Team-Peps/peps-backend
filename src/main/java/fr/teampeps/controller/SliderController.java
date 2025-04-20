@@ -2,7 +2,7 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.SliderDto;
 import fr.teampeps.dto.SliderTinyDto;
-import fr.teampeps.model.Slider;
+import fr.teampeps.models.Slider;
 import fr.teampeps.service.SliderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -115,7 +115,7 @@ public class SliderController {
 
     @PutMapping("/reorder")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateSliderOrder(@RequestBody List<String> orderedIds) {
+    public ResponseEntity<Map<String, String>> updateSliderOrder(@RequestBody List<String> orderedIds) {
         try {
             sliderService.updateSliderOrder(orderedIds);
             return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Ordre des sliders mis à jour avec succès"));

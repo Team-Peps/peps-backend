@@ -1,6 +1,7 @@
-package fr.teampeps.model.heroe;
+package fr.teampeps.models;
 
-import fr.teampeps.model.Game;
+import fr.teampeps.enums.Game;
+import fr.teampeps.enums.HeroeRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

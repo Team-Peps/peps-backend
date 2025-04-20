@@ -1,7 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.PartnerDto;
-import fr.teampeps.model.Partner;
+import fr.teampeps.models.Partner;
 import fr.teampeps.service.PartnerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

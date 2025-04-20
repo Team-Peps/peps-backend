@@ -1,7 +1,7 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.Game;
-import fr.teampeps.model.member.Member;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.PathVariable;

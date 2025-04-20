@@ -1,6 +1,6 @@
 package fr.teampeps.dto;
 
-import fr.teampeps.model.article.ArticleType;
+import fr.teampeps.enums.ArticleType;
 import lombok.Builder;
 import lombok.Data;
 

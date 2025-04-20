@@ -1,7 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.AchievementDto;
-import fr.teampeps.model.Achievement;
+import fr.teampeps.models.Achievement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

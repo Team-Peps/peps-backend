@@ -2,9 +2,9 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.AchievementDto;
 import fr.teampeps.mapper.AchievementMapper;
-import fr.teampeps.model.Achievement;
-import fr.teampeps.model.Game;
-import fr.teampeps.model.member.Member;
+import fr.teampeps.models.Achievement;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Member;
 import fr.teampeps.repository.AchievementRepository;
 import fr.teampeps.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;

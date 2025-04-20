@@ -1,6 +1,6 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.token.Token;
+import fr.teampeps.models.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

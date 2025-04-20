@@ -1,6 +1,6 @@
 package fr.teampeps.dto;
 
-import fr.teampeps.model.member.MemberRole;
+import fr.teampeps.enums.MemberRole;
 import lombok.Builder;
 import lombok.Data;
 

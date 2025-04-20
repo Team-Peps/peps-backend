@@ -1,10 +1,10 @@
 package fr.teampeps.security.auth;
 
-import fr.teampeps.model.user.AuthType;
-import fr.teampeps.model.user.Authority;
-import fr.teampeps.model.user.User;
-import fr.teampeps.model.token.Token;
-import fr.teampeps.model.token.TokenType;
+import fr.teampeps.enums.AuthType;
+import fr.teampeps.enums.Authority;
+import fr.teampeps.models.User;
+import fr.teampeps.models.Token;
+import fr.teampeps.enums.TokenType;
 import fr.teampeps.repository.TokenRepository;
 import fr.teampeps.repository.UserRepository;
 import fr.teampeps.security.config.JwtService;

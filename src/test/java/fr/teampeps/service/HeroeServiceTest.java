@@ -2,9 +2,9 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.HeroeDto;
 import fr.teampeps.mapper.HeroeMapper;
-import fr.teampeps.model.Bucket;
-import fr.teampeps.model.Game;
-import fr.teampeps.model.heroe.Heroe;
+import fr.teampeps.enums.Bucket;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Heroe;
 import fr.teampeps.repository.HeroeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

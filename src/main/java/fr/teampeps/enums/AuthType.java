@@ -1,4 +1,4 @@
-package fr.teampeps.model.user;
+package fr.teampeps.enums;
 
 public enum AuthType {
     LOCAL,

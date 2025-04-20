@@ -1,6 +1,6 @@
 package fr.teampeps.repository;
 
-import fr.teampeps.model.Slider;
+import fr.teampeps.models.Slider;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

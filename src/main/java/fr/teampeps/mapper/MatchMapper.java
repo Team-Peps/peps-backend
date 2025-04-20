@@ -1,7 +1,7 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.MatchDto;
-import fr.teampeps.model.Match;
+import fr.teampeps.models.Match;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

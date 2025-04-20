@@ -3,8 +3,8 @@ package fr.teampeps.service;
 import fr.teampeps.dto.MatchDto;
 import fr.teampeps.dto.MatchGroupByDate;
 import fr.teampeps.mapper.MatchMapper;
-import fr.teampeps.model.Game;
-import fr.teampeps.model.Match;
+import fr.teampeps.enums.Game;
+import fr.teampeps.models.Match;
 import fr.teampeps.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +65,8 @@ public class MatchService {
                 .map(entry -> new MatchGroupByDate(entry.getKey(), entry.getValue()
                         .stream()
                         .map(matchMapper::toMatchDto)
-                        .collect(Collectors.toList()))).toList();
+                        .toList()
+                )).toList();
     }
 
     public Page<MatchGroupByDate> getResultsMatches(int page, String filter) {
@@ -95,7 +96,7 @@ public class MatchService {
                         entry.getKey(),
                         entry.getValue().stream()
                                 .map(matchMapper::toMatchDto)
-                                .collect(Collectors.toList())
+                                .toList()
                 ))
                 .toList();
 
@@ -128,7 +129,7 @@ public class MatchService {
                         entry.getKey(),
                         entry.getValue().stream()
                                 .map(matchMapper::toMatchDto)
-                                .collect(Collectors.toList())
+                                .toList()
                 ))
                 .toList();
 
@@ -149,7 +150,7 @@ public class MatchService {
                 .map(entry -> new MatchGroupByDate(entry.getKey(), entry.getValue()
                         .stream()
                         .map(matchMapper::toMatchDto)
-                        .collect(Collectors.toList())))
-                .toList();
+                        .toList()
+                )).toList();
     }
 }

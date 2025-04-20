@@ -1,6 +1,6 @@
 package fr.teampeps.dto;
 
-import fr.teampeps.model.user.AuthType;
+import fr.teampeps.enums.AuthType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

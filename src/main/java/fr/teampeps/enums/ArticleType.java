@@ -1,4 +1,4 @@
-package fr.teampeps.model.article;
+package fr.teampeps.enums;
 
 public enum ArticleType {
     OVERWATCH,

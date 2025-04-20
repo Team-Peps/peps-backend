@@ -1,5 +1,6 @@
-package fr.teampeps.model.article;
+package fr.teampeps.models;
 
+import fr.teampeps.enums.ArticleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

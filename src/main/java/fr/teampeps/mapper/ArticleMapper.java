@@ -2,7 +2,7 @@ package fr.teampeps.mapper;
 
 import fr.teampeps.dto.ArticleDto;
 import fr.teampeps.dto.ArticleTinyDto;
-import fr.teampeps.model.article.Article;
+import fr.teampeps.models.Article;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;

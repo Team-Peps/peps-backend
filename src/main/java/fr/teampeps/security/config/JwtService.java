@@ -1,6 +1,6 @@
 package fr.teampeps.security.config;
 
-import fr.teampeps.model.user.User;
+import fr.teampeps.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

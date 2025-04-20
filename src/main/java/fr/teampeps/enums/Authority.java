@@ -1,4 +1,4 @@
-package fr.teampeps.model.user;
+package fr.teampeps.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 

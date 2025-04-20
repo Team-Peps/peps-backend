@@ -2,7 +2,7 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.ArticleDto;
 import fr.teampeps.dto.ArticleTinyDto;
-import fr.teampeps.model.article.Article;
+import fr.teampeps.models.Article;
 import fr.teampeps.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
