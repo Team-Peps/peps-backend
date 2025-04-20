@@ -1,7 +1,8 @@
 package fr.teampeps.model;
 
-import fr.teampeps.model.article.ArticleType;
+import lombok.Getter;
 
+@Getter
 public enum Game {
     OVERWATCH("overwatch"),
     MARVEL_RIVALS("marvel-rivals");
@@ -20,4 +21,5 @@ public enum Game {
         }
         return false;
     }
+
 }

@@ -22,6 +22,8 @@ import java.util.Map;
 public class AchievementController {
 
     private final AchievementService achievementService;
+    private static final String MESSAGE_PLACEHOLDER = "message";
+    private static final String ERROR_PLACEHOLDER = "error";
 
     @GetMapping("/game/{game}")
     public ResponseEntity<List<AchievementDto>> getAllAchievementsByGame(@PathVariable Game game) {
@@ -41,14 +43,14 @@ public class AchievementController {
         try {
             AchievementDto created = achievementService.saveGameAchievement(achievement);
             return ResponseEntity.ok(Map.of(
-                    "message", "Succès : le palmarès a été enregistré",
+                    MESSAGE_PLACEHOLDER, "Succès : le palmarès a été enregistré",
                     "achievement", created
             ));
         } catch (Exception e) {
             log.error("❌ Erreur lors de la création d'un palmarès", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de l'enregistrement du palmarès",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de l'enregistrement du palmarès",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -62,14 +64,14 @@ public class AchievementController {
         try {
             AchievementDto created = achievementService.saveMemberAchievement(achievement, memberId);
             return ResponseEntity.ok(Map.of(
-                    "message", "Succès : le palmarès a été enregistré",
+                    MESSAGE_PLACEHOLDER, "Succès : le palmarès a été enregistré",
                     "achievement", created
             ));
         } catch (Exception e) {
             log.error("❌ Erreur lors de la création d'un palmarès", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de l'enregistrement du palmarès",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de l'enregistrement du palmarès",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -79,12 +81,12 @@ public class AchievementController {
     public ResponseEntity<Map<String, Object>> deleteAchievement(@PathVariable String id) {
         try {
             achievementService.delete(id);
-            return ResponseEntity.ok(Map.of("message", "Succès : palmarès supprimé"));
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Succès : palmarès supprimé"));
         } catch (DataAccessException e) {
             log.error("❌ Erreur lors de la suppression du palmarès avec ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de la suppression du palmarès",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la suppression du palmarès",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }

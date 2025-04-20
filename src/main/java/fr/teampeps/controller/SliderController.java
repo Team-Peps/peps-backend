@@ -24,6 +24,9 @@ import java.util.Map;
 public class SliderController {
 
     private final SliderService sliderService;
+    private static final String MESSAGE_PLACEHOLDER = "message";
+    private static final String ERROR_PLACEHOLDER = "error";
+    private static final String SLIDER_PLACEHOLDER = "slider";
 
     @GetMapping
     public ResponseEntity<Map<String, List<SliderDto>>> getAllSliders() {
@@ -45,13 +48,13 @@ public class SliderController {
         try {
             SliderDto created = sliderService.saveSlider(slider, imageFile, mobileImageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Slider enregistré avec succès",
-                    "slider", created
+                    MESSAGE_PLACEHOLDER, "Slider enregistré avec succès",
+                    SLIDER_PLACEHOLDER, created
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de la création du slider",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la création du slider",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -66,14 +69,14 @@ public class SliderController {
         try {
             SliderDto updatedSlider = sliderService.updateSlider(slider, imageFile, mobileImageFile);
             return ResponseEntity.ok(Map.of(
-                    "message", "Slider mis à jour avec succès",
-                    "slider", updatedSlider
+                    MESSAGE_PLACEHOLDER, "Slider mis à jour avec succès",
+                    SLIDER_PLACEHOLDER, updatedSlider
             ));
         } catch (Exception e) {
             log.error("❌ Error processing slider with ID: {}", slider.getId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors du traitement du slider",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement du slider",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -83,11 +86,11 @@ public class SliderController {
     public ResponseEntity<Map<String, Object>> deleteSlider(@PathVariable String id) {
         try {
             sliderService.deleteSlider(id);
-            return ResponseEntity.ok(Map.of("message", "Slider supprimé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Slider supprimé avec succès"));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(Map.of(
-                    "message", "Erreur lors de la suppression du slider",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la suppression du slider",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -98,14 +101,14 @@ public class SliderController {
         try {
             SliderDto updatedSlider = sliderService.toggleActive(id);
             return ResponseEntity.ok(Map.of(
-                    "message", "Slider activé avec succès",
-                    "slider", updatedSlider
+                    MESSAGE_PLACEHOLDER, "Slider activé avec succès",
+                    SLIDER_PLACEHOLDER, updatedSlider
             ));
         } catch (DataAccessException e) {
             log.error("❌ Error activating slider with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de l'activation du slider",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de l'activation du slider",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }
@@ -115,11 +118,11 @@ public class SliderController {
     public ResponseEntity<?> updateSliderOrder(@RequestBody List<String> orderedIds) {
         try {
             sliderService.updateSliderOrder(orderedIds);
-            return ResponseEntity.ok(Map.of("message", "Ordre des sliders mis à jour avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Ordre des sliders mis à jour avec succès"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Erreur lors de la mise à jour de l'ordre",
-                    "error", e.getMessage()
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la mise à jour de l'ordre",
+                    ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
     }

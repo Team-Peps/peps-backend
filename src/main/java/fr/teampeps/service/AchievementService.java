@@ -50,12 +50,12 @@ public class AchievementService {
     }
 
     public AchievementDto saveMemberAchievement(Achievement achievement, String memberId) {
-        try {
+        Optional<Member> memberOptional = memberRepository.findById(memberId);
+        if (memberOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé");
+        }
 
-            Optional<Member> memberOptional = memberRepository.findById(memberId);
-            if (memberOptional.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Membre non trouvé");
-            }
+        try {
 
             achievement.setMember(memberOptional.get());
             achievement.setGame(memberOptional.get().getGame());

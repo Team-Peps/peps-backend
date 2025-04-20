@@ -1,5 +1,7 @@
 package fr.teampeps.service;
 
+import fr.teampeps.exceptions.DateParsingException;
+import fr.teampeps.exceptions.ImageUploadException;
 import fr.teampeps.model.Bucket;
 import fr.teampeps.model.Game;
 import fr.teampeps.model.Match;
@@ -24,10 +26,7 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -104,37 +103,28 @@ public class CronService {
                 }
 
                 Elements colsFirstRow = firstRow.select("td");
-                if (colsFirstRow.size() < 3) {
-                    continue;
-                }
-
                 Elements colsLastRow = lastRow.select("td");
-                if (colsLastRow.isEmpty()) {
+
+                if (colsFirstRow.size() < 3 || colsLastRow.isEmpty()) {
                     continue;
                 }
 
                 String date = colsLastRow.get(0).select("span.timer-object").text();
 
-                String competitionLogo = colsLastRow.get(0).selectFirst("img").attr("src");
-                String competitionName = colsLastRow.get(0).selectFirst("div.tournament-text-flex").text();
+                String competitionLogo = Objects.requireNonNull(colsLastRow.get(0).selectFirst("img")).attr("src");
+                String competitionName = Objects.requireNonNull(colsLastRow.get(0).selectFirst("div.tournament-text-flex")).text();
 
                 String opponent = colsFirstRow.get(2).text();
-                String opponentLogo = colsFirstRow.get(2).selectFirst("img").attr("src");
+                String opponentLogo = Objects.requireNonNull(colsFirstRow.get(2).selectFirst("img")).attr("src");
 
-                String competitionLogoKey = "";
-                String opponentLogoKey = "";
+                String competitionLogoKey;
+                String opponentLogoKey;
 
                 LocalDateTime parsedDate = parseToDateTime(date);
-
-                if(parsedDate.isBefore(LocalDateTime.now())) {
-                    log.info("Match is in the past: {}", date);
-                    continue;
-                }
-
                 String matchId = generateMatchId(date, competitionName, opponent);
 
-                if(matchRepository.existsById(matchId)) {
-                    log.info("Match already exists: {}", matchId);
+                if(parsedDate.isBefore(LocalDateTime.now()) || matchRepository.existsById(matchId)) {
+                    log.info("Match {} is in the past or already exist: {}", matchId, date);
                     continue;
                 }
 
@@ -189,14 +179,14 @@ public class CronService {
                 if (cols.size() < 5) continue;
 
                 String date = cols.get(0).text();
-                String competitionLogo = cols.get(2).selectFirst("img").attr("src");
+                String competitionLogo = Objects.requireNonNull(cols.get(2).selectFirst("img")).attr("src");
                 String competitionName = cols.get(3).text();
                 String score = cols.get(4).text();
                 String opponent = cols.get(5).text();
-                String opponentLogo = cols.get(5).selectFirst("img").attr("src");
+                String opponentLogo = Objects.requireNonNull(cols.get(5).selectFirst("img")).attr("src");
 
-                String competitionLogoKey = "";
-                String opponentLogoKey = "";
+                String competitionLogoKey;
+                String opponentLogoKey;
 
                 String[] scores = score.split(":");
                 LocalDateTime parsedDate = parseToDateTime(date);
@@ -205,7 +195,8 @@ public class CronService {
 
                 if(matchRepository.existsById(matchId) && matchRepository.isMatchScoreIsNull(matchId).isEmpty()) {
                     log.info("Match already exists and updating score: {}", matchId);
-                    Match match = matchRepository.findById(matchId).get();
+                    Match match = matchRepository.findById(matchId)
+                            .orElseThrow(() -> new RuntimeException("Match not found: " + matchId));
                     match.setScore(scores[0]);
                     match.setOpponentScore(scores[1]);
                     matches.add(match);
@@ -250,15 +241,12 @@ public class CronService {
             String extension = url.substring(url.lastIndexOf('.'));
 
             return minioService.uploadImageFromBytes(imgResponse.body(), fileName, extension, bucket);
-
         } catch (Exception e) {
-            log.error("Error fetching image: {}", url, e);
+            throw new ImageUploadException("❌ Échec du téléchargement ou de l'upload de l'image depuis l'URL: " + url, e);
         }
-        return null;
     }
 
     private LocalDateTime parseToDateTime(String date) {
-        LocalDateTime parsedDate = null;
         String[] patterns = {
                 "MMM d, yyyy - HH:mm z",
                 "MMMM d, yyyy - HH:mm z",
@@ -272,17 +260,16 @@ public class CronService {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
                 if (pattern.contains("z")) {
                     ZonedDateTime zdt = ZonedDateTime.parse(date, formatter);
-                    parsedDate = zdt.toLocalDateTime();
+                    return zdt.toLocalDateTime();
                 } else {
                     LocalDate localDate = LocalDate.parse(date, formatter);
-                    parsedDate = LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
+                    return LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
                 }
-                break;
             } catch (DateTimeParseException e) {
-                log.debug("Could not parse date: {}", date, e);
+                log.error("Error parsing date: {} with pattern: {}", date, pattern);
             }
         }
-        return parsedDate;
+        throw new DateParsingException("❌ Impossible de parser la date : " + date);
     }
 
     private String reformatString(String str) {

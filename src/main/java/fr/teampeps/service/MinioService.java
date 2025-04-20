@@ -19,7 +19,7 @@ public class MinioService {
 
     public String uploadImageFromMultipartFile(MultipartFile file, String fileName, Bucket bucket) {
         try {
-            String extension = "";
+            String extension;
             extension = extractExtension(file.getOriginalFilename());
             String key = formatKey(fileName) + extension;
 
@@ -41,14 +41,14 @@ public class MinioService {
         }
     }
 
-    private String formatKey(String key) {
+    String formatKey(String key) {
         if (key == null) return null;
         return key
                 .toLowerCase()
                 .replaceAll("[\\s'\\-]", "_");
     }
 
-    private String extractExtension(String originalFilename) {
+    String extractExtension(String originalFilename) {
         if (originalFilename != null && originalFilename.contains(".")) {
             return originalFilename.substring(originalFilename.lastIndexOf('.'));
         }

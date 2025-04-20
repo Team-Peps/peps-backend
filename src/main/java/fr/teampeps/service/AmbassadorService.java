@@ -25,11 +25,14 @@ public class AmbassadorService {
     private final AmbassadorMapper ambassadorMapper;
 
     public AmbassadorDto saveOrUpdateAmbassador(Ambassador ambassador, MultipartFile imageFile) {
+
+        if(imageFile == null || imageFile.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
+        }
+
         try {
-            if (imageFile != null) {
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, ambassador.getName().toLowerCase(), Bucket.AMBASSADORS);
-                ambassador.setImageKey(imageUrl);
-            }
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, ambassador.getName().toLowerCase(), Bucket.AMBASSADORS);
+            ambassador.setImageKey(imageUrl);
 
             return ambassadorMapper.toAmbassadorDto(ambassadorRepository.save(ambassador));
 
