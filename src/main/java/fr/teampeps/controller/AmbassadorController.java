@@ -78,7 +78,7 @@ public class AmbassadorController {
     public ResponseEntity<Map<String, Object>> deleteAmbassador(@PathVariable String id) {
         try {
             ambassadorService.deleteAmbassador(id);
-                return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Ambassadeur supprimé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Ambassadeur supprimé avec succès"));
         } catch (DataAccessException e) {
             log.error("❌ Error deleting ambassador with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
