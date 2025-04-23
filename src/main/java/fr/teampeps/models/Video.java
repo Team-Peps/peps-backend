@@ -23,7 +23,7 @@ public class Video {
     private String id;
 
     @Column(name = "title",
-            nullable = false)
+            nullable = false, length = 30)
     private String title;
 
     @Column(name = "link",
