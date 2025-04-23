@@ -49,6 +49,7 @@ discord:
   redirect-uri: ${DISCORD_REDIRECT_URI}
 frontend:
   redirect-uri: ${FRONTEND_REDIRECT_URI}
+  redirect-cancel-uri: ${FRONTEND_REDIRECT_CANCEL_URI}
 
 ---
 spring:

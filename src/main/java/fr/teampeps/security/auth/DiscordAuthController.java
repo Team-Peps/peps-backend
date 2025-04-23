@@ -37,6 +37,9 @@ public class DiscordAuthController {
     @Value("${frontend.redirect-uri}")
     private String frontendRedirect;
 
+    @Value("${frontend.redirect-cancel-uri}")
+    private String frontendRedirectCancel;
+
     private final RestTemplate restTemplate = new RestTemplate();
     private final AuthenticationService authenticationService;
 
@@ -51,7 +54,21 @@ public class DiscordAuthController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<?> callback(@RequestParam String code) {
+    public ResponseEntity<?> callback(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String error
+    ) {
+
+        if (error != null) {
+            String redirectUrl = UriComponentsBuilder
+                    .fromHttpUrl(frontendRedirectCancel)
+                    .queryParam("error", "login_cancelled")
+                    .build()
+                    .toUriString();
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .header(HttpHeaders.LOCATION, redirectUrl)
+                    .build();
+        }
         // Étape 1 : Récupère access_token depuis Discord
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
