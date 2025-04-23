@@ -74,6 +74,11 @@ spec:
                 secretKeyRef:
                   key: FRONTEND_REDIRECT_URI
                   name: discord-credentials
+            - name: FRONTEND_REDIRECT_CANCEL_URI
+              valueFrom:
+                secretKeyRef:
+                  key: FRONTEND_REDIRECT_CANCEL_URI
+                  name: discord-credentials
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
