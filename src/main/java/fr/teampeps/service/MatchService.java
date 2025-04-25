@@ -106,7 +106,7 @@ public class MatchService {
 
 
     public Page<MatchGroupByDate> getUpcomingMatches(int page, String filter) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("datetime").descending());
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("datetime").ascending());
 
         List<Game> games = Arrays.stream(filter.split(","))
                 .map(String::trim)
@@ -114,7 +114,7 @@ public class MatchService {
                 .map(Game::valueOf)
                 .toList();
 
-        Page<Match> matchPage = matchRepository.findAllByScoreIsNullAndGameInOrderByDatetimeDesc(games, pageable);
+        Page<Match> matchPage = matchRepository.findAllByScoreIsNullAndGameInOrderByDatetimeAsc(games, pageable);
         List<Match> matches = matchPage.getContent();
 
         Map<LocalDate, List<Match>> matchesByDate = matches.stream()
@@ -137,7 +137,7 @@ public class MatchService {
     }
 
     public List<MatchGroupByDate> getUpcomingMatchesByGame(Game game) {
-        List<Match> matches = matchRepository.findAllByGameAndScoreIsNullOrderByDatetimeDesc(game);
+        List<Match> matches = matchRepository.findAllByGameAndScoreIsNullOrderByDatetimeAsc(game);
 
         Map<LocalDate, List<Match>> matchesByDate = matches.stream()
                 .collect(Collectors.groupingBy(

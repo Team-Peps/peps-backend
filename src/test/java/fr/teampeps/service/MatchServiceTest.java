@@ -100,7 +100,7 @@ class MatchServiceTest {
         MatchDto dto = MatchDto.builder().build();
         Page<Match> matchPage = new PageImpl<>(List.of(match));
 
-        when(matchRepository.findAllByScoreIsNullAndGameInOrderByDatetimeDesc(anyList(), any())).thenReturn(matchPage);
+        when(matchRepository.findAllByScoreIsNullAndGameInOrderByDatetimeAsc(anyList(), any())).thenReturn(matchPage);
         when(matchMapper.toMatchDto(match)).thenReturn(dto);
 
         Page<MatchGroupByDate> result = matchService.getUpcomingMatches(0, "OVERWATCH");
@@ -115,7 +115,7 @@ class MatchServiceTest {
         match.setDatetime(LocalDateTime.now());
         MatchDto dto = MatchDto.builder().build();
 
-        when(matchRepository.findAllByGameAndScoreIsNullOrderByDatetimeDesc(Game.OVERWATCH)).thenReturn(List.of(match));
+        when(matchRepository.findAllByGameAndScoreIsNullOrderByDatetimeAsc(Game.OVERWATCH)).thenReturn(List.of(match));
         when(matchMapper.toMatchDto(match)).thenReturn(dto);
 
         List<MatchGroupByDate> result = matchService.getUpcomingMatchesByGame(Game.OVERWATCH);
