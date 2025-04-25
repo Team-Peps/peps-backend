@@ -36,7 +36,7 @@ public interface MatchRepository extends JpaRepository<Match, String > {
 
     Page<Match> findAllByScoreIsNotNullAndGameInOrderByDatetimeDesc(List<Game> games, Pageable pageable);
 
-    Page<Match> findAllByScoreIsNullAndGameInOrderByDatetimeDesc(List<Game> games, Pageable pageable);
+    Page<Match> findAllByScoreIsNullAndGameInOrderByDatetimeAsc(List<Game> games, Pageable pageable);
 
-    List<Match> findAllByGameAndScoreIsNullOrderByDatetimeDesc(Game game);
+    List<Match> findAllByGameAndScoreIsNullOrderByDatetimeAsc(Game game);
 }
