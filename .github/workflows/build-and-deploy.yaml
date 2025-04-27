@@ -11,6 +11,9 @@ on:
         options:
           - dev
           - prod
+  push:
+    branches:
+      - dev
 
 env:
   IMAGE_NAME: serkox/peps-api
@@ -58,6 +61,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
+    environment: ${{ github.event_name == 'push' && 'dev' || github.event.inputs.environment }}
 
     steps:
       - name: 🔄 Checkout du code
@@ -66,7 +70,7 @@ jobs:
       - name: 📦 Définir les variables selon l’environnement
         id: set-vars
         run: |
-          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+          if [ "${{ job.environment }}" = "prod" ]; then
             echo "release_name=peps-api-prod" >> $GITHUB_OUTPUT
             echo "namespace=peps-prod" >> $GITHUB_OUTPUT
             echo "values_file=values-prod.yaml" >> $GITHUB_OUTPUT
