@@ -51,6 +51,9 @@ public class PartnerService {
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
             partner.setImageKey(imageUrl);
 
+            long order = partnerRepository.count();
+            partner.setOrder(order);
+
             return partnerMapper.toPartnerDto(partnerRepository.save(partner));
 
         } catch (Exception e) {

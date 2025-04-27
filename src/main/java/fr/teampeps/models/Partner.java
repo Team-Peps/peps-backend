@@ -37,4 +37,7 @@ public class Partner {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @Column(name = "order_index", nullable = false)
+    private Long order;
 }
