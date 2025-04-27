@@ -43,7 +43,7 @@ public class PartnerController {
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
         try {
-            PartnerDto updatedPartner = partnerService.saveOrUpdatePartner(partner, imageFile);
+            PartnerDto updatedPartner = partnerService.updatePartner(partner, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Partenaire mis à jour avec succès",
                     PARTNER_PLACEHOLDER, updatedPartner
@@ -64,7 +64,7 @@ public class PartnerController {
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
         try {
-            PartnerDto updatedPartner = partnerService.saveOrUpdatePartner(partner, imageFile);
+            PartnerDto updatedPartner = partnerService.savePartner(partner, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Partenaire enregistré avec succès",
                     PARTNER_PLACEHOLDER, updatedPartner
@@ -106,6 +106,20 @@ public class PartnerController {
             log.error("❌ Error activating partner with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors de l'activation du partenaire",
+                    ERROR_PLACEHOLDER, e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/reorder")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Map<String, String>> updatePartnerOrder(@RequestBody List<String> orderedIds) {
+        try {
+            partnerService.updatePartnerOrder(orderedIds);
+            return ResponseEntity.ok(Map.of(MESSAGE_PLACEHOLDER, "Ordre des partenaires mis à jour avec succès"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la mise à jour de l'ordre",
                     ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
