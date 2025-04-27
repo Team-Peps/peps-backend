@@ -61,4 +61,16 @@ public class Match {
             nullable = false)
     @Enumerated(EnumType.STRING)
     private Game game;
+
+    @Column(name = "competition_image_width")
+    private Integer competitionImageWidth;
+
+    @Column(name = "competition_image_height")
+    private Integer competitionImageHeight;
+
+    @Column(name = "opponent_image_width")
+    private Integer opponentImageWidth;
+
+    @Column(name = "opponent_image_height")
+    private Integer opponentImageHeight;
 }

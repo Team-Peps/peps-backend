@@ -5,6 +5,7 @@ import fr.teampeps.exceptions.ImageUploadException;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.enums.Game;
 import fr.teampeps.models.Match;
+import fr.teampeps.record.ImageData;
 import fr.teampeps.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -118,8 +122,8 @@ public class CronService {
                 String opponent = colsFirstRow.get(2).text();
                 String opponentLogo = Objects.requireNonNull(colsFirstRow.get(2).selectFirst("img")).attr("src");
 
-                String competitionLogoKey;
-                String opponentLogoKey;
+                ImageData competitionLogoRecord;
+                ImageData opponentLogoRecord;
 
                 LocalDateTime parsedDate = parseToDateTime(date);
                 String matchId = generateMatchId(date, competitionName, opponent);
@@ -129,16 +133,20 @@ public class CronService {
                     continue;
                 }
 
-                competitionLogoKey = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, reformatString(competitionName), client);
-                opponentLogoKey = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, reformatString(opponent), client);
+                competitionLogoRecord = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, reformatString(competitionName), client);
+                opponentLogoRecord = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, reformatString(opponent), client);
 
                 Match match = Match.builder()
                         .id(matchId)
                         .datetime(parsedDate)
                         .competitionName(competitionName)
                         .opponent(opponent)
-                        .competitionImageKey(competitionLogoKey)
-                        .opponentImageKey(opponentLogoKey)
+                        .competitionImageKey(competitionLogoRecord.imageKey())
+                        .competitionImageWidth(competitionLogoRecord.width())
+                        .competitionImageHeight(competitionLogoRecord.height())
+                        .opponentImageKey(opponentLogoRecord.imageKey())
+                        .opponentImageWidth(opponentLogoRecord.width())
+                        .opponentImageHeight(opponentLogoRecord.height())
                         .game(game)
                         .streamUrl(streamUrl)
                         .build();
@@ -186,8 +194,8 @@ public class CronService {
                 String opponent = cols.get(5).text();
                 String opponentLogo = Objects.requireNonNull(cols.get(5).selectFirst("img")).attr("src");
 
-                String competitionLogoKey;
-                String opponentLogoKey;
+                ImageData competitionLogoRecord;
+                ImageData opponentLogoRecord;
 
                 String[] scores = score.split(":");
                 LocalDateTime parsedDate = parseToDateTime(date);
@@ -204,8 +212,8 @@ public class CronService {
 
                 }else{
 
-                    competitionLogoKey = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, reformatString(competitionName), client);
-                    opponentLogoKey = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, reformatString(opponent), client);
+                    competitionLogoRecord = downloadAndUploadImage(BASE_URL + competitionLogo, Bucket.COMPETITIONS, reformatString(competitionName), client);
+                    opponentLogoRecord = downloadAndUploadImage(BASE_URL + opponentLogo, Bucket.OPPONENTS, reformatString(opponent), client);
                     Match match = Match.builder()
                             .id(matchId)
                             .datetime(parsedDate)
@@ -213,8 +221,12 @@ public class CronService {
                             .score(scores[0])
                             .opponentScore(scores[1])
                             .opponent(opponent)
-                            .competitionImageKey(competitionLogoKey)
-                            .opponentImageKey(opponentLogoKey)
+                            .competitionImageKey(competitionLogoRecord.imageKey())
+                            .competitionImageWidth(competitionLogoRecord.width())
+                            .competitionImageHeight(competitionLogoRecord.height())
+                            .opponentImageKey(opponentLogoRecord.imageKey())
+                            .opponentImageWidth(opponentLogoRecord.width())
+                            .opponentImageHeight(opponentLogoRecord.height())
                             .game(game)
                             .streamUrl(streamUrl)
                             .build();
@@ -231,17 +243,27 @@ public class CronService {
         }
     }
 
-    private String downloadAndUploadImage(String url, Bucket bucket, String fileName, HttpClient client) {
+    private ImageData downloadAndUploadImage(String url, Bucket bucket, String fileName, HttpClient client) {
         try {
             HttpRequest imgRequest = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("User-Agent", USER_AGENT)
                     .build();
 
+            log.info("Downloading image from URL: {}", url);
+
             HttpResponse<byte[]> imgResponse = client.send(imgRequest, HttpResponse.BodyHandlers.ofByteArray());
+            byte[] imageBytes = imgResponse.body();
+
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
+
+            int width = img.getWidth();
+            int height = img.getHeight();
+            log.info("Image dimensions: {}x{}", width, height);
+
             String extension = url.substring(url.lastIndexOf('.'));
 
-            return minioService.uploadImageFromBytes(imgResponse.body(), fileName, extension, bucket);
+            return new ImageData(minioService.uploadImageFromBytes(imgResponse.body(), fileName, extension, bucket), width, height);
         } catch (IOException | InterruptedException e) {
             if(e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
