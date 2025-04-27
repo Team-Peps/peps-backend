@@ -141,7 +141,7 @@ class PartnerServiceTest {
     }
 
     @Test
-    void saveOrUpdatePartner_Success() {
+    void savePartner_Success() {
         // Arrange
         when(minioService.uploadImageFromMultipartFile(any(MultipartFile.class), eq("testpartner"), eq(Bucket.PARTNERS)))
                 .thenReturn("test-image-url");
@@ -149,7 +149,7 @@ class PartnerServiceTest {
         when(partnerMapper.toPartnerDto(partner)).thenReturn(partnerDto);
 
         // Act
-        PartnerDto result = partnerService.saveOrUpdatePartner(partner, imageFile);
+        PartnerDto result = partnerService.savePartner(partner, imageFile);
 
         // Assert
         assertNotNull(result);
@@ -160,24 +160,67 @@ class PartnerServiceTest {
     }
 
     @Test
-    void saveOrUpdatePartner_NullImageFile() {
+    void savePartner_NullImageFile() {
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                partnerService.saveOrUpdatePartner(partner, null));
+                partnerService.savePartner(partner, null));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Image non fournie", exception.getReason());
     }
 
     @Test
-    void saveOrUpdatePartner_MinioServiceException() {
+    void savePartner_MinioServiceException() {
         // Arrange
         when(minioService.uploadImageFromMultipartFile(any(), any(), any()))
                 .thenThrow(new RuntimeException("Error uploading image"));
 
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                partnerService.saveOrUpdatePartner(partner, imageFile));
+                partnerService.savePartner(partner, imageFile));
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
+        assertEquals("Erreur lors de la mise à jour du partnenaire", exception.getReason());
+    }
+
+    @Test
+    void updatePartner_Success() {
+        // Arrange
+        when(minioService.uploadImageFromMultipartFile(any(MultipartFile.class), eq("testpartner"), eq(Bucket.PARTNERS)))
+                .thenReturn("test-image-url");
+        when(partnerRepository.save(any(Partner.class))).thenReturn(partner);
+        when(partnerMapper.toPartnerDto(partner)).thenReturn(partnerDto);
+
+        // Act
+        PartnerDto result = partnerService.updatePartner(partner, imageFile);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(partnerDto, result);
+        assertEquals("test-image-url", partner.getImageKey());
+        verify(partnerRepository).save(partner);
+        verify(minioService).uploadImageFromMultipartFile(imageFile, "testpartner", Bucket.PARTNERS);
+    }
+
+    @Test
+    void updatePartner_NullImageFile() {
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                partnerService.updatePartner(partner, null));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Image non fournie", exception.getReason());
+    }
+
+    @Test
+    void updatePartner_MinioServiceException() {
+        // Arrange
+        when(minioService.uploadImageFromMultipartFile(any(), any(), any()))
+                .thenThrow(new RuntimeException("Error uploading image"));
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                partnerService.updatePartner(partner, imageFile));
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         assertEquals("Erreur lors de la mise à jour du partnenaire", exception.getReason());

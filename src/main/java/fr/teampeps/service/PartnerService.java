@@ -41,7 +41,7 @@ public class PartnerService {
         );
     }
 
-    public PartnerDto saveOrUpdatePartner(Partner partner, MultipartFile imageFile) {
+    public PartnerDto savePartner(Partner partner, MultipartFile imageFile) {
 
         if(imageFile == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image non fournie");
@@ -53,6 +53,24 @@ public class PartnerService {
 
             long order = partnerRepository.count();
             partner.setOrder(order);
+
+            return partnerMapper.toPartnerDto(partnerRepository.save(partner));
+
+        } catch (Exception e) {
+            log.error("Error saving partner with ID: {}", partner.getId(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du partnenaire", e);
+        }
+    }
+
+    public PartnerDto updatePartner(Partner partner, MultipartFile imageFile) {
+
+        if(imageFile == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image non fournie");
+        }
+
+        try {
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
+            partner.setImageKey(imageUrl);
 
             return partnerMapper.toPartnerDto(partnerRepository.save(partner));
 
@@ -83,5 +101,16 @@ public class PartnerService {
         return partnerRepository.findAllByIsActive(true).stream()
                 .map(partnerMapper::toPartnerDto)
                 .toList();
+    }
+
+    public void updatePartnerOrder(List<String> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            String id = orderedIds.get(i);
+            int finalI = i;
+            partnerRepository.findById(id).ifPresent(partner -> {
+                partner.setOrder((long) finalI);
+                partnerRepository.save(partner);
+            });
+        }
     }
 }
