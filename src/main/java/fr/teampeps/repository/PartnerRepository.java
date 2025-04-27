@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface PartnerRepository extends JpaRepository<Partner, String> {
 
-    @Query("SELECT p FROM Partner p WHERE p.isActive = :isActive")
+    @Query("SELECT p FROM Partner p WHERE p.isActive = :isActive ORDER BY p.order ASC")
     List<Partner> findAllByIsActive(@PathVariable("isActive") boolean isActive);
 }
