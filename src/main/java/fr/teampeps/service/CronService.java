@@ -54,8 +54,6 @@ public class CronService {
     @Scheduled(cron = "${cron.expression}")
     public Map<String, List<Match>> fetchAndSaveMatches() {
 
-        matchRepository.deleteAllWhereScoreIsNull();
-
         List<Match> upcomingOverwatchMatches = fetchAndSaveUpcomingMatches(Game.OVERWATCH, "/overwatch/Team_Peps", urlStreamOverwatch);
         List<Match> upcomingMarvelRivalsMatches = fetchAndSaveUpcomingMatches(Game.MARVEL_RIVALS, "/marvelrivals/Team_Peps", urlStreamMarvelRivals);
 
