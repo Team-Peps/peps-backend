@@ -286,16 +286,6 @@ class SliderServiceTest {
     }
 
     @Test
-    void updateSlider_NullImageFile() {
-        // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                sliderService.updateSlider(slider, null, mobileImageFile));
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertEquals("Il faut fournir les deux images", exception.getReason());
-    }
-
-    @Test
     void updateSlider_SliderNotFound() {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
                 sliderService.updateSlider(slider, imageFile, mobileImageFile));

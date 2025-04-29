@@ -32,15 +32,13 @@ public class MemberService {
 
     private static final String MEMBER_NOT_FOUND = "Membre non trouvé";
 
-    public MemberDto saveOrUpdateMember(Member member, MultipartFile imageFile) {
+    public MemberDto saveMember(Member member, MultipartFile imageFile) {
 
         if(imageFile == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
         }
 
-        if(member.getFavoriteHeroes() != null && member.getFavoriteHeroes().size() > 3) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un membre ne peut avoir plus de 3 héros favoris");
-        }
+        checkIfMemberAsMaxHeroes(member.getFavoriteHeroes());
 
         if (member.getFavoriteHeroes() != null) {
             List<Heroe> validatedHeroes = member.getFavoriteHeroes().stream()
@@ -54,6 +52,33 @@ public class MemberService {
         try {
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
             member.setImageKey(imageUrl);
+
+            return memberMapper.toMemberDto(memberRepository.save(member));
+
+        } catch (Exception e) {
+            log.error("Error saving member with ID: {}", member.getId(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du membre", e);
+        }
+    }
+
+    public MemberDto updateMember(Member member, MultipartFile imageFile) {
+
+        checkIfMemberAsMaxHeroes(member.getFavoriteHeroes());
+
+        if (member.getFavoriteHeroes() != null) {
+            List<Heroe> validatedHeroes = member.getFavoriteHeroes().stream()
+                    .map(hero -> heroeRepository.findById(hero.getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Héros introuvable : " + hero.getId())))
+                    .toList();
+
+            member.setFavoriteHeroes(validatedHeroes);
+        }
+
+        try {
+            if(imageFile != null) {
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
+                member.setImageKey(imageUrl);
+            }
 
             return memberMapper.toMemberDto(memberRepository.save(member));
 
@@ -141,5 +166,11 @@ public class MemberService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND));
 
         return memberMapper.toMemberDto(member);
+    }
+
+    private void checkIfMemberAsMaxHeroes(List<Heroe> favoriteHeroes) {
+        if (favoriteHeroes != null && favoriteHeroes.size() >= 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un membre ne peut avoir plus de 3 héros favoris");
+        }
     }
 }

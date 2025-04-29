@@ -61,18 +61,18 @@ public class ArticleService {
 
     public ArticleDto updateArticle(Article article, MultipartFile thumbnailImageFile, MultipartFile imageFile) {
 
-       if(imageFile == null || thumbnailImageFile == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
-        }
-
        try {
-            String fileName = article.getTitle().toLowerCase();
-            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
-            article.setImageKey(imageUrl);
+           if(imageFile != null) {
+                String fileName = article.getTitle().toLowerCase();
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
+                article.setImageKey(imageUrl);
+            }
 
-            String fileNameThumbnail = article.getTitle().toLowerCase() + "_thumbnail";
-            String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, fileNameThumbnail, Bucket.ARTICLES);
-            article.setThumbnailImageKey(thumbnailImageUrl);
+            if(thumbnailImageFile != null) {
+                String fileNameThumbnail = article.getTitle().toLowerCase() + "_thumbnail";
+                String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, fileNameThumbnail, Bucket.ARTICLES);
+                article.setThumbnailImageKey(thumbnailImageUrl);
+            }
 
             return articleMapper.toArticleDto(articleRepository.save(article));
 

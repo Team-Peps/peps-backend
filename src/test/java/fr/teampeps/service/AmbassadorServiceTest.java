@@ -56,7 +56,7 @@ class AmbassadorServiceTest {
         when(ambassadorRepository.save(ambassador)).thenReturn(savedAmbassador);
         when(ambassadorMapper.toAmbassadorDto(savedAmbassador)).thenReturn(dto);
 
-        AmbassadorDto result = ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile);
+        AmbassadorDto result = ambassadorService.saveAmbassador(ambassador, imageFile);
 
         assertThat(result).isEqualTo(dto);
         verify(ambassadorRepository).save(ambassador);
@@ -69,7 +69,7 @@ class AmbassadorServiceTest {
         ambassador.setName("Test");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveOrUpdateAmbassador(ambassador, null)
+                ambassadorService.saveAmbassador(ambassador, null)
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
@@ -86,7 +86,7 @@ class AmbassadorServiceTest {
         when(emptyFile.isEmpty()).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveOrUpdateAmbassador(ambassador, emptyFile)
+                ambassadorService.saveAmbassador(ambassador, emptyFile)
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
@@ -104,7 +104,7 @@ class AmbassadorServiceTest {
         when(minioService.uploadImageFromMultipartFile(any(), any(), any())).thenThrow(new RuntimeException("MinIO error"));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile)
+                ambassadorService.saveAmbassador(ambassador, imageFile)
         );
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());

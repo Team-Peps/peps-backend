@@ -91,14 +91,6 @@ class ArticleServiceTest {
     }
 
     @Test
-    void updateArticle_shouldThrowBadRequest_whenImagesMissing() {
-        Article article = new Article();
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> articleService.updateArticle(article, null, null));
-        assertEquals("400 BAD_REQUEST \"Aucune image fournie\"", exception.getMessage());
-    }
-
-    @Test
     void updateArticle_shouldReturnDto_whenValidInputs() {
         Article article = new Article();
         article.setTitle("Update");

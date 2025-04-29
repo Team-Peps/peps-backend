@@ -51,7 +51,7 @@ public class MemberController {
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
         try {
-            MemberDto updatedMember = memberService.saveOrUpdateMember(member, imageFile);
+            MemberDto updatedMember = memberService.updateMember(member, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Membre mis à jour avec succès",
                     MEMBER_PLACEHOLDER, updatedMember
@@ -72,7 +72,7 @@ public class MemberController {
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
         try {
-            MemberDto updatedMember = memberService.saveOrUpdateMember(member, imageFile);
+            MemberDto updatedMember = memberService.saveMember(member, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Membre enregistré avec succès",
                     MEMBER_PLACEHOLDER, updatedMember

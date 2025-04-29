@@ -38,7 +38,7 @@ public class AmbassadorController {
     ) {
         log.info(ambassador.getTwitchUsername());
         try {
-            AmbassadorDto updatedAmbassador = ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile);
+            AmbassadorDto updatedAmbassador = ambassadorService.updateAmbassador(ambassador, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Ambassadeur mis à jour avec succès",
                     "ambassador", updatedAmbassador
@@ -59,7 +59,7 @@ public class AmbassadorController {
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
         try {
-            AmbassadorDto updatedAmbassador = ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile);
+            AmbassadorDto updatedAmbassador = ambassadorService.saveAmbassador(ambassador, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Ambassadeur enregistré avec succès",
                     "ambassador", updatedAmbassador

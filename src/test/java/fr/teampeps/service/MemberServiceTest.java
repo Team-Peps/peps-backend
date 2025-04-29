@@ -100,7 +100,7 @@ class MemberServiceTest {
         when(memberMapper.toMemberDto(member)).thenReturn(memberDto);
 
         // Act
-        MemberDto result = memberService.saveOrUpdateMember(member, imageFile);
+        MemberDto result = memberService.saveMember(member, imageFile);
 
         // Assert
         assertNotNull(result);
@@ -114,7 +114,7 @@ class MemberServiceTest {
     void saveOrUpdateMember_NullImageFile() {
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                memberService.saveOrUpdateMember(member, null));
+                memberService.saveMember(member, null));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Aucune image fournie", exception.getReason());
@@ -133,7 +133,7 @@ class MemberServiceTest {
 
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                memberService.saveOrUpdateMember(member, imageFile));
+                memberService.saveMember(member, imageFile));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Un membre ne peut avoir plus de 3 héros favoris", exception.getReason());
@@ -147,7 +147,7 @@ class MemberServiceTest {
 
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                memberService.saveOrUpdateMember(member, imageFile));
+                memberService.saveMember(member, imageFile));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertNotNull(exception.getReason());
@@ -164,7 +164,7 @@ class MemberServiceTest {
 
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                memberService.saveOrUpdateMember(member, imageFile));
+                memberService.saveMember(member, imageFile));
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         assertEquals("Erreur lors de la mise à jour du membre", exception.getReason());

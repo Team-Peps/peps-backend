@@ -24,7 +24,7 @@ public class AmbassadorService {
     private final MinioService minioService;
     private final AmbassadorMapper ambassadorMapper;
 
-    public AmbassadorDto saveOrUpdateAmbassador(Ambassador ambassador, MultipartFile imageFile) {
+    public AmbassadorDto saveAmbassador(Ambassador ambassador, MultipartFile imageFile) {
 
         if(imageFile == null || imageFile.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
@@ -33,6 +33,22 @@ public class AmbassadorService {
         try {
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, ambassador.getName().toLowerCase(), Bucket.AMBASSADORS);
             ambassador.setImageKey(imageUrl);
+
+            return ambassadorMapper.toAmbassadorDto(ambassadorRepository.save(ambassador));
+
+        } catch (Exception e) {
+            log.error("Error saving ambassador with ID: {}", ambassador.getId(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour de l'ambassadeur", e);
+        }
+    }
+
+    public AmbassadorDto updateAmbassador(Ambassador ambassador, MultipartFile imageFile) {
+
+        try {
+            if(imageFile != null && !imageFile.isEmpty()) {
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, ambassador.getName().toLowerCase(), Bucket.AMBASSADORS);
+                ambassador.setImageKey(imageUrl);
+            }
 
             return ambassadorMapper.toAmbassadorDto(ambassadorRepository.save(ambassador));
 
