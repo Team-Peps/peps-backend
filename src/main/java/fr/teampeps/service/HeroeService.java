@@ -44,7 +44,7 @@ public class HeroeService {
         );
     }
 
-    public HeroeDto saveOrUpdateHeroe(Heroe heroe, MultipartFile imageFile) {
+    public HeroeDto saveHeroe(Heroe heroe, MultipartFile imageFile) {
 
         if(imageFile == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
@@ -54,6 +54,23 @@ public class HeroeService {
             String fileName = heroe.getGame() + SLASH_DELIMITER + heroe.getName().toLowerCase();
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.HEROES);
             heroe.setImageKey(imageUrl);
+
+            return heroeMapper.toHeroeDto(heroeRepository.save(heroe));
+
+        } catch (Exception e) {
+            log.error("Error saving heroe with ID: {}", heroe.getId(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du héro", e);
+        }
+    }
+
+    public HeroeDto updateHeroe(Heroe heroe, MultipartFile imageFile) {
+
+        try {
+            if(imageFile != null) {
+                String fileName = heroe.getGame() + SLASH_DELIMITER + heroe.getName().toLowerCase();
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.HEROES);
+                heroe.setImageKey(imageUrl);
+            }
 
             return heroeMapper.toHeroeDto(heroeRepository.save(heroe));
 

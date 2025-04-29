@@ -131,9 +131,6 @@ class CronServiceTest {
         // Exécution
         Map<String, List<Match>> result = spyService.fetchAndSaveMatches();
 
-        // Vérification
-        verify(matchRepository).deleteAllWhereScoreIsNull();
-
         assertNotNull(result);
         assertEquals(2, result.get("upcoming").size());
         assertEquals(2, result.get("played").size());

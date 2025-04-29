@@ -75,20 +75,20 @@ public class SliderService {
 
     public SliderDto updateSlider(Slider slider, MultipartFile imageFile, MultipartFile mobileImageFile) {
 
-        if(imageFile == null || mobileImageFile == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il faut fournir les deux images");
-        }
-
         Slider existingSlider = sliderRepository.findById(slider.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Slider non trouvé"));
         slider.setOrder(existingSlider.getOrder());
 
         try {
-            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, slider.getId(), Bucket.SLIDERS);
-            slider.setImageKey(imageUrl);
+            if(imageFile != null) {
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, slider.getId(), Bucket.SLIDERS);
+                slider.setImageKey(imageUrl);
+            }
 
-            String mobileImageUrl = minioService.uploadImageFromMultipartFile(mobileImageFile, slider.getId() + "_mobile", Bucket.SLIDERS);
-            slider.setMobileImageKey(mobileImageUrl);
+            if(mobileImageFile != null) {
+                String mobileImageUrl = minioService.uploadImageFromMultipartFile(mobileImageFile, slider.getId() + "_mobile", Bucket.SLIDERS);
+                slider.setMobileImageKey(mobileImageUrl);
+            }
 
             return sliderMapper.toSliderDto(sliderRepository.save(slider));
 

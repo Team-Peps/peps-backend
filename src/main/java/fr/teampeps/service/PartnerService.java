@@ -64,13 +64,11 @@ public class PartnerService {
 
     public PartnerDto updatePartner(Partner partner, MultipartFile imageFile) {
 
-        if(imageFile == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image non fournie");
-        }
-
         try {
-            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
-            partner.setImageKey(imageUrl);
+            if(imageFile != null) {
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
+                partner.setImageKey(imageUrl);
+            }
 
             return partnerMapper.toPartnerDto(partnerRepository.save(partner));
 

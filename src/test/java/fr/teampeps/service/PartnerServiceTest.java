@@ -203,16 +203,6 @@ class PartnerServiceTest {
     }
 
     @Test
-    void updatePartner_NullImageFile() {
-        // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                partnerService.updatePartner(partner, null));
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertEquals("Image non fournie", exception.getReason());
-    }
-
-    @Test
     void updatePartner_MinioServiceException() {
         // Arrange
         when(minioService.uploadImageFromMultipartFile(any(), any(), any()))
