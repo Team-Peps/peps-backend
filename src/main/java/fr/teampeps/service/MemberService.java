@@ -169,7 +169,7 @@ public class MemberService {
     }
 
     private void checkIfMemberAsMaxHeroes(List<Heroe> favoriteHeroes) {
-        if (favoriteHeroes != null && favoriteHeroes.size() >= 3) {
+        if (favoriteHeroes != null && favoriteHeroes.size() > 3) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un membre ne peut avoir plus de 3 héros favoris");
         }
     }
