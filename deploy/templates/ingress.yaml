@@ -8,6 +8,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 
 spec:
   ingressClassName: {{ .Values.ingress.className }}
@@ -22,3 +23,7 @@ spec:
                 name: {{ .Chart.Name }}
                 port:
                   number: {{ .Values.service.port }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ .Chart.Name }}-tls
