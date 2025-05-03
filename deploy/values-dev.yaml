@@ -8,7 +8,7 @@ image:
 
 ingress:
   className: nginx
-  host: api.2.11.47.69.nip.io
+  host: apipeps.serkox.ovh
 
 service:
   port: 80

@@ -66,7 +66,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4300", "http://backoffice.2.11.47.69.nip.io", "http://frontend.2.11.47.69.nip.io"));
+        configuration.setAllowedOrigins(List.of("https://localhost:4200", "https://localhost:4300", "https://backofficepeps.serkox.ovh", "https://frontendpeps.serkox.ovh"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
         configuration.addAllowedHeader("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
