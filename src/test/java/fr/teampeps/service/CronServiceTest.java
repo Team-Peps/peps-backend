@@ -53,8 +53,8 @@ class CronServiceTest {
         java.lang.reflect.Method method = CronService.class.getDeclaredMethod("generateMatchId", String.class, String.class, String.class);
         method.setAccessible(true);
 
-        String result = (String) method.invoke(cronService, "May 10, 2023", "Tournament Finals", "Team Rival");
-        assertEquals("may 10, 2023-tournament-finals-team rival", result);
+        String result = (String) method.invoke(cronService, "May 10, 2023", "overwatch", "Team Rival");
+        assertEquals("overwatch-team-peps-vs-team rival-may 10, 2023", result);
     }
 
     @Test
