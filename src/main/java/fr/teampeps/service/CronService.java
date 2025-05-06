@@ -124,7 +124,7 @@ public class CronService {
                 ImageData opponentLogoRecord;
 
                 LocalDateTime parsedDate = parseToDateTime(date);
-                String matchId = generateMatchId(date, competitionName, opponent);
+                String matchId = generateMatchId(date, game.getName(), opponent);
 
                 if(parsedDate.isBefore(LocalDateTime.now()) || matchRepository.existsById(matchId)) {
                     log.info("Match {} is in the past or already exist: {}", matchId, date);
@@ -198,7 +198,7 @@ public class CronService {
                 String[] scores = score.split(":");
                 LocalDateTime parsedDate = parseToDateTime(date);
 
-                String matchId = generateMatchId(date, competitionName, opponent);
+                String matchId = generateMatchId(date, game.getName(), opponent);
 
                 if(matchRepository.existsById(matchId) && matchRepository.isMatchScoreIsNull(matchId).isEmpty()) {
                     log.info("Match already exists and updating score: {}", matchId);
@@ -300,8 +300,8 @@ public class CronService {
         return str.toLowerCase().replaceAll("[^a-zA-Z0-9_-]", "");
     }
 
-    private String generateMatchId(String date, String competitionName, String opponent) {
-        return (date + "-" + competitionName.replace(" - ", "-").replace(" ","-") + "-" + opponent).toLowerCase();
+    private String generateMatchId(String date, String game, String opponent) {
+        return (game + "-Team-Peps-vs-" + opponent + "-" + date).toLowerCase();
     }
 
 }
