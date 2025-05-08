@@ -78,8 +78,6 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserTinyDto> getProfile(@AuthenticationPrincipal User userAuthenticated) {
-        log.info(userAuthenticated.toString());
-
         User user = userRepository.findById(userAuthenticated.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable"));
 
