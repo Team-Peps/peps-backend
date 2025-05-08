@@ -25,6 +25,8 @@
     <cache alias="ambassadorCache" uses-template="defaultTemplate"/>
     <cache alias="memberCache" uses-template="defaultTemplate"/>
     <cache alias="heroeCache" uses-template="defaultTemplate"/>
+    <cache alias="galleryCache" uses-template="defaultTemplate"/>
+    <cache alias="galleryPhotoCache" uses-template="defaultTemplate"/>
 
     <cache alias="matchCache">
         <expiry>

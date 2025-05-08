@@ -19,8 +19,8 @@ spring:
       config: classpath:ehcache.xml
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
+      max-file-size: 200MB
+      max-request-size: 200MB
 
 application:
   security:

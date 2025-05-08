@@ -110,7 +110,11 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-jpeg</artifactId>
+            <version>3.10.1</version>
+        </dependency>
     </dependencies>
 
     <build>
