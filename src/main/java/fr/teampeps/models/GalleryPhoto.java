@@ -22,9 +22,9 @@ public class GalleryPhoto {
             nullable = false)
     private String imageKey;
 
-    @Column(name = "author",
-            nullable = false)
-    private String author;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "gallery_id", nullable = false)

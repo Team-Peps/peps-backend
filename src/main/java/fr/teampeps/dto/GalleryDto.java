@@ -13,4 +13,5 @@ public class GalleryDto {
     private String date;
     private String description;
     private List<GalleryPhotoDto> photos;
+    private List<String> authors;
 }

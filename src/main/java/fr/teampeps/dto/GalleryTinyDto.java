@@ -7,11 +7,10 @@ import java.util.List;
 
 @Data
 @Builder
-public class GalleryWithAuthorsDto {
+public class GalleryTinyDto {
     private String id;
     private String eventName;
     private String date;
     private String description;
-    private List<GalleryPhotoDto> photos;
     private List<String> authors;
 }

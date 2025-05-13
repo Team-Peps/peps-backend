@@ -1,7 +1,8 @@
 package fr.teampeps.mapper;
 
 import fr.teampeps.dto.GalleryDto;
-import fr.teampeps.dto.GalleryWithAuthorsDto;
+import fr.teampeps.dto.GalleryTinyDto;
+import fr.teampeps.models.Author;
 import fr.teampeps.models.Gallery;
 import fr.teampeps.models.GalleryPhoto;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,16 @@ public class GalleryMapper {
                 .photos(gallery.getPhotos().stream()
                         .map(galleryPhotoMapper::toGalleryPhotoDto)
                         .toList())
+                .authors(gallery.getPhotos().stream()
+                        .map(GalleryPhoto::getAuthor)
+                        .distinct()
+                        .map(Author::getName)
+                        .toList())
                 .build();
     }
 
-    public GalleryWithAuthorsDto toGalleryWithAuthorsDto(Gallery gallery) {
-        return GalleryWithAuthorsDto.builder()
+    public GalleryTinyDto toGalleryTinyDto(Gallery gallery) {
+        return GalleryTinyDto.builder()
                 .id(gallery.getId())
                 .eventName(gallery.getEventName())
                 .date(gallery.getDate().toString())
@@ -34,9 +40,7 @@ public class GalleryMapper {
                 .authors(gallery.getPhotos().stream()
                         .map(GalleryPhoto::getAuthor)
                         .distinct()
-                        .toList())
-                .photos(gallery.getPhotos().stream()
-                        .map(galleryPhotoMapper::toGalleryPhotoDto)
+                        .map(Author::getName)
                         .toList())
                 .build();
     }

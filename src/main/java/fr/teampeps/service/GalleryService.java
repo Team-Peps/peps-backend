@@ -1,15 +1,20 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.GalleryDto;
-import fr.teampeps.dto.GalleryWithAuthorsDto;
+import fr.teampeps.dto.GalleryTinyDto;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.mapper.GalleryMapper;
+import fr.teampeps.models.Author;
 import fr.teampeps.models.Gallery;
 import fr.teampeps.models.GalleryPhoto;
 import fr.teampeps.repository.GalleryPhotoRepository;
 import fr.teampeps.repository.GalleryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +39,7 @@ public class GalleryService {
     private final GalleryMapper galleryMapper;
     private final MinioService minioService;
 
-    public GalleryDto addPhotosToGallery(String galleryId, MultipartFile zipFile, String author) {
+    public GalleryDto addPhotosToGallery(String galleryId, MultipartFile zipFile, Author author) {
 
         Optional<Gallery> galleryOptional = galleryRepository.findById(galleryId);
         Gallery gallery;
@@ -59,7 +64,7 @@ public class GalleryService {
         return galleryMapper.toGalleryDto(galleryRepository.save(gallery));
     }
 
-    private List<GalleryPhoto> extractAndSavePhotosFromZip(MultipartFile zipFile, Gallery gallery, String author) {
+    private List<GalleryPhoto> extractAndSavePhotosFromZip(MultipartFile zipFile, Gallery gallery, Author author) {
 
         List<GalleryPhoto> photos = new ArrayList<>();
 
@@ -167,25 +172,21 @@ public class GalleryService {
         }
     }
 
-    public List<GalleryWithAuthorsDto> getAllGallery() {
+    public List<GalleryDto> getAllGallery() {
         List<Gallery> galleries = galleryRepository.findAllOrderByDate();
         return galleries.stream()
-                .map(galleryMapper::toGalleryWithAuthorsDto)
+                .map(galleryMapper::toGalleryDto)
                 .toList();
     }
 
     public GalleryDto updateGallery(String galleryId, Gallery gallery) {
-        Optional<Gallery> galleryOptional = galleryRepository.findById(galleryId);
+        Gallery existingGallery = galleryRepository.findById(galleryId)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune galerie trouvée avec cet ID"));
 
-        if(galleryOptional.isPresent()) {
-            Gallery existingGallery = galleryOptional.get();
             existingGallery.setEventName(gallery.getEventName());
             existingGallery.setDate(gallery.getDate());
             existingGallery.setDescription(gallery.getDescription());
             return galleryMapper.toGalleryDto(galleryRepository.save(existingGallery));
-        } else {
-            throw new IllegalArgumentException("Aucune galerie trouvée avec cet ID");
-        }
     }
 
     public void deletePhoto(String photoId) {
@@ -202,5 +203,11 @@ public class GalleryService {
         } else {
             throw new IllegalArgumentException("Aucune photo trouvée avec cet ID");
         }
+    }
+
+    public Page<GalleryTinyDto> getGalleries(int page) {
+        Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "date"));
+
+        return galleryRepository.findAll(pageable).map(galleryMapper::toGalleryTinyDto);
     }
 }

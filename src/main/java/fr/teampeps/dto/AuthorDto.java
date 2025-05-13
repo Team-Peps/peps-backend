@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class GalleryPhotoDto {
+public class AuthorDto {
     private String id;
-    private String imageKey;
-    private AuthorDto author;
+    private String name;
 }

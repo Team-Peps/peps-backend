@@ -1,9 +1,9 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.GalleryDto;
-import fr.teampeps.dto.GalleryWithAuthorsDto;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.mapper.GalleryMapper;
+import fr.teampeps.models.Author;
 import fr.teampeps.models.Gallery;
 import fr.teampeps.models.GalleryPhoto;
 import fr.teampeps.repository.GalleryPhotoRepository;
@@ -51,9 +51,8 @@ class GalleryServiceTest {
 
     private Gallery gallery;
     private GalleryDto galleryDto;
-    private GalleryWithAuthorsDto galleryWithAuthorsDto;
     private final String GALLERY_ID = "gallery-id-123";
-    private final String AUTHOR = "test-author";
+    private final Author author = new Author();
 
     @BeforeEach
     void setUp() {
@@ -71,13 +70,9 @@ class GalleryServiceTest {
         galleryDto.setDescription("Test Description");
         galleryDto.setPhotos(new ArrayList<>());
 
-        galleryWithAuthorsDto = GalleryWithAuthorsDto.builder().build();
-        galleryWithAuthorsDto.setId(GALLERY_ID);
-        galleryWithAuthorsDto.setAuthors(new ArrayList<>());
-        galleryWithAuthorsDto.setEventName("Test Event");
-        galleryWithAuthorsDto.setDate(String.valueOf(LocalDate.now()));
-        galleryWithAuthorsDto.setDescription("Test Description");
-        galleryWithAuthorsDto.setPhotos(new ArrayList<>());
+        author.setId("author-id-123");
+        author.setName("Test Author");
+
     }
 
     // Tests for createGallery method
@@ -115,13 +110,13 @@ class GalleryServiceTest {
         galleries.add(gallery);
 
         when(galleryRepository.findAllOrderByDate()).thenReturn(galleries);
-        when(galleryMapper.toGalleryWithAuthorsDto(any(Gallery.class))).thenReturn(galleryWithAuthorsDto);
+        when(galleryMapper.toGalleryDto(any(Gallery.class))).thenReturn(galleryDto);
 
-        List<GalleryWithAuthorsDto> result = galleryService.getAllGallery();
+        List<GalleryDto> result = galleryService.getAllGallery();
 
         verify(galleryRepository).findAllOrderByDate();
         assertEquals(1, result.size());
-        assertEquals(galleryWithAuthorsDto, result.get(0));
+        assertEquals(galleryDto, result.get(0));
     }
 
     // Tests for updateGallery method
@@ -249,7 +244,7 @@ class GalleryServiceTest {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.addPhotosToGallery(GALLERY_ID, zipFile, AUTHOR)
+                () -> galleryService.addPhotosToGallery(GALLERY_ID, zipFile, author)
         );
 
         assertEquals("Aucune galerie trouvée avec cet ID", exception.getMessage());
@@ -273,7 +268,7 @@ class GalleryServiceTest {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.addPhotosToGallery(GALLERY_ID, zipFile, AUTHOR)
+                () -> galleryService.addPhotosToGallery(GALLERY_ID, zipFile, author)
         );
 
         assertEquals("Aucune photo trouvée dans le fichier zip", exception.getMessage());
@@ -285,7 +280,7 @@ class GalleryServiceTest {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.addPhotosToGallery(GALLERY_ID, null, AUTHOR)
+                () -> galleryService.addPhotosToGallery(GALLERY_ID, null, author)
         );
 
         assertEquals("Aucun fichier zip fourni", exception.getMessage());
@@ -311,7 +306,7 @@ class GalleryServiceTest {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.addPhotosToGallery(GALLERY_ID, zipFile, AUTHOR)
+                () -> galleryService.addPhotosToGallery(GALLERY_ID, zipFile, author)
         );
 
         assertEquals("Aucune photo trouvée dans le fichier zip", exception.getMessage());
@@ -340,7 +335,7 @@ class GalleryServiceTest {
         when(galleryRepository.save(any(Gallery.class))).thenReturn(gallery);
         when(galleryMapper.toGalleryDto(any(Gallery.class))).thenReturn(galleryDto);
 
-        GalleryDto result = galleryService.addPhotosToGallery(GALLERY_ID, zipFile, AUTHOR);
+        GalleryDto result = galleryService.addPhotosToGallery(GALLERY_ID, zipFile, author);
 
         verify(galleryRepository).save(galleryCaptor.capture());
         Gallery savedGallery = galleryCaptor.getValue();

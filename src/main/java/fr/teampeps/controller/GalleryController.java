@@ -1,12 +1,12 @@
 package fr.teampeps.controller;
 
-import fr.teampeps.dto.AmbassadorDto;
-import fr.teampeps.dto.GalleryDto;
-import fr.teampeps.dto.GalleryWithAuthorsDto;
+import fr.teampeps.dto.*;
+import fr.teampeps.models.Author;
 import fr.teampeps.models.Gallery;
 import fr.teampeps.service.GalleryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,7 +50,7 @@ public class GalleryController {
     public ResponseEntity<Map<String, Object>> addPhotosToGallery(
             @PathVariable("galleryId") String galleryId,
             @RequestPart(value = "zipFile") MultipartFile zipFile,
-            @RequestParam(value = "author") String author
+            @RequestParam(value = "author") Author author
     ) {
         log.info("📦 Processing gallery with ID: {}", galleryId);
         try {
@@ -90,8 +90,8 @@ public class GalleryController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<GalleryWithAuthorsDto>> getAllGallery() {
+    @GetMapping("/all")
+    public ResponseEntity<List<GalleryDto>> getAllGallery() {
         return ResponseEntity.ok(galleryService.getAllGallery());
     }
 
@@ -131,6 +131,14 @@ public class GalleryController {
                     ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<GalleryTinyDto>> getGalleries(
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Page<GalleryTinyDto> galleries = galleryService.getGalleries(page);
+        return ResponseEntity.ok(galleries);
     }
 
 }
