@@ -59,7 +59,8 @@ public class MinioService {
     public String uploadImageFromBytes(byte[] imageContent, String fileName, String extension, Bucket bucket) {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(imageContent);
-            String key = formatKey(fileName) + extension;
+            String sanitizedExtension = extension.replace(".", "").toLowerCase();
+            String key = formatKey(fileName) + "." + sanitizedExtension;
 
             log.info("Uploading file (from byte) to Minio: {}", key);
 
@@ -76,6 +77,20 @@ public class MinioService {
 
         } catch (Exception e) {
             throw new UploadImageException("Error uploading image", e);
+        }
+    }
+
+    public void deleteImage(String imageKey, Bucket bucket) {
+        try {
+            log.info("Deleting file from Minio: {}", imageKey);
+            minioClient.removeObject(
+                    io.minio.RemoveObjectArgs.builder()
+                            .bucket(bucket.name().toLowerCase())
+                            .object(imageKey)
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new UploadImageException("Error deleting image", e);
         }
     }
 }
