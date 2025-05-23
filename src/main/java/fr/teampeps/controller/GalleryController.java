@@ -28,10 +28,13 @@ public class GalleryController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> createGallery(@RequestBody Gallery gallery) {
+    public ResponseEntity<Map<String, Object>> createGallery(
+            @RequestPart("gallery") Gallery gallery,
+            @RequestPart("imageFile") MultipartFile imageFile
+    ) {
         log.info("📦 Creating gallery with event name : {}", gallery.getEventName());
         try {
-            GalleryDto createdGallery = galleryService.createGallery(gallery);
+            GalleryDto createdGallery = galleryService.createGallery(gallery, imageFile);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Galerie créée avec succès",
                     "gallery", createdGallery
@@ -72,11 +75,13 @@ public class GalleryController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateGallery(
             @PathVariable("galleryId") String galleryId,
-            @RequestBody Gallery gallery
+            @RequestPart("gallery") Gallery gallery,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+
     ) {
         log.info("📝 Updating gallery with ID: {}", galleryId);
         try {
-            GalleryDto updatedGallery = galleryService.updateGallery(galleryId, gallery);
+            GalleryDto updatedGallery = galleryService.updateGallery(galleryId, gallery, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Galerie mise à jour avec succès",
                     "gallery", updatedGallery

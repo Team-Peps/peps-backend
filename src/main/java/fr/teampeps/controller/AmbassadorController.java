@@ -36,7 +36,6 @@ public class AmbassadorController {
             @RequestPart("ambassador") Ambassador ambassador,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
-        log.info(ambassador.getTwitchUsername());
         try {
             AmbassadorDto updatedAmbassador = ambassadorService.updateAmbassador(ambassador, imageFile);
             return ResponseEntity.ok(Map.of(

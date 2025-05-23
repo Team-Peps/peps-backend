@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -81,8 +82,9 @@ class GalleryServiceTest {
         when(galleryRepository.existsByEventName(anyString())).thenReturn(false);
         when(galleryRepository.save(any(Gallery.class))).thenReturn(gallery);
         when(galleryMapper.toGalleryDto(any(Gallery.class))).thenReturn(galleryDto);
+        MultipartFile imageFile = mock(MultipartFile.class);
 
-        GalleryDto result = galleryService.createGallery(gallery);
+        GalleryDto result = galleryService.createGallery(gallery, imageFile);
 
         verify(galleryRepository).existsByEventName(gallery.getEventName());
         verify(galleryRepository).save(gallery);
@@ -92,10 +94,11 @@ class GalleryServiceTest {
     @Test
     void createGallery_DuplicateEventName_ThrowsException() {
         when(galleryRepository.existsByEventName(anyString())).thenReturn(true);
+        MultipartFile imageFile = mock(MultipartFile.class);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.createGallery(gallery)
+                () -> galleryService.createGallery(gallery, imageFile)
         );
 
         assertEquals("Une galerie avec ce nom d'événement existe déjà", exception.getMessage());
@@ -132,12 +135,13 @@ class GalleryServiceTest {
         updatedDto.setEventName("Updated Event");
         updatedDto.setDate(String.valueOf(LocalDate.now().plusDays(1)));
         updatedDto.setDescription("Updated Description");
+        MultipartFile imageFile = mock(MultipartFile.class);
 
         when(galleryRepository.findById(GALLERY_ID)).thenReturn(Optional.of(gallery));
         when(galleryRepository.save(any(Gallery.class))).thenReturn(gallery);
         when(galleryMapper.toGalleryDto(any(Gallery.class))).thenReturn(updatedDto);
 
-        GalleryDto result = galleryService.updateGallery(GALLERY_ID, updatedGallery);
+        GalleryDto result = galleryService.updateGallery(GALLERY_ID, updatedGallery, imageFile);
 
         verify(galleryRepository).findById(GALLERY_ID);
         verify(galleryRepository).save(galleryCaptor.capture());
@@ -151,10 +155,11 @@ class GalleryServiceTest {
     @Test
     void updateGallery_GalleryNotFound_ThrowsException() {
         when(galleryRepository.findById(GALLERY_ID)).thenReturn(Optional.empty());
+        MultipartFile imageFile = mock(MultipartFile.class);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.updateGallery(GALLERY_ID, gallery)
+                () -> galleryService.updateGallery(GALLERY_ID, gallery, imageFile)
         );
 
         assertEquals("Aucune galerie trouvée avec cet ID", exception.getMessage());

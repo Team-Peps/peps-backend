@@ -14,4 +14,5 @@ public class GalleryDto {
     private String description;
     private List<GalleryPhotoDto> photos;
     private List<String> authors;
+    private String thumbnailImageKey;
 }
