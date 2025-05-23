@@ -15,8 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -62,6 +64,92 @@ public class GalleryService {
 
         gallery.getPhotos().addAll(photos);
         return galleryMapper.toGalleryDto(galleryRepository.save(gallery));
+    }
+
+    public GalleryDto createGallery(Gallery gallery, MultipartFile imageFile) {
+
+        if(imageFile == null || imageFile.isEmpty()) {
+            throw new IllegalArgumentException("Aucune image fournie");
+        }
+
+        if(galleryRepository.existsByEventName(gallery.getEventName())) {
+            throw new IllegalArgumentException("Une galerie avec ce nom d'événement existe déjà");
+        }
+
+        try {
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, gallery.getEventName().toLowerCase(), Bucket.GALLERIES);
+            gallery.setThumbnailImageKey(imageUrl);
+
+            return galleryMapper.toGalleryDto(galleryRepository.save(gallery));
+
+        } catch (Exception e) {
+            log.error("Error saving gallery with ID: {}", gallery.getEventName(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la sauvegarde de la galerie", e);
+        }
+
+    }
+
+    public void deleteGallery(String galleryId) {
+        Optional<Gallery> galleryOptional = galleryRepository.findById(galleryId);
+
+        if(galleryOptional.isPresent()) {
+            Gallery gallery = galleryOptional.get();
+            gallery.getPhotos().forEach(photo -> minioService.deleteImage(photo.getImageKey(), Bucket.GALLERIES));
+            galleryRepository.delete(gallery);
+        } else {
+            throw new IllegalArgumentException("Aucune galerie trouvée avec cet ID");
+        }
+    }
+
+    public List<GalleryDto> getAllGallery() {
+        List<Gallery> galleries = galleryRepository.findAllOrderByDate();
+        return galleries.stream()
+                .map(galleryMapper::toGalleryDto)
+                .toList();
+    }
+
+    public GalleryDto updateGallery(String galleryId, Gallery gallery, MultipartFile imageFile) {
+
+        Gallery existingGallery = galleryRepository.findById(galleryId)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune galerie trouvée avec cet ID"));
+
+        try {
+            if(imageFile != null) {
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, existingGallery.getEventName().toLowerCase(), Bucket.GALLERIES);
+                existingGallery.setThumbnailImageKey(imageUrl);
+            }
+
+            existingGallery.setEventName(gallery.getEventName());
+            existingGallery.setDate(gallery.getDate());
+            existingGallery.setDescription(gallery.getDescription());
+            return galleryMapper.toGalleryDto(galleryRepository.save(existingGallery));
+
+        } catch (Exception e) {
+            log.error("Error saving gallery with ID: {}", gallery.getId(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour de la galerie", e);
+        }
+    }
+
+    public void deletePhoto(String photoId) {
+        Optional<GalleryPhoto> photoOptional = galleryPhotoRepository.findById(photoId);
+
+        if(photoOptional.isPresent()) {
+            GalleryPhoto photo = photoOptional.get();
+            Gallery gallery = photo.getGallery();
+
+            gallery.getPhotos().remove(photo);
+
+            minioService.deleteImage(photo.getImageKey(), Bucket.GALLERIES);
+            galleryRepository.save(gallery);
+        } else {
+            throw new IllegalArgumentException("Aucune photo trouvée avec cet ID");
+        }
+    }
+
+    public Page<GalleryTinyDto> getGalleries(int page) {
+        Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "date"));
+
+        return galleryRepository.findAll(pageable).map(galleryMapper::toGalleryTinyDto);
     }
 
     private List<GalleryPhoto> extractAndSavePhotosFromZip(MultipartFile zipFile, Gallery gallery, Author author) {
@@ -144,70 +232,11 @@ public class GalleryService {
         return convertedBytes;
     }
 
-    public GalleryDto createGallery(Gallery gallery) {
-        if(galleryRepository.existsByEventName(gallery.getEventName())) {
-            throw new IllegalArgumentException("Une galerie avec ce nom d'événement existe déjà");
-        }
-
-        return galleryMapper.toGalleryDto(galleryRepository.save(gallery));
-    }
-
     private boolean isConversionNeeded(String name) {
         return name.matches(".*\\.(jpg|png)$");
     }
 
     private boolean isImage(String name) {
         return name.matches(".*\\.(webp|avif|jpg|png)$");
-    }
-
-    public void deleteGallery(String galleryId) {
-        Optional<Gallery> galleryOptional = galleryRepository.findById(galleryId);
-
-        if(galleryOptional.isPresent()) {
-            Gallery gallery = galleryOptional.get();
-            gallery.getPhotos().forEach(photo -> minioService.deleteImage(photo.getImageKey(), Bucket.GALLERIES));
-            galleryRepository.delete(gallery);
-        } else {
-            throw new IllegalArgumentException("Aucune galerie trouvée avec cet ID");
-        }
-    }
-
-    public List<GalleryDto> getAllGallery() {
-        List<Gallery> galleries = galleryRepository.findAllOrderByDate();
-        return galleries.stream()
-                .map(galleryMapper::toGalleryDto)
-                .toList();
-    }
-
-    public GalleryDto updateGallery(String galleryId, Gallery gallery) {
-        Gallery existingGallery = galleryRepository.findById(galleryId)
-                .orElseThrow(() -> new IllegalArgumentException("Aucune galerie trouvée avec cet ID"));
-
-            existingGallery.setEventName(gallery.getEventName());
-            existingGallery.setDate(gallery.getDate());
-            existingGallery.setDescription(gallery.getDescription());
-            return galleryMapper.toGalleryDto(galleryRepository.save(existingGallery));
-    }
-
-    public void deletePhoto(String photoId) {
-        Optional<GalleryPhoto> photoOptional = galleryPhotoRepository.findById(photoId);
-
-        if(photoOptional.isPresent()) {
-            GalleryPhoto photo = photoOptional.get();
-            Gallery gallery = photo.getGallery();
-
-            gallery.getPhotos().remove(photo);
-
-            minioService.deleteImage(photo.getImageKey(), Bucket.GALLERIES);
-            galleryRepository.save(gallery);
-        } else {
-            throw new IllegalArgumentException("Aucune photo trouvée avec cet ID");
-        }
-    }
-
-    public Page<GalleryTinyDto> getGalleries(int page) {
-        Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "date"));
-
-        return galleryRepository.findAll(pageable).map(galleryMapper::toGalleryTinyDto);
     }
 }

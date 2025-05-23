@@ -13,4 +13,5 @@ public class GalleryTinyDto {
     private String date;
     private String description;
     private List<String> authors;
+    private String thumbnailImageKey;
 }

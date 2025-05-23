@@ -38,4 +38,7 @@ public class Gallery {
     @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, orphanRemoval = true)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "galleryPhotoCache")
     private List<GalleryPhoto> photos = new ArrayList<>();
+
+    @Column(name = "thumbnail_image_key")
+    private String thumbnailImageKey;
 }
