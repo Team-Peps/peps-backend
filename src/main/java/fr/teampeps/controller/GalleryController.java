@@ -146,4 +146,10 @@ public class GalleryController {
         return ResponseEntity.ok(galleries);
     }
 
+    @GetMapping("/{galleryId}")
+    public ResponseEntity<GalleryDto> getGalleryById(@PathVariable("galleryId") String galleryId) {
+        GalleryDto gallery = galleryService.getGalleryById(galleryId);
+        return ResponseEntity.ok(gallery);
+    }
+
 }

@@ -39,6 +39,6 @@ public class Gallery {
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "galleryPhotoCache")
     private List<GalleryPhoto> photos = new ArrayList<>();
 
-    @Column(name = "thumbnail_image_key")
+    @Column(name = "thumbnail_image_key", nullable = false)
     private String thumbnailImageKey;
 }

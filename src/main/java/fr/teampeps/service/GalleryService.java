@@ -152,6 +152,12 @@ public class GalleryService {
         return galleryRepository.findAll(pageable).map(galleryMapper::toGalleryTinyDto);
     }
 
+    public GalleryDto getGalleryById(String galleryId) {
+        return galleryRepository.findById(galleryId)
+                .map(galleryMapper::toGalleryDto)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune galerie trouvée avec cet ID"));
+    }
+
     private List<GalleryPhoto> extractAndSavePhotosFromZip(MultipartFile zipFile, Gallery gallery, Author author) {
 
         List<GalleryPhoto> photos = new ArrayList<>();

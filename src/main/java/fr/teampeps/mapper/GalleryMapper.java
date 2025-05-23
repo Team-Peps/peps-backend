@@ -37,13 +37,8 @@ public class GalleryMapper {
                 .id(gallery.getId())
                 .eventName(gallery.getEventName())
                 .date(gallery.getDate().toString())
-                .description(gallery.getDescription())
+                .description(gallery.getDescription().length() > 133 ? gallery.getDescription().substring(0, 134) + "..." : gallery.getDescription())
                 .thumbnailImageKey(gallery.getThumbnailImageKey())
-                .authors(gallery.getPhotos().stream()
-                        .map(GalleryPhoto::getAuthor)
-                        .distinct()
-                        .map(Author::getName)
-                        .toList())
                 .build();
     }
 }
