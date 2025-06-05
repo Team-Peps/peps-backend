@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.PartnerDto;
+import fr.teampeps.enums.PartnerType;
 import fr.teampeps.mapper.PartnerMapper;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.models.Partner;
@@ -278,30 +279,30 @@ class PartnerServiceTest {
         activePartnerDto2.setId("active2");
         activePartnerDto2.setName("ActivePartner2");
 
-        when(partnerRepository.findAllByIsActive(true)).thenReturn(activePartners);
+        when(partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR.name())).thenReturn(activePartners);
         when(partnerMapper.toPartnerDto(activePartners.get(0))).thenReturn(activePartnerDto1);
         when(partnerMapper.toPartnerDto(activePartners.get(1))).thenReturn(activePartnerDto2);
 
         // Act
-        List<PartnerDto> result = partnerService.getAllActivePartners();
+        Map<String, List<PartnerDto>> result = partnerService.getAllActivePartners();
 
         // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("active1", result.get(0).getId());
-        assertEquals("active2", result.get(1).getId());
+        assertEquals("active1", result.get(PartnerType.MAJOR.name()).get(0).getId());
+        assertEquals("active2", result.get(PartnerType.MAJOR.name()).get(1).getId());
     }
 
     @Test
     void getAllActivePartners_EmptyList() {
         // Arrange
-        when(partnerRepository.findAllByIsActive(true)).thenReturn(Collections.emptyList());
+        when(partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR.name())).thenReturn(Collections.emptyList());
 
         // Act
-        List<PartnerDto> result = partnerService.getAllActivePartners();
+        Map<String, List<PartnerDto>> result = partnerService.getAllActivePartners();
 
         // Assert
         assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertTrue(result.get(PartnerType.MAJOR.name()).isEmpty());
     }
 }

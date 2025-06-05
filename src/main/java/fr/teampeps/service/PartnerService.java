@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.PartnerDto;
+import fr.teampeps.enums.PartnerType;
 import fr.teampeps.mapper.PartnerMapper;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.models.Partner;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,10 +97,22 @@ public class PartnerService {
         return partnerMapper.toPartnerDto(partnerRepository.save(partner));
     }
 
-    public List<PartnerDto> getAllActivePartners() {
-        return partnerRepository.findAllByIsActive(true).stream()
+    public Map<String, List<PartnerDto>> getAllActivePartners() {
+        Map<String, List<PartnerDto>> activePartners = new HashMap<>();
+
+        List<PartnerDto> partnersMajor = partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR.name())
+                .stream()
                 .map(partnerMapper::toPartnerDto)
                 .toList();
+        activePartners.put(PartnerType.MAJOR.name(), partnersMajor);
+
+        List<PartnerDto> partnersMinor = partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MINOR.name())
+                .stream()
+                .map(partnerMapper::toPartnerDto)
+                .toList();
+        activePartners.put(PartnerType.MINOR.name(), partnersMinor);
+
+        return activePartners;
     }
 
     public void updatePartnerOrder(List<String> orderedIds) {

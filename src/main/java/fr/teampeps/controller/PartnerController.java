@@ -32,7 +32,7 @@ public class PartnerController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<PartnerDto>> getAllActivePartners() {
+    public ResponseEntity<Map<String, List<PartnerDto>>> getAllActivePartners() {
         return ResponseEntity.ok(partnerService.getAllActivePartners());
     }
 
