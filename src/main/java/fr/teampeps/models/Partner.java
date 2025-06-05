@@ -1,5 +1,6 @@
 package fr.teampeps.models;
 
+import fr.teampeps.enums.PartnerType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,4 +41,8 @@ public class Partner {
 
     @Column(name = "order_index", nullable = false)
     private Long order;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "partner_type", nullable = false)
+    private PartnerType type = PartnerType.MINOR;
 }

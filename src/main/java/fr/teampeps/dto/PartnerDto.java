@@ -16,4 +16,5 @@ public class PartnerDto {
     private List<String> codes;
     private Boolean isActive;
     private Long order;
+    private String type;
 }

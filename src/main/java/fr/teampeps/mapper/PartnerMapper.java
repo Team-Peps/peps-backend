@@ -21,6 +21,7 @@ public class PartnerMapper {
                 .codes(Arrays.asList(partner.getCodes().split(",")))
                 .isActive(partner.getIsActive())
                 .order(partner.getOrder())
+                .type(partner.getType().name())
                 .build();
     }
 
