@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +29,13 @@ class CronServiceTest {
     @InjectMocks
     private CronService cronService;
 
+    private LocalDate localDate;
+
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(cronService, "urlStreamOverwatch", "https://www.twitch.tv/overwatchleague");
         ReflectionTestUtils.setField(cronService, "urlStreamMarvelRivals", "https://www.twitch.tv/marvelrivals");
+        localDate = LocalDate.of(2023, 5, 10);
     }
 
     @Test
@@ -50,11 +54,11 @@ class CronServiceTest {
     @Test
     void testGenerateMatchId() throws Exception {
         // Test méthode privée via reflection
-        java.lang.reflect.Method method = CronService.class.getDeclaredMethod("generateMatchId", String.class, String.class, String.class);
+        java.lang.reflect.Method method = CronService.class.getDeclaredMethod("generateMatchId", LocalDate.class, String.class, String.class);
         method.setAccessible(true);
 
-        String result = (String) method.invoke(cronService, "May 10, 2023", "overwatch", "Team Rival");
-        assertEquals("overwatch-team-peps-vs-team rival-may 10, 2023", result);
+        String result = (String) method.invoke(cronService, localDate, "overwatch", "Team Rival");
+        assertEquals("overwatch-team-peps-vs-team rival-2023-05-10", result);
     }
 
     @Test

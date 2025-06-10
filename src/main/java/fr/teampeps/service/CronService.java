@@ -16,6 +16,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -53,17 +54,15 @@ public class CronService {
 
     @Scheduled(cron = "${cron.expression}")
     public Map<String, List<Match>> fetchAndSaveMatches() {
+        List<Match> marvelRivalsMatches = fetchAndSavePlayedMatches(Game.MARVEL_RIVALS, "/marvelrivals/Team_Peps/Played_Matches", urlStreamMarvelRivals);
+        List<Match> overwatchMatches = fetchAndSavePlayedMatches(Game.OVERWATCH, "/overwatch/Team_Peps/Played_Matches", urlStreamOverwatch);
 
         List<Match> upcomingOverwatchMatches = fetchAndSaveUpcomingMatches(Game.OVERWATCH, "/overwatch/Team_Peps", urlStreamOverwatch);
         List<Match> upcomingMarvelRivalsMatches = fetchAndSaveUpcomingMatches(Game.MARVEL_RIVALS, "/marvelrivals/Team_Peps", urlStreamMarvelRivals);
 
-        List<Match> marvelRivalsMatches = fetchAndSavePlayedMatches(Game.MARVEL_RIVALS, "/marvelrivals/Team_Peps/Played_Matches", urlStreamMarvelRivals);
-        List<Match> overwatchMatches = fetchAndSavePlayedMatches(Game.OVERWATCH, "/overwatch/Team_Peps/Played_Matches", urlStreamOverwatch);
-
         List<Match> playedMatches = Stream.concat(overwatchMatches.stream(), marvelRivalsMatches.stream()).toList();
 
         List<Match> upcomingMatches = Stream.concat(upcomingOverwatchMatches.stream(), upcomingMarvelRivalsMatches.stream()).toList();
-
 
         log.info("Found {} overwatch matches", overwatchMatches.size());
         log.info("Found {} marvel rivals matches", marvelRivalsMatches.size());
@@ -78,7 +77,54 @@ public class CronService {
 
     }
 
-    public List<Match> fetchAndSaveUpcomingMatches(Game game, String url, String streamUrl) {
+    public void fetchAndSaveMatchesManually(SseEmitter emitter) {
+        try {
+
+            emitter.send("Suppression des matchs avec un score null...");
+            matchRepository.deleteAllWhereScoreIsNull();
+
+            emitter.send("Début de la récupération des matchs...");
+
+            List<Match> overwatchMatches = fetchAndSavePlayedMatches(Game.OVERWATCH, "/overwatch/Team_Peps/Played_Matches", urlStreamOverwatch);
+            emitter.send("Récupération des matchs joués Overwatch terminée");
+
+            List<Match> marvelRivalsMatches = fetchAndSavePlayedMatches(Game.MARVEL_RIVALS, "/marvelrivals/Team_Peps/Played_Matches", urlStreamMarvelRivals);
+            emitter.send("Récupération des matchs joués Marvel Rivals terminée");
+
+            List<Match> upcomingOverwatchMatches = fetchAndSaveUpcomingMatches(Game.OVERWATCH, "/overwatch/Team_Peps", urlStreamOverwatch);
+            emitter.send("Récupération des matchs à venir Overwatch terminée");
+
+            List<Match> upcomingMarvelRivalsMatches = fetchAndSaveUpcomingMatches(Game.MARVEL_RIVALS, "/marvelrivals/Team_Peps", urlStreamMarvelRivals);
+            emitter.send("Récupération des matchs à venir Marvel Rivals terminée");
+
+            emitter.send("Tous les matchs ont été récupérés et sauvegardés avec succès");
+            emitter.complete();
+
+            log.info("Found {} overwatch matches", overwatchMatches.size());
+            log.info("Found {} marvel rivals matches", marvelRivalsMatches.size());
+
+            log.info("Found {} upcoming overwatch matches", upcomingOverwatchMatches.size());
+            log.info("Found {} upcoming marvel rivals matches", upcomingMarvelRivalsMatches.size());
+
+        } catch (Exception e) {
+            log.error("Erreur lors de l'envoi de l'événement SSE: {}", e.getMessage());
+            try {
+                if(e instanceof DateParsingException) {
+                    emitter.send("Erreur (NON BLOQUANTE) de parsing de date: " + e.getMessage());
+                } else if(e instanceof ImageUploadException) {
+                    emitter.send("Erreur (BLOQUANTE) de téléchargement ou d'upload d'image: " + e.getMessage());
+                } else {
+                    emitter.send("Une erreur s'est produite: " + e.getMessage());
+                }
+            } catch (IOException ioException) {
+                log.error("Erreur lors de l'envoi de l'erreur SSE: {}", ioException.getMessage());
+            }
+            emitter.complete();
+        }
+    }
+
+
+    protected List<Match> fetchAndSaveUpcomingMatches(Game game, String url, String streamUrl) {
         log.info("Fetching upcoming matches...");
 
         String fetchUrl = BASE_URL + url;
@@ -124,7 +170,7 @@ public class CronService {
                 ImageData opponentLogoRecord;
 
                 LocalDateTime parsedDate = parseToDateTime(date);
-                String matchId = generateMatchId(date, game.getName(), opponent);
+                String matchId = generateMatchId(parsedDate.toLocalDate(), game.getName(), opponent);
 
                 if(parsedDate.isBefore(LocalDateTime.now()) || matchRepository.existsById(matchId)) {
                     log.info("Match {} is in the past or already exist: {}", matchId, date);
@@ -160,7 +206,7 @@ public class CronService {
         }
     }
 
-    public List<Match> fetchAndSavePlayedMatches(Game game, String url, String streamUrl) {
+    protected List<Match> fetchAndSavePlayedMatches(Game game, String url, String streamUrl) {
 
         log.info("Fetching played matches...");
 
@@ -198,7 +244,7 @@ public class CronService {
                 String[] scores = score.split(":");
                 LocalDateTime parsedDate = parseToDateTime(date);
 
-                String matchId = generateMatchId(date, game.getName(), opponent);
+                String matchId = generateMatchId(parsedDate.toLocalDate(), game.getName(), opponent);
 
                 if(matchRepository.existsById(matchId) && matchRepository.isMatchScoreIsNull(matchId).isEmpty()) {
                     log.info("Match already exists and updating score: {}", matchId);
@@ -275,8 +321,7 @@ public class CronService {
                 "MMM d, yyyy - HH:mm z",
                 "MMMM d, yyyy - HH:mm z",
                 "MMM d, yyyy",
-                "MMMM d, yyyy",
-                "MMM dd, yyyy - HH:mm z"
+                "MMMM d, yyyy"
         };
 
         for (String pattern : patterns) {
@@ -300,7 +345,7 @@ public class CronService {
         return str.toLowerCase().replaceAll("[^a-zA-Z0-9_-]", "");
     }
 
-    private String generateMatchId(String date, String game, String opponent) {
+    private String generateMatchId(LocalDate date, String game, String opponent) {
         return (game + "-Team-Peps-vs-" + opponent + "-" + date).toLowerCase();
     }
 
