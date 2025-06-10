@@ -11,4 +11,5 @@ public enum Bucket {
     PARTNERS,
     ROSTERS,
     SLIDERS,
+    VIDEOS,
 }

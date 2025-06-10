@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.VideoDto;
+import fr.teampeps.enums.Bucket;
 import fr.teampeps.mapper.VideoMapper;
 import fr.teampeps.models.Video;
 import fr.teampeps.repository.VideoRepository;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final VideoMapper videoMapper;
+    private final MinioService minioService;
 
     public List<VideoDto> getLastVideos() {
         return videoRepository.findAll().stream()
@@ -26,12 +29,19 @@ public class VideoService {
                 .toList();
     }
 
-    public VideoDto saveVideo(Video video) {
+    public VideoDto saveVideo(Video video, MultipartFile imageFile) {
         if(videoRepository.count() >=3) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Impossible d'ajouter plus de 3 vidéos");
         }
 
+        if(imageFile == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image non fournie");
+        }
+
         try {
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, video.getTitle().toLowerCase(), Bucket.VIDEOS);
+            video.setImageKey(imageUrl);
+
             return videoMapper.toVideoDto(videoRepository.save(video));
         } catch (Exception e) {
             log.error("❌ Erreur lors de l'enregistrement de la vidéo avec ID: {}", video.getId(), e);
@@ -43,13 +53,19 @@ public class VideoService {
         }
     }
 
-    public VideoDto updateVideo(Video video) {
+    public VideoDto updateVideo(Video video, MultipartFile imageFile) {
 
         if(!videoRepository.existsById(video.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Vidéo non trouvée");
         }
 
         try {
+
+            if(imageFile != null) {
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, video.getTitle().toLowerCase(), Bucket.VIDEOS);
+                video.setImageKey(imageUrl);
+            }
+
             return videoMapper.toVideoDto(videoRepository.save(video));
         } catch (Exception e) {
             log.error("❌ Erreur lors de l'enregistrement de la vidéo avec ID: {}", video.getId(), e);
