@@ -12,7 +12,7 @@ import java.util.List;
 public interface PartnerRepository extends JpaRepository<Partner, String> {
 
     @Query("SELECT p FROM Partner p WHERE p.isActive = :isActive AND p.type = :partnerType ORDER BY p.order ASC")
-    List<Partner> findAllByIsActiveAndPartnerType(@PathVariable("isActive") boolean isActive, @PathVariable("partnerType") String partnerType);
+    List<Partner> findAllByIsActiveAndPartnerType(@PathVariable("isActive") boolean isActive, @PathVariable("partnerType") PartnerType partnerType);
 
     @Query("SELECT p FROM Partner p WHERE p.isActive = :isActive ORDER BY p.order ASC")
     List<Partner> findAllByIsActive(@PathVariable("isActive") boolean isActive);
