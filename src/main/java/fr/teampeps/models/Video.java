@@ -29,4 +29,8 @@ public class Video {
     @Column(name = "link",
             nullable = false)
     private String link;
+
+    @Column(name = "image_key",
+            nullable = true)
+    private String imageKey;
 }
