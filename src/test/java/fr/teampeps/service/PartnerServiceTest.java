@@ -279,7 +279,7 @@ class PartnerServiceTest {
         activePartnerDto2.setId("active2");
         activePartnerDto2.setName("ActivePartner2");
 
-        when(partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR.name())).thenReturn(activePartners);
+        when(partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR)).thenReturn(activePartners);
         when(partnerMapper.toPartnerDto(activePartners.get(0))).thenReturn(activePartnerDto1);
         when(partnerMapper.toPartnerDto(activePartners.get(1))).thenReturn(activePartnerDto2);
 
@@ -296,7 +296,7 @@ class PartnerServiceTest {
     @Test
     void getAllActivePartners_EmptyList() {
         // Arrange
-        when(partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR.name())).thenReturn(Collections.emptyList());
+        when(partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR)).thenReturn(Collections.emptyList());
 
         // Act
         Map<String, List<PartnerDto>> result = partnerService.getAllActivePartners();

@@ -100,13 +100,13 @@ public class PartnerService {
     public Map<String, List<PartnerDto>> getAllActivePartners() {
         Map<String, List<PartnerDto>> activePartners = new HashMap<>();
 
-        List<PartnerDto> partnersMajor = partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR.name())
+        List<PartnerDto> partnersMajor = partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MAJOR)
                 .stream()
                 .map(partnerMapper::toPartnerDto)
                 .toList();
         activePartners.put(PartnerType.MAJOR.name(), partnersMajor);
 
-        List<PartnerDto> partnersMinor = partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MINOR.name())
+        List<PartnerDto> partnersMinor = partnerRepository.findAllByIsActiveAndPartnerType(true, PartnerType.MINOR)
                 .stream()
                 .map(partnerMapper::toPartnerDto)
                 .toList();
