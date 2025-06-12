@@ -44,6 +44,7 @@ public class SecurityConfig {
                         (request, response, exception) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage())))
                 .authorizeHttpRequests()
                     //Everybody are able to access to the application patterns bellow
+                    .requestMatchers("/v1/legend/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/**").permitAll()
                     .requestMatchers("/v1/auth/authenticate/**").permitAll()
                     .requestMatchers("/v1/auth/refresh-token").permitAll()

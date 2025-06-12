@@ -47,6 +47,8 @@ discord:
   client-id: ${DISCORD_CLIENT_ID}
   client-secret: ${DISCORD_CLIENT_SECRET}
   redirect-uri: ${DISCORD_REDIRECT_URI}
+  bot:
+    api-key: ${DISCORD_BOT_API_KEY}
 frontend:
   redirect-uri: ${FRONTEND_REDIRECT_URI}
   redirect-cancel-uri: ${FRONTEND_REDIRECT_CANCEL_URI}
