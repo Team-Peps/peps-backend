@@ -1,5 +1,6 @@
 package fr.teampeps.dto;
 
+import fr.teampeps.models.PartnerCode;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class PartnerDto {
     private String description;
     private String imageKey;
     private String link;
-    private List<String> codes;
+    private List<PartnerCode> codes;
     private Boolean isActive;
     private Long order;
     private String type;
