@@ -56,6 +56,11 @@ public class PartnerService {
             long order = partnerRepository.count();
             partner.setOrder(order);
 
+            partner.getCodes().removeIf(code ->
+                    code.getCode() == null || code.getCode().isEmpty() ||
+                    code.getDescription() == null || code.getDescription().isEmpty()
+            );
+
             return partnerMapper.toPartnerDto(partnerRepository.save(partner));
 
         } catch (Exception e) {
@@ -71,6 +76,11 @@ public class PartnerService {
                 String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
                 partner.setImageKey(imageUrl);
             }
+
+            partner.getCodes().removeIf(code ->
+                    code.getCode() == null || code.getCode().isEmpty() ||
+                    code.getDescription() == null || code.getDescription().isEmpty()
+            );
 
             return partnerMapper.toPartnerDto(partnerRepository.save(partner));
 

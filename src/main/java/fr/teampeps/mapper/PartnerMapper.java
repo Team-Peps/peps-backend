@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class PartnerMapper {
                 .description(partner.getDescription())
                 .imageKey(partner.getImageKey())
                 .link(partner.getLink())
-                .codes(Arrays.asList(partner.getCodes().split(",")))
+                .codes(partner.getCodes() != null ? partner.getCodes() : List.of())
                 .isActive(partner.getIsActive())
                 .order(partner.getOrder())
                 .type(partner.getType().name())

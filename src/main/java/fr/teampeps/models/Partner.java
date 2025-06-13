@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -33,8 +36,9 @@ public class Partner {
     @Column(name = "link")
     private String link;
 
-    @Column(name = "codes")
-    private String codes;
+    @ElementCollection
+    @CollectionTable(name = "partner_codes", joinColumns = @JoinColumn(name = "partner_id"))
+    private List<PartnerCode> codes = new ArrayList<>();
 
     @Column(name = "is_active")
     private Boolean isActive;
