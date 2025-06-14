@@ -2,9 +2,11 @@ package fr.teampeps.models;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -13,22 +15,16 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
         @Index(name = "idx_slider_order", columnList = "order_index")
 })
 @Cacheable
+@Builder
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "sliderCache")
-public class Slider {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Slider extends TranslatableEntity<SliderTranslation>{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",
             nullable = false)
     private String id;
-
-    @Column(name = "image_key",
-            nullable = false)
-    private String imageKey;
-
-    @Column(name = "mobile_image_key",
-            nullable = false)
-    private String mobileImageKey;
 
     @Column(name = "is_active",
             nullable = false)
@@ -38,11 +34,11 @@ public class Slider {
             nullable = false)
     private String ctaLink;
 
-    @Column(name = "cta_label",
-            nullable = false)
-    private String ctaLabel;
-
     @Column(name = "order_index",
             nullable = false)
     private Long order;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SliderTranslation> translations = new ArrayList<>();
+
 }

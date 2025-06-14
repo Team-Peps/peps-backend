@@ -5,11 +5,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class SliderTinyDto {
-    private String id;
+public class SliderTranslationDto {
+    private String ctaLabel;
     private String imageKey;
     private String mobileImageKey;
-    private String ctaLink;
-    private String ctaLabel;
-    private Long order;
 }
+

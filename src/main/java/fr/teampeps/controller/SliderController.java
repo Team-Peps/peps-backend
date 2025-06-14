@@ -1,8 +1,7 @@
 package fr.teampeps.controller;
 
 import fr.teampeps.dto.SliderDto;
-import fr.teampeps.dto.SliderTinyDto;
-import fr.teampeps.models.Slider;
+import fr.teampeps.record.SliderRequest;
 import fr.teampeps.service.SliderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -34,19 +34,21 @@ public class SliderController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<SliderTinyDto>> getAllActiveSlider() {
+    public ResponseEntity<List<SliderDto>> getAllActiveSlider() {
         return ResponseEntity.ok(sliderService.getAllActiveSlider());
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> createSlider(
-            @RequestPart("slider") Slider slider,
-            @RequestPart("imageFile") MultipartFile imageFile,
-            @RequestPart("mobileImageFile") MultipartFile mobileImageFile
+            @RequestPart("slider") SliderRequest sliderRequest,
+            @RequestPart("imageFileFr") MultipartFile imageFileFr,
+            @RequestPart("mobileImageFileFr") MultipartFile mobileImageFileFr,
+            @RequestPart("imageFileEn") MultipartFile imageFileEn,
+            @RequestPart("mobileImageFileEn") MultipartFile mobileImageFileEn
     ) {
         try {
-            SliderDto created = sliderService.saveSlider(slider, imageFile, mobileImageFile);
+            SliderDto created = sliderService.saveSlider(sliderRequest, imageFileFr, mobileImageFileFr, imageFileEn, mobileImageFileEn);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Slider enregistré avec succès",
                     SLIDER_PLACEHOLDER, created
@@ -62,18 +64,20 @@ public class SliderController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateSlider(
-            @RequestPart("slider") Slider slider,
-            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
-            @RequestPart(value = "mobileImageFile", required = false) MultipartFile mobileImageFile
+            @RequestPart("slider") SliderRequest sliderRequest,
+            @RequestPart("imageFileFr") @Nullable MultipartFile imageFileFr,
+            @RequestPart("mobileImageFileFr") @Nullable MultipartFile mobileImageFileFr,
+            @RequestPart("imageFileEn") @Nullable MultipartFile imageFileEn,
+            @RequestPart("mobileImageFileEn") @Nullable MultipartFile mobileImageFileEn
     ) {
         try {
-            SliderDto updatedSlider = sliderService.updateSlider(slider, imageFile, mobileImageFile);
+            SliderDto updatedSlider = sliderService.updateSlider(sliderRequest, imageFileFr, mobileImageFileFr, imageFileEn, mobileImageFileEn);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Slider mis à jour avec succès",
                     SLIDER_PLACEHOLDER, updatedSlider
             ));
         } catch (Exception e) {
-            log.error("❌ Error processing slider with ID: {}", slider.getId(), e);
+            log.error("❌ Error processing slider with ID: {}", sliderRequest.id(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors du traitement du slider",
                     ERROR_PLACEHOLDER, e.getMessage()
