@@ -6,6 +6,8 @@ import fr.teampeps.mapper.ArticleMapper;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.models.Article;
 import fr.teampeps.enums.ArticleType;
+import fr.teampeps.models.ArticleTranslation;
+import fr.teampeps.record.ArticleRequest;
 import fr.teampeps.repository.ArticleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,20 +42,33 @@ public class ArticleService {
                 .toList();
     }
 
-    public ArticleDto createArticle(Article article, MultipartFile thumbnailImageFile, MultipartFile imageFile) {
+    public ArticleDto createArticle(
+            ArticleRequest articleRequest,
+            MultipartFile thumbnailImageFile,
+            MultipartFile imageFile
+    ) {
 
         if(imageFile == null || thumbnailImageFile == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
         }
 
+        Article article = articleMapper.toArticle(articleRequest);
+
         try {
-            String fileName = article.getTitle().toLowerCase();
-            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, article.getId(), Bucket.ARTICLES);
+            String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, article.getId() + "_thumbnail", Bucket.ARTICLES);
+
+            article.setThumbnailImageKey(thumbnailImageUrl);
             article.setImageKey(imageUrl);
 
-            String fileNameThumbnail = article.getTitle().toLowerCase() + "_thumbnail";
-            String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, fileNameThumbnail, Bucket.ARTICLES);
-            article.setThumbnailImageKey(thumbnailImageUrl);
+            List<ArticleTranslation> validTranslations = article.getTranslations().stream()
+                .filter(t -> t.getLang() != null && !t.getLang().isBlank() && t.getTitle() != null && !t.getTitle().isBlank() && t.getContent() != null && !t.getContent().isBlank())
+                .peek(articleTranslation -> {
+                    articleTranslation.setParent(article);
+                })
+                .toList();
+
+            article.setTranslations(validTranslations);
 
             return articleMapper.toArticleDto(articleRepository.save(article));
 
@@ -59,22 +77,38 @@ public class ArticleService {
         }
     }
 
-    public ArticleDto updateArticle(Article article, MultipartFile thumbnailImageFile, MultipartFile imageFile) {
+    public ArticleDto updateArticle(
+            ArticleRequest articleRequest,
+            MultipartFile thumbnailImageFile,
+            MultipartFile imageFile
+    ) {
+        Article existingArticle = articleRepository.findById(articleRequest.id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Article non trouvé"));
+        existingArticle.setArticleType(articleRequest.articleType());
+
+        Map<String, ArticleTranslation> translationsByLang = existingArticle.getTranslations().stream()
+                .collect(Collectors.toMap(ArticleTranslation::getLang, Function.identity()));
+
+        articleRequest.translations().forEach((lang, tRequest) -> {
+            ArticleTranslation translation = translationsByLang.get(lang.toLowerCase());
+            if(translation != null) {
+                translation.setContent(tRequest.content());
+                translation.setTitle(tRequest.title());
+            }
+        });
 
        try {
            if(imageFile != null) {
-                String fileName = article.getTitle().toLowerCase();
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, fileName, Bucket.ARTICLES);
-                article.setImageKey(imageUrl);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, existingArticle.getId(), Bucket.ARTICLES);
+                existingArticle.setImageKey(imageUrl);
             }
 
-            if(thumbnailImageFile != null) {
-                String fileNameThumbnail = article.getTitle().toLowerCase() + "_thumbnail";
-                String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, fileNameThumbnail, Bucket.ARTICLES);
-                article.setThumbnailImageKey(thumbnailImageUrl);
-            }
+           if(thumbnailImageFile != null) {
+               String thumbnailImageUrl = minioService.uploadImageFromMultipartFile(thumbnailImageFile, existingArticle.getId() + "_thumbnail", Bucket.ARTICLES);
+               existingArticle.setThumbnailImageKey(thumbnailImageUrl);
+           }
 
-            return articleMapper.toArticleDto(articleRepository.save(article));
+            return articleMapper.toArticleDto(articleRepository.save(existingArticle));
 
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour de l'article", e);
