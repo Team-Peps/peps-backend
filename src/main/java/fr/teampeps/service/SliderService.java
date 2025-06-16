@@ -17,6 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -106,41 +108,29 @@ public class SliderService {
             MultipartFile imageFileEn,
             MultipartFile mobileImageFileEn
     ) {
+
         Slider existingSlider = sliderRepository.findById(sliderRequest.id())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Slider non trouvé"));
 
+        Map<String, SliderTranslation> translationsByLang = existingSlider.getTranslations().stream()
+                        .collect(Collectors.toMap(t -> t.getLang().toLowerCase(), Function.identity()));
+
+        sliderRequest.translations().forEach((lang, tRequest) -> {
+            SliderTranslation translation = translationsByLang.get(lang.toLowerCase());
+            if(translation != null) {
+                translation.setCtaLabel(tRequest.ctaLabel());
+            }
+        });
+
+        existingSlider.setCtaLink(sliderRequest.ctaLink());
+        existingSlider.setIsActive(sliderRequest.isActive());
+
         try {
-            if(imageFileFr != null) {
-                String imageUrlFr = minioService.uploadImageFromMultipartFile(imageFileFr, existingSlider.getId() + "_fr", Bucket.SLIDERS);
-                existingSlider.getTranslations().stream()
-                        .filter(t -> "fr".equalsIgnoreCase(t.getLang()))
-                        .findFirst()
-                        .ifPresent(t -> t.setImageKey(imageUrlFr));
-            }
 
-            if(mobileImageFileFr != null) {
-                String mobileImageUrlFr = minioService.uploadImageFromMultipartFile(mobileImageFileFr, existingSlider.getId() + "_mobile_fr", Bucket.SLIDERS);
-                existingSlider.getTranslations().stream()
-                        .filter(t -> "fr".equalsIgnoreCase(t.getLang()))
-                        .findFirst()
-                        .ifPresent(t -> t.setMobileImageKey(mobileImageUrlFr));
-            }
-
-            if(imageFileEn != null) {
-                String imageUrlEn = minioService.uploadImageFromMultipartFile(imageFileEn, existingSlider.getId() + "_en", Bucket.SLIDERS);
-                existingSlider.getTranslations().stream()
-                        .filter(t -> "en".equalsIgnoreCase(t.getLang()))
-                        .findFirst()
-                        .ifPresent(t -> t.setImageKey(imageUrlEn));
-            }
-
-            if(mobileImageFileEn != null) {
-                String mobileImageUrlEn = minioService.uploadImageFromMultipartFile(mobileImageFileEn, existingSlider.getId() + "_mobile_en", Bucket.SLIDERS);
-                existingSlider.getTranslations().stream()
-                        .filter(t -> "en".equalsIgnoreCase(t.getLang()))
-                        .findFirst()
-                        .ifPresent(t -> t.setMobileImageKey(mobileImageUrlEn));
-            }
+            uploadImageIfPresent(imageFileFr, existingSlider.getId() + "_fr", "fr", translationsByLang, true);
+            uploadImageIfPresent(mobileImageFileFr, existingSlider.getId() + "_mobile_fr", "fr", translationsByLang, false);
+            uploadImageIfPresent(imageFileEn, existingSlider.getId() + "_en", "en", translationsByLang, true);
+            uploadImageIfPresent(mobileImageFileEn, existingSlider.getId() + "_mobile_en", "en", translationsByLang, false);
 
             return sliderMapper.toSliderDto(sliderRepository.save(existingSlider));
 
@@ -178,6 +168,26 @@ public class SliderService {
                 slider.setOrder((long) finalI);
                 sliderRepository.save(slider);
             });
+        }
+    }
+
+    private void uploadImageIfPresent(
+            MultipartFile file,
+            String objectName,
+            String lang,
+            Map<String, SliderTranslation> translationsByLang,
+            boolean isDesktop
+    ) {
+        if(file != null && !file.isEmpty()) {
+            String imageKey = minioService.uploadImageFromMultipartFile(file, objectName, Bucket.SLIDERS);
+            SliderTranslation translation = translationsByLang.get(lang.toLowerCase());
+            if(translation != null) {
+                if(isDesktop) {
+                    translation.setImageKey(imageKey);
+                } else {
+                    translation.setMobileImageKey(imageKey);
+                }
+            }
         }
     }
 
