@@ -63,9 +63,7 @@ public class ArticleService {
 
             List<ArticleTranslation> validTranslations = article.getTranslations().stream()
                 .filter(t -> t.getLang() != null && !t.getLang().isBlank() && t.getTitle() != null && !t.getTitle().isBlank() && t.getContent() != null && !t.getContent().isBlank())
-                .peek(articleTranslation -> {
-                    articleTranslation.setParent(article);
-                })
+                .peek(articleTranslation -> articleTranslation.setParent(article))
                 .toList();
 
             article.setTranslations(validTranslations);
