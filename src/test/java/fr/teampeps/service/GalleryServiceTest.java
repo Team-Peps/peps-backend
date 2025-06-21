@@ -6,6 +6,8 @@ import fr.teampeps.mapper.GalleryMapper;
 import fr.teampeps.models.Author;
 import fr.teampeps.models.Gallery;
 import fr.teampeps.models.GalleryPhoto;
+import fr.teampeps.record.GalleryRequest;
+import fr.teampeps.record.GalleryTranslationRequest;
 import fr.teampeps.repository.GalleryPhotoRepository;
 import fr.teampeps.repository.GalleryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,59 +56,60 @@ class GalleryServiceTest {
     private GalleryDto galleryDto;
     private final String GALLERY_ID = "gallery-id-123";
     private final Author author = new Author();
+    private GalleryRequest galleryRequest;
 
     @BeforeEach
     void setUp() {
         gallery = new Gallery();
         gallery.setId(GALLERY_ID);
-        gallery.setEventName("Test Event");
         gallery.setDate(LocalDate.now());
-        gallery.setDescription("Test Description");
         gallery.setPhotos(new ArrayList<>());
 
         galleryDto = GalleryDto.builder().build();
         galleryDto.setId(GALLERY_ID);
-        galleryDto.setEventName("Test Event");
         galleryDto.setDate(String.valueOf(LocalDate.now()));
-        galleryDto.setDescription("Test Description");
         galleryDto.setPhotos(new ArrayList<>());
 
         author.setId("author-id-123");
         author.setName("Test Author");
 
+        galleryRequest = new GalleryRequest(
+                LocalDate.now(),
+                "image-key",
+                Map.of(
+                        "fr", new GalleryTranslationRequest("Evénement de test", "Description en français"),
+                        "en", new GalleryTranslationRequest("Test Event", "Description in English")
+                )
+        );
+
     }
 
-    // Tests for createGallery method
     @Test
     void createGallery_Success() {
-        when(galleryRepository.existsByEventName(anyString())).thenReturn(false);
+        when(galleryRepository.existsById(anyString())).thenReturn(false);
         when(galleryRepository.save(any(Gallery.class))).thenReturn(gallery);
         when(galleryMapper.toGalleryDto(any(Gallery.class))).thenReturn(galleryDto);
+        when(galleryMapper.toGallery(any(GalleryRequest.class))).thenReturn(gallery);
         MultipartFile imageFile = mock(MultipartFile.class);
 
-        GalleryDto result = galleryService.createGallery(gallery, imageFile);
-
-        verify(galleryRepository).existsByEventName(gallery.getEventName());
-        verify(galleryRepository).save(gallery);
+        GalleryDto result = galleryService.createGallery(galleryRequest, imageFile);
         assertEquals(galleryDto, result);
     }
 
     @Test
     void createGallery_DuplicateEventName_ThrowsException() {
-        when(galleryRepository.existsByEventName(anyString())).thenReturn(true);
+        when(galleryRepository.existsById(anyString())).thenReturn(true);
         MultipartFile imageFile = mock(MultipartFile.class);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.createGallery(gallery, imageFile)
+                () -> galleryService.createGallery(galleryRequest, imageFile)
         );
 
-        assertEquals("Une galerie avec ce nom d'événement existe déjà", exception.getMessage());
-        verify(galleryRepository).existsByEventName(gallery.getEventName());
+        assertEquals("Une galerie avec cet ID existe déjà", exception.getMessage());
         verify(galleryRepository, never()).save(any(Gallery.class));
     }
 
-    // Tests for getAllGallery method
     @Test
     void getAllGallery_ReturnsAllGalleries() {
         List<Gallery> galleries = new ArrayList<>();
@@ -122,33 +125,20 @@ class GalleryServiceTest {
         assertEquals(galleryDto, result.get(0));
     }
 
-    // Tests for updateGallery method
     @Test
     void updateGallery_Success() {
-        Gallery updatedGallery = new Gallery();
-        updatedGallery.setEventName("Updated Event");
-        updatedGallery.setDate(LocalDate.now().plusDays(1));
-        updatedGallery.setDescription("Updated Description");
-
         GalleryDto updatedDto = GalleryDto.builder().build();
         updatedDto.setId(GALLERY_ID);
-        updatedDto.setEventName("Updated Event");
         updatedDto.setDate(String.valueOf(LocalDate.now().plusDays(1)));
-        updatedDto.setDescription("Updated Description");
         MultipartFile imageFile = mock(MultipartFile.class);
 
         when(galleryRepository.findById(GALLERY_ID)).thenReturn(Optional.of(gallery));
         when(galleryRepository.save(any(Gallery.class))).thenReturn(gallery);
         when(galleryMapper.toGalleryDto(any(Gallery.class))).thenReturn(updatedDto);
 
-        GalleryDto result = galleryService.updateGallery(GALLERY_ID, updatedGallery, imageFile);
+        GalleryDto result = galleryService.updateGallery(GALLERY_ID, galleryRequest, imageFile);
 
         verify(galleryRepository).findById(GALLERY_ID);
-        verify(galleryRepository).save(galleryCaptor.capture());
-
-        Gallery capturedGallery = galleryCaptor.getValue();
-        assertEquals("Updated Event", capturedGallery.getEventName());
-        assertEquals("Updated Description", capturedGallery.getDescription());
         assertEquals(updatedDto, result);
     }
 
@@ -159,7 +149,7 @@ class GalleryServiceTest {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> galleryService.updateGallery(GALLERY_ID, gallery, imageFile)
+                () -> galleryService.updateGallery(GALLERY_ID, galleryRequest, imageFile)
         );
 
         assertEquals("Aucune galerie trouvée avec cet ID", exception.getMessage());

@@ -2,7 +2,7 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.*;
 import fr.teampeps.models.Author;
-import fr.teampeps.models.Gallery;
+import fr.teampeps.record.GalleryRequest;
 import fr.teampeps.service.GalleryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,18 +29,18 @@ public class GalleryController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> createGallery(
-            @RequestPart("gallery") Gallery gallery,
+            @RequestPart("gallery") GalleryRequest galleryRequest,
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
-        log.info("📦 Creating gallery with event name : {}", gallery.getEventName());
+        log.info("📦 Creating gallery with date : {}", galleryRequest.date());
         try {
-            GalleryDto createdGallery = galleryService.createGallery(gallery, imageFile);
+            GalleryDto createdGallery = galleryService.createGallery(galleryRequest, imageFile);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Galerie créée avec succès",
                     "gallery", createdGallery
             ));
         } catch (Exception e) {
-            log.error("❌ Error creating gallery event name: {}", gallery.getEventName(), e);
+            log.error("❌ Error creating gallery : {}", galleryRequest.date(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors de la création de la galerie",
                     ERROR_PLACEHOLDER, e.getMessage()
@@ -75,13 +75,13 @@ public class GalleryController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateGallery(
             @PathVariable("galleryId") String galleryId,
-            @RequestPart("gallery") Gallery gallery,
+            @RequestPart("gallery") GalleryRequest galleryRequest,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
 
     ) {
         log.info("📝 Updating gallery with ID: {}", galleryId);
         try {
-            GalleryDto updatedGallery = galleryService.updateGallery(galleryId, gallery, imageFile);
+            GalleryDto updatedGallery = galleryService.updateGallery(galleryId, galleryRequest, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Galerie mise à jour avec succès",
                     "gallery", updatedGallery
