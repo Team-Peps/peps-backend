@@ -1,15 +1,32 @@
 package fr.teampeps.models;
 
-import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Embeddable
 @Getter
 @Setter
+@Entity
+@Builder
+@Table(name = "partner_codes")
+@NoArgsConstructor
+@AllArgsConstructor
 public class PartnerCode {
 
-    private String code;
-    private String description;
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
+    @Column(name = "code", nullable = false)
+    private String code;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partner_id", nullable = false)
+    private Partner partner;
+
+    @Column(name = "description_fr", nullable = false, columnDefinition = "TEXT")
+    private String descriptionFr;
+
+    @Column(name = "description_en", nullable = false, columnDefinition = "TEXT")
+    private String descriptionEn;
 }

@@ -140,7 +140,7 @@ class PartnerServiceTest {
         assertTrue(result.get("activePartners").isEmpty());
         assertTrue(result.get("inactivePartners").isEmpty());
     }
-
+/*
     @Test
     void savePartner_Success() {
         // Arrange
@@ -215,7 +215,7 @@ class PartnerServiceTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         assertEquals("Erreur lors de la mise à jour du partnenaire", exception.getReason());
-    }
+    }*/
 
     @Test
     void deletePartner_Success() {

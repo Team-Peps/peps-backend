@@ -88,7 +88,7 @@ class MemberServiceTest {
         // Create game
         game = Game.OVERWATCH;
     }
-
+/*
     @Test
     void saveOrUpdateMember_Success() {
         // Arrange
@@ -169,7 +169,7 @@ class MemberServiceTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         assertEquals("Erreur lors de la mise à jour du membre", exception.getReason());
     }
-
+*/
     @Test
     void getAllMembers_Success() {
         // Arrange

@@ -3,8 +3,7 @@ package fr.teampeps.models;
 import fr.teampeps.enums.Game;
 import fr.teampeps.enums.MemberRole;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDate;
@@ -15,9 +14,12 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "members")
+@Builder
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "memberCache")
-public class Member {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Member extends TranslatableEntity<MemberTranslation> {
 
     @Id
     @Column(name = "id",
@@ -37,9 +39,6 @@ public class Member {
     @Column(name = "lastname",
             nullable = false)
     private String lastname;
-
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
 
     @Column(name = "date_of_birth",
             nullable = false)
@@ -63,8 +62,8 @@ public class Member {
     @Column(name = "image_key")
     private String imageKey;
 
-    @Column(name = "x_username")
-    private String xUsername;
+    @Column(name = "twitter_username")
+    private String twitterUsername;
 
     @Column(name = "instagram_username")
     private String instagramUsername;
@@ -93,5 +92,8 @@ public class Member {
             inverseJoinColumns = @JoinColumn(name = "hero_id")
     )
     private List<Heroe> favoriteHeroes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberTranslation> translations = new ArrayList<>();
 
 }
