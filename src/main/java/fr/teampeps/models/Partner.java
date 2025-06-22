@@ -2,8 +2,7 @@ package fr.teampeps.models;
 
 import fr.teampeps.enums.PartnerType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.util.ArrayList;
@@ -13,9 +12,12 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "partners")
+@Builder
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "partnerCache")
-public class Partner {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Partner extends TranslatableEntity<PartnerTranslation> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,17 +29,13 @@ public class Partner {
             nullable = false)
     private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
     @Column(name = "image_key")
     private String imageKey;
 
     @Column(name = "link")
     private String link;
 
-    @ElementCollection
-    @CollectionTable(name = "partner_codes", joinColumns = @JoinColumn(name = "partner_id"))
+    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnerCode> codes = new ArrayList<>();
 
     @Column(name = "is_active")
@@ -49,4 +47,21 @@ public class Partner {
     @Enumerated(EnumType.STRING)
     @Column(name = "partner_type", nullable = false)
     private PartnerType type = PartnerType.MINOR;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PartnerTranslation> translations = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Partner{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", imageKey='" + imageKey + '\'' +
+                ", link='" + link + '\'' +
+                ", isActive=" + isActive +
+                ", order=" + order +
+                ", type=" + type +
+                ", translations=" + translations +
+                '}';
+    }
 }

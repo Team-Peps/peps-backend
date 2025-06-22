@@ -5,6 +5,9 @@ import fr.teampeps.enums.PartnerType;
 import fr.teampeps.mapper.PartnerMapper;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.models.Partner;
+import fr.teampeps.models.PartnerCode;
+import fr.teampeps.models.PartnerTranslation;
+import fr.teampeps.record.PartnerRequest;
 import fr.teampeps.repository.PartnerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,11 +48,16 @@ public class PartnerService {
         );
     }
 
-    public PartnerDto savePartner(Partner partner, MultipartFile imageFile) {
+    public PartnerDto savePartner(
+            PartnerRequest partnerRequest,
+            MultipartFile imageFile
+    ) {
 
         if(imageFile == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image non fournie");
         }
+
+        Partner partner = partnerMapper.toPartner(partnerRequest);
 
         try {
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
@@ -58,8 +68,17 @@ public class PartnerService {
 
             partner.getCodes().removeIf(code ->
                     code.getCode() == null || code.getCode().isEmpty() ||
-                    code.getDescription() == null || code.getDescription().isEmpty()
+                    code.getDescriptionEn() == null || code.getDescriptionEn().isEmpty() ||
+                    code.getDescriptionFr() == null || code.getDescriptionFr().isEmpty()
             );
+            partner.getCodes().forEach(code -> {
+                code.setPartner(partner);
+            });
+            List<PartnerTranslation> validTranslations = partner.getTranslations().stream()
+                    .filter(t -> t.getLang() != null && !t.getLang().isBlank() && t.getDescription() != null && !t.getDescription().isBlank())
+                    .peek(partnerTranslation -> partnerTranslation.setParent(partner))
+                    .toList();
+            partner.setTranslations(validTranslations);
 
             return partnerMapper.toPartnerDto(partnerRepository.save(partner));
 
@@ -69,23 +88,57 @@ public class PartnerService {
         }
     }
 
-    public PartnerDto updatePartner(Partner partner, MultipartFile imageFile) {
+    public PartnerDto updatePartner(
+            PartnerRequest partnerRequest,
+            MultipartFile imageFile
+    ) {
+
+        Partner existingPartner = partnerRepository.findById(partnerRequest.id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Partenaire non trouvé"));
+
+        Map<String, PartnerTranslation> translationsByLang = existingPartner.getTranslations().stream()
+                .collect(Collectors.toMap(PartnerTranslation::getLang, Function.identity()));
+
+        partnerRequest.translations().forEach((lang, tRequest) -> {
+            PartnerTranslation translation = translationsByLang.get(lang.toLowerCase());
+            if (translation != null) {
+                translation.setDescription(tRequest.description());
+            }
+        });
+
+        List<PartnerCode> validCodes = partnerRequest.codes().stream()
+            .filter(
+    code -> code.getCode() != null && !code.getCode().isEmpty() &&
+                code.getDescriptionEn() != null && !code.getDescriptionEn().isEmpty() &&
+                code.getDescriptionFr() != null && !code.getDescriptionFr().isEmpty()
+            )
+            .map(code -> {
+                PartnerCode partnerCode = new PartnerCode();
+                partnerCode.setCode(code.getCode());
+                partnerCode.setDescriptionEn(code.getDescriptionEn());
+                partnerCode.setDescriptionFr(code.getDescriptionFr());
+                partnerCode.setPartner(existingPartner);
+                return partnerCode;
+            })
+            .toList();
+
+        existingPartner.setName(partnerRequest.name());
+        existingPartner.setType(partnerRequest.type());
+        existingPartner.setOrder(partnerRequest.order());
+        existingPartner.setIsActive(partnerRequest.isActive());
+        existingPartner.setLink(partnerRequest.link());
+        existingPartner.getCodes().clear();
+        existingPartner.getCodes().addAll(validCodes);
 
         try {
-            if(imageFile != null) {
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, partner.getName().toLowerCase(), Bucket.PARTNERS);
-                partner.setImageKey(imageUrl);
+            if(imageFile != null && !imageFile.isEmpty()) {
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, existingPartner.getName().toLowerCase(), Bucket.PARTNERS);
+                existingPartner.setImageKey(imageUrl);
             }
-
-            partner.getCodes().removeIf(code ->
-                    code.getCode() == null || code.getCode().isEmpty() ||
-                    code.getDescription() == null || code.getDescription().isEmpty()
-            );
-
-            return partnerMapper.toPartnerDto(partnerRepository.save(partner));
+            return partnerMapper.toPartnerDto(partnerRepository.save(existingPartner));
 
         } catch (Exception e) {
-            log.error("Error saving partner with ID: {}", partner.getId(), e);
+            log.error("Error saving partner with ID: {}", existingPartner.getId(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du partnenaire", e);
         }
     }
