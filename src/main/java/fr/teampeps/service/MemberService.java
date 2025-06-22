@@ -91,7 +91,8 @@ public class MemberService {
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Héros introuvable : " + hero.getId())))
                     .toList();
 
-            existingMember.setFavoriteHeroes(validatedHeroes);
+            existingMember.getFavoriteHeroes().clear();
+            existingMember.getFavoriteHeroes().addAll(validatedHeroes);
         }
 
         Map<String, MemberTranslation> translationsByLang = existingMember.getTranslations().stream()
@@ -106,9 +107,8 @@ public class MemberService {
 
         existingMember.setGame(memberRequest.game());
         existingMember.setPseudo(memberRequest.pseudo());
-        existingMember.setIsActive(memberRequest.isActive());
         existingMember.setIsSubstitute(memberRequest.isSubstitute());
-        existingMember.setXUsername(memberRequest.xUsername());
+        existingMember.setTwitterUsername(memberRequest.twitterUsername());
         existingMember.setTwitchUsername(memberRequest.twitchUsername());
         existingMember.setYoutubeUsername(memberRequest.youtubeUsername());
         existingMember.setInstagramUsername(memberRequest.instagramUsername());

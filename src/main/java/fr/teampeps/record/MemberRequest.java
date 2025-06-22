@@ -18,7 +18,7 @@ public record MemberRequest(
     MemberRole role,
     Boolean isSubstitute,
     Boolean isActive,
-    String xUsername,
+    String twitterUsername,
     String instagramUsername,
     String tiktokUsername,
     String youtubeUsername,

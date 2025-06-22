@@ -62,8 +62,8 @@ public class Member extends TranslatableEntity<MemberTranslation> {
     @Column(name = "image_key")
     private String imageKey;
 
-    @Column(name = "x_username")
-    private String xUsername;
+    @Column(name = "twitter_username")
+    private String twitterUsername;
 
     @Column(name = "instagram_username")
     private String instagramUsername;

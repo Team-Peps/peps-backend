@@ -92,7 +92,6 @@ public class PartnerService {
             PartnerRequest partnerRequest,
             MultipartFile imageFile
     ) {
-
         Partner existingPartner = partnerRepository.findById(partnerRequest.id())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Partenaire non trouvé"));
 

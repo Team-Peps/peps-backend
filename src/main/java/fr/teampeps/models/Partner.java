@@ -50,18 +50,4 @@ public class Partner extends TranslatableEntity<PartnerTranslation> {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnerTranslation> translations = new ArrayList<>();
-
-    @Override
-    public String toString() {
-        return "Partner{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", imageKey='" + imageKey + '\'' +
-                ", link='" + link + '\'' +
-                ", isActive=" + isActive +
-                ", order=" + order +
-                ", type=" + type +
-                ", translations=" + translations +
-                '}';
-    }
 }

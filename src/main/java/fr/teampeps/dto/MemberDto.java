@@ -22,7 +22,7 @@ public class MemberDto {
     private Boolean isSubstitute;
     private Boolean isActive;
     private String imageKey;
-    private String xUsername;
+    private String twitterUsername;
     private String instagramUsername;
     private String tiktokUsername;
     private String youtubeUsername;
