@@ -7,6 +7,8 @@ import fr.teampeps.enums.Bucket;
 import fr.teampeps.enums.Game;
 import fr.teampeps.models.Heroe;
 import fr.teampeps.models.Member;
+import fr.teampeps.models.MemberTranslation;
+import fr.teampeps.record.MemberRequest;
 import fr.teampeps.repository.HeroeRepository;
 import fr.teampeps.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,6 +21,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +36,16 @@ public class MemberService {
 
     private static final String MEMBER_NOT_FOUND = "Membre non trouvé";
 
-    public MemberDto saveMember(Member member, MultipartFile imageFile) {
+    public MemberDto saveMember(
+            MemberRequest memberRequest,
+            MultipartFile imageFile
+    ) {
 
         if(imageFile == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
         }
+
+        Member member = memberMapper.toMember(memberRequest);
 
         checkIfMemberAsMaxHeroes(member.getFavoriteHeroes());
 
@@ -53,6 +62,12 @@ public class MemberService {
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
             member.setImageKey(imageUrl);
 
+            List<MemberTranslation> validTranslations = member.getTranslations().stream()
+                    .filter(t -> t.getLang() != null && !t.getLang().isBlank() && t.getDescription() != null && !t.getDescription().isBlank())
+                    .peek(memberTranslation -> memberTranslation.setParent(member))
+                    .toList();
+            member.setTranslations(validTranslations);
+
             return memberMapper.toMemberDto(memberRepository.save(member));
 
         } catch (Exception e) {
@@ -61,29 +76,59 @@ public class MemberService {
         }
     }
 
-    public MemberDto updateMember(Member member, MultipartFile imageFile) {
+    public MemberDto updateMember(
+            MemberRequest memberRequest,
+            MultipartFile imageFile
+    ) {
+        Member existingMember = memberRepository.findById(memberRequest.id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND));
 
-        checkIfMemberAsMaxHeroes(member.getFavoriteHeroes());
+        checkIfMemberAsMaxHeroes(memberRequest.favoriteHeroes());
 
-        if (member.getFavoriteHeroes() != null) {
-            List<Heroe> validatedHeroes = member.getFavoriteHeroes().stream()
+        if (memberRequest.favoriteHeroes() != null) {
+            List<Heroe> validatedHeroes = memberRequest.favoriteHeroes().stream()
                     .map(hero -> heroeRepository.findById(hero.getId())
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Héros introuvable : " + hero.getId())))
                     .toList();
 
-            member.setFavoriteHeroes(validatedHeroes);
+            existingMember.setFavoriteHeroes(validatedHeroes);
         }
+
+        Map<String, MemberTranslation> translationsByLang = existingMember.getTranslations().stream()
+                .collect(Collectors.toMap(MemberTranslation::getLang, Function.identity()));
+
+        memberRequest.translations().forEach((lang, tRequest) -> {
+            MemberTranslation translation = translationsByLang.get(lang);
+            if(translation != null) {
+                translation.setDescription(tRequest.description());
+            }
+        });
+
+        existingMember.setGame(memberRequest.game());
+        existingMember.setPseudo(memberRequest.pseudo());
+        existingMember.setIsActive(memberRequest.isActive());
+        existingMember.setIsSubstitute(memberRequest.isSubstitute());
+        existingMember.setXUsername(memberRequest.xUsername());
+        existingMember.setTwitchUsername(memberRequest.twitchUsername());
+        existingMember.setYoutubeUsername(memberRequest.youtubeUsername());
+        existingMember.setInstagramUsername(memberRequest.instagramUsername());
+        existingMember.setTiktokUsername(memberRequest.tiktokUsername());
+        existingMember.setFirstname(memberRequest.firstname());
+        existingMember.setLastname(memberRequest.lastname());
+        existingMember.setNationality(memberRequest.nationality());
+        existingMember.setRole(memberRequest.role());
+        existingMember.setDateOfBirth(memberRequest.dateOfBirth());
 
         try {
             if(imageFile != null) {
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, member.getPseudo().toLowerCase(), Bucket.MEMBERS);
-                member.setImageKey(imageUrl);
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, memberRequest.pseudo().toLowerCase(), Bucket.MEMBERS);
+                existingMember.setImageKey(imageUrl);
             }
 
-            return memberMapper.toMemberDto(memberRepository.save(member));
+            return memberMapper.toMemberDto(memberRepository.save(existingMember));
 
         } catch (Exception e) {
-            log.error("Error saving member with ID: {}", member.getId(), e);
+            log.error("Error saving member with ID: {}", memberRequest.id(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour du membre", e);
         }
     }
