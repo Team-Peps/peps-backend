@@ -34,7 +34,7 @@ public class GalleryController {
     ) {
         log.info("📦 Creating gallery with date : {}", galleryRequest.date());
         try {
-            GalleryDto createdGallery = galleryService.createGallery(galleryRequest, imageFile);
+            GalleryTinyDto createdGallery = galleryService.createGallery(galleryRequest, imageFile);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Galerie créée avec succès",
                     "gallery", createdGallery
@@ -144,6 +144,12 @@ public class GalleryController {
     ) {
         Page<GalleryTinyDto> galleries = galleryService.getGalleries(page);
         return ResponseEntity.ok(galleries);
+    }
+
+    @GetMapping("/club")
+    public ResponseEntity<List<GalleryTinyDto>> getClubGalleries() {
+        List<GalleryTinyDto> clubGalleries = galleryService.getClubGalleries();
+        return ResponseEntity.ok(clubGalleries);
     }
 
     @GetMapping("/{galleryId}")

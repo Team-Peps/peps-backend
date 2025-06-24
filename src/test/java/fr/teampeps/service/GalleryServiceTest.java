@@ -1,6 +1,7 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.GalleryDto;
+import fr.teampeps.dto.GalleryTinyDto;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.mapper.GalleryMapper;
 import fr.teampeps.models.Author;
@@ -54,6 +55,7 @@ class GalleryServiceTest {
 
     private Gallery gallery;
     private GalleryDto galleryDto;
+    private GalleryTinyDto galleryTinyDto;
     private final String GALLERY_ID = "gallery-id-123";
     private final Author author = new Author();
     private GalleryRequest galleryRequest;
@@ -69,6 +71,10 @@ class GalleryServiceTest {
         galleryDto.setId(GALLERY_ID);
         galleryDto.setDate(String.valueOf(LocalDate.now()));
         galleryDto.setPhotos(new ArrayList<>());
+
+        galleryTinyDto = GalleryTinyDto.builder().build();
+        galleryTinyDto.setId(GALLERY_ID);
+        galleryTinyDto.setDate(String.valueOf(LocalDate.now()));
 
         author.setId("author-id-123");
         author.setName("Test Author");
@@ -88,12 +94,12 @@ class GalleryServiceTest {
     void createGallery_Success() {
         when(galleryRepository.existsById(anyString())).thenReturn(false);
         when(galleryRepository.save(any(Gallery.class))).thenReturn(gallery);
-        when(galleryMapper.toGalleryDto(any(Gallery.class))).thenReturn(galleryDto);
+        when(galleryMapper.toGalleryTinyDto(any(Gallery.class))).thenReturn(galleryTinyDto);
         when(galleryMapper.toGallery(any(GalleryRequest.class))).thenReturn(gallery);
         MultipartFile imageFile = mock(MultipartFile.class);
 
-        GalleryDto result = galleryService.createGallery(galleryRequest, imageFile);
-        assertEquals(galleryDto, result);
+        GalleryTinyDto result = galleryService.createGallery(galleryRequest, imageFile);
+        assertEquals(galleryTinyDto, result);
     }
 
     @Test
