@@ -68,7 +68,7 @@ public class GalleryService {
         return galleryMapper.toGalleryDto(galleryRepository.save(gallery));
     }
 
-    public GalleryDto createGallery(
+    public GalleryTinyDto createGallery(
             GalleryRequest galleryRequest,
             MultipartFile imageFile
     ) {
@@ -95,7 +95,7 @@ public class GalleryService {
                     .toList();
             gallery.setTranslations(validTranslations);
 
-            return galleryMapper.toGalleryDto(galleryRepository.save(gallery));
+            return galleryMapper.toGalleryTinyDto(galleryRepository.save(gallery));
         } catch (Exception e) {
             log.error("Error saving gallery with ID: {}", eventNameFr, e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la sauvegarde de la galerie", e);
@@ -178,6 +178,12 @@ public class GalleryService {
         Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "date"));
 
         return galleryRepository.findAll(pageable).map(galleryMapper::toGalleryTinyDto);
+    }
+
+    public List<GalleryTinyDto> getClubGalleries() {
+        return galleryRepository.findAll().stream()
+                .map(galleryMapper::toGalleryTinyDto)
+                .toList();
     }
 
     public GalleryDto getGalleryById(String galleryId) {
