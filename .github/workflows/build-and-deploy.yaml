@@ -98,7 +98,7 @@ jobs:
       - name: 📦 Définir les variables selon l’environnement
         id: set-vars
         run: |
-          if [ "$ENVIRONMENT" = "prod" ]; then
+          if [ "${{ job.environment }}" = "prod" ]; then
             echo "release_name=peps-api-prod" >> $GITHUB_OUTPUT
             echo "namespace=peps-prod" >> $GITHUB_OUTPUT
             echo "values_file=values-prod.yaml" >> $GITHUB_OUTPUT
