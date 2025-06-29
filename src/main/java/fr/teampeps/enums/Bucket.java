@@ -9,7 +9,6 @@ public enum Bucket {
     MEMBERS,
     OPPONENTS,
     PARTNERS,
-    ROSTERS,
     SLIDERS,
     VIDEOS,
 }
