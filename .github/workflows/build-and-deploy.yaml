@@ -67,10 +67,21 @@ jobs:
       - name: 🔄 Checkout du code
         uses: actions/checkout@v4
 
+      - name: 🧪 Déterminer l’environnement
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          fi
+
       - name: 📦 Définir les variables selon l’environnement
         id: set-vars
         run: |
-          if [ "${{ job.environment }}" = "prod" ]; then
+          if [ "$ENVIRONMENT" = "prod" ]; then
             echo "release_name=peps-api-prod" >> $GITHUB_OUTPUT
             echo "namespace=peps-prod" >> $GITHUB_OUTPUT
             echo "values_file=values-prod.yaml" >> $GITHUB_OUTPUT
@@ -98,3 +109,20 @@ jobs:
             --set image.repository=${{ env.IMAGE_NAME }} \
             --set image.tag=${{ needs.build-and-push.outputs.image_tag }} \
             -f deploy/${{ steps.set-vars.outputs.values_file }}
+
+  notify-discord:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📣 Envoyer une notification Discord
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+            "username": "GitHub Deploy Bot",
+            "embeds": [{
+              "title": "✅ Déploiement terminé",
+              "description": "**Projet :** Peps API\n**Environnement :** '"$ENVIRONMENT"'\n**Image tag :** '${{ needs.build-and-push.outputs.image_tag }}'\n**Auteur :** ${{ github.actor }}",
+              "color": 5814783
+            }]
+          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
