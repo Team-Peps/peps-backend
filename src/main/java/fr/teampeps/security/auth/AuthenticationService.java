@@ -62,29 +62,6 @@ public class AuthenticationService {
         return true;
     }
 
-    /**
-     * Register a new user with Discord.
-     *
-     * @param request The registration request.
-     */
-    public void registerDiscord(DiscordRegisterRequest request) {
-        if (!isValidDiscordRegisterRequest(request)) {
-            return;
-        }
-
-        User user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .discordId(request.getDiscordId())
-                .authorities(List.of(Authority.USER))
-                .avatarUrl(request.getAvatarUrl())
-                .authType(AuthType.DISCORD)
-                .enable(true)
-                .build();
-
-        userRepository.save(user);
-    }
-
     public Optional<AuthenticationResponse> authenticateDiscord(String discordId) {
         Optional<User> userOptional = userRepository.findByDiscordId(discordId);
 
@@ -263,13 +240,5 @@ public class AuthenticationService {
                 !registerRequest.getPassword().isEmpty() &&
                 userRepository.findByEmail(registerRequest.getEmail()).isEmpty() &&
                 userRepository.findByUsername(registerRequest.getUsername()).isEmpty();
-    }
-
-    private boolean isValidDiscordRegisterRequest(DiscordRegisterRequest registerRequest) {
-        return userRepository.findByDiscordId(registerRequest.getDiscordId()).isEmpty();
-    }
-
-    public boolean isUserRegistered(String discordId) {
-        return userRepository.findByDiscordId(discordId).isPresent();
     }
 }

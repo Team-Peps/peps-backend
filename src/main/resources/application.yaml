@@ -1,8 +1,9 @@
 spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
-    show-sql: false
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate:
         cache:
@@ -29,6 +30,8 @@ application:
       expiration: 86400000 #a day
       refresh-token:
         expiration: 604800000 #7 days
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
 
 minio:
   endpoint: ${MINIO_ENDPOINT}
@@ -43,25 +46,12 @@ url:
     overwatch: https://www.twitch.tv/fefegg
     marvel-rivals: https://www.twitch.tv/lunium
 
-discord:
-  client-id: ${DISCORD_CLIENT_ID}
-  client-secret: ${DISCORD_CLIENT_SECRET}
-  redirect-uri: ${DISCORD_REDIRECT_URI}
-  bot:
-    api-key: ${DISCORD_BOT_API_KEY}
-frontend:
-  redirect-uri: ${FRONTEND_REDIRECT_URI}
-  redirect-cancel-uri: ${FRONTEND_REDIRECT_CANCEL_URI}
-
 ---
 spring:
   config:
     activate:
       on-profile: local
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
     jpa:
       show-sql: true
       hibernate:
@@ -73,13 +63,35 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
     jpa:
       show-sql: true
       hibernate:
         ddl-auto: update
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    jpa:
+      show-sql: false
+      hibernate:
+        ddl-auto: validate
+    hikari:
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      idle-timeout: 30000
+      minimum-idle: 5
+      maximum-pool-size: 20
+
+logging:
+  level:
+    root: info
+    org.springframework.web: warn
+    org.hibernate: error
+    fr.teampeps: info
 
 ---
 spring:

@@ -54,33 +54,13 @@ spec:
                 secretKeyRef:
                   key: MINIO_SECRET_KEY
                   name: minio-credentials
-            - name: DISCORD_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  key: DISCORD_CLIENT_ID
-                  name: discord-credentials
-            - name: DISCORD_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: DISCORD_CLIENT_SECRET
-                  name: discord-credentials
-            - name: DISCORD_REDIRECT_URI
-              valueFrom:
-                secretKeyRef:
-                  key: DISCORD_REDIRECT_URI
-                  name: discord-credentials
-            - name: FRONTEND_REDIRECT_URI
-              valueFrom:
-                secretKeyRef:
-                  key: FRONTEND_REDIRECT_URI
-                  name: discord-credentials
-            - name: FRONTEND_REDIRECT_CANCEL_URI
-              valueFrom:
-                secretKeyRef:
-                  key: FRONTEND_REDIRECT_CANCEL_URI
-                  name: discord-credentials
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   key: SECRET_KEY
                   name: secret-key
+            - name: CORS_ALLOWED_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  key: CORS_ALLOWED_ORIGINS
+                  name: cors-allowed-origins
