@@ -63,10 +63,14 @@ jobs:
     needs: build-and-push
     outputs:
       environment: ${{ steps.set-env.outputs.environment }}
+      branch_name: ${{ steps.set-env.outputs.branch_name }}
     steps:
       - name: 🧠 Déduire l’environnement
         id: set-env
         run: |
+          BRANCH_NAME="${GITHUB_REF##*/}"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          
           if [ "${{ github.event_name }}" = "push" ]; then
             if [ "${{ github.ref }}" = "refs/heads/main" ]; then
               echo "environment=prod" >> $GITHUB_OUTPUT
@@ -75,6 +79,7 @@ jobs:
             fi
           else
             echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          fi
 
   deploy:
     runs-on: ubuntu-latest
@@ -134,7 +139,7 @@ jobs:
             "username": "GitHub Deploy Bot",
             "embeds": [{
               "title": "✅ Nouvelle version déployée en '"$ENVIRONMENT"'",
-              "description": "**API**\n**Image tag :** '"$TAG"'\n[Voir le commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) \n\n**Auteur :** ${{ github.actor }}",
+              "description": "**API**\n**Branche :** ${{ needs.set-environment.outputs.branch_name }}\n**Image tag :** '"$TAG"'\n[Voir le commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) \n\n**Auteur :** ${{ github.actor }}",
               "color": 5814783
             }]
           }' ${{ secrets.DISCORD_WEBHOOK_URL }}
