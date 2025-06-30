@@ -14,6 +14,7 @@ on:
   push:
     branches:
       - dev
+      - main
 
 env:
   IMAGE_NAME: serkox/peps-api
@@ -136,7 +137,7 @@ jobs:
           curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
-            "username": "GitHub Deploy Bot",
+            "username": "Team Peps CI/CD",
             "embeds": [{
               "title": "✅ Nouvelle version déployée en '"$ENVIRONMENT"'",
               "description": "**API**\n**Branche :** ${{ needs.set-environment.outputs.branch_name }}\n**Image tag :** '"$TAG"'\n[Voir le commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) \n\n**Auteur :** ${{ github.actor }}",
