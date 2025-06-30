@@ -127,6 +127,7 @@ jobs:
 
   notify-discord:
     needs: [deploy, set-environment, build-and-push]
+    environment: ${{ needs.set-environment.outputs.environment }}
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: ${{ needs.set-environment.outputs.environment }}
