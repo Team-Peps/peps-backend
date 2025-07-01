@@ -54,10 +54,12 @@ jobs:
       - name: 🐳 Build de l’image Docker
         run: |
           docker build -t ${{ env.IMAGE_NAME }}:${{ steps.generate-tag.outputs.tag }} .
+          docker build -t ${{ env.IMAGE_NAME }}:latest .
 
       - name: 🚀 Push de l’image Docker
         run: |
           docker push ${{ env.IMAGE_NAME }}:${{ steps.generate-tag.outputs.tag }}
+          docker push ${{ env.IMAGE_NAME }}:latest
 
   set-environment:
     runs-on: ubuntu-latest
