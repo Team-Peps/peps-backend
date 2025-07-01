@@ -4,6 +4,7 @@ import fr.teampeps.dto.MemberDto;
 import fr.teampeps.dto.MemberTinyDto;
 import fr.teampeps.enums.Game;
 import fr.teampeps.models.Member;
+import fr.teampeps.record.MemberRequest;
 import fr.teampeps.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,17 +48,17 @@ public class MemberController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateMember(
-            @RequestPart("member") Member member,
+            @RequestPart("member") MemberRequest memberRequest,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
         try {
-            MemberDto updatedMember = memberService.saveOrUpdateMember(member, imageFile);
+            MemberDto updatedMember = memberService.updateMember(memberRequest, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Membre mis à jour avec succès",
                     MEMBER_PLACEHOLDER, updatedMember
             ));
         } catch (Exception e) {
-            log.error("❌ Error processing member with ID: {}", member.getId(), e);
+            log.error("❌ Error processing member with ID: {}", memberRequest.id(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors du traitement du membre",
                     ERROR_PLACEHOLDER, e.getMessage()
@@ -68,17 +69,17 @@ public class MemberController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> saveMember(
-            @RequestPart("member") Member member,
+            @RequestPart("member") MemberRequest memberRequest,
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
         try {
-            MemberDto updatedMember = memberService.saveOrUpdateMember(member, imageFile);
+            MemberDto updatedMember = memberService.saveMember(memberRequest, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Membre enregistré avec succès",
                     MEMBER_PLACEHOLDER, updatedMember
             ));
         } catch (Exception e) {
-            log.error("❌ Error processing member with ID: {}", member.getId(), e);
+            log.error("❌ Error processing member with username: {}", memberRequest.pseudo(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors du traitement du membre",
                     ERROR_PLACEHOLDER, e.getMessage()

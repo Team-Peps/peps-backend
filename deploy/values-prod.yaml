@@ -8,7 +8,7 @@ image:
 
 ingress:
   className: nginx
-  host: api.2.11.47.69.nip.io
+  host: api.teampeps.fr
 
 service:
   port: 80
@@ -17,6 +17,6 @@ service:
   protocol: TCP
   name: http
 
-replicaCount: 1
+replicaCount: 4
 
 springProfile: prod

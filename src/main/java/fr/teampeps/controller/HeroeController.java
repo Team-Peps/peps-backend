@@ -35,7 +35,7 @@ public class HeroeController {
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
         try {
-            HeroeDto updatedHeroe = heroeService.saveOrUpdateHeroe(heroe, imageFile);
+            HeroeDto updatedHeroe = heroeService.updateHeroe(heroe, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Héro mis à jour avec succès",
                     "heroe", updatedHeroe
@@ -56,7 +56,7 @@ public class HeroeController {
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
         try {
-            HeroeDto updatedHeroe = heroeService.saveOrUpdateHeroe(heroe, imageFile);
+            HeroeDto updatedHeroe = heroeService.saveHeroe(heroe, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Héro enregistré avec succès",
                     "heroe", updatedHeroe

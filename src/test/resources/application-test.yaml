@@ -2,16 +2,10 @@ application:
   security:
     jwt:
       secret-key: test
+  cors:
+    allowed-origins: "*"
 
 minio:
   endpoint: http://localhost:9000
   access-key: test
   secret-key: test
-
-discord:
-  client-id: test
-  client-secret: test
-  redirect-uri: http://localhost:8080/api/v1/auth/discord/callback
-frontend:
-  redirect-uri: http://localhost:4200
-  redirect-cancel-uri: http://localhost:4200

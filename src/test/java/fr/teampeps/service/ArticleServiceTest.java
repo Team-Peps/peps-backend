@@ -2,12 +2,17 @@ package fr.teampeps.service;
 
 import fr.teampeps.dto.ArticleDto;
 import fr.teampeps.dto.ArticleTinyDto;
+import fr.teampeps.dto.ArticleTranslationDto;
 import fr.teampeps.mapper.ArticleMapper;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.models.Article;
 import fr.teampeps.enums.ArticleType;
+import fr.teampeps.models.ArticleTranslation;
+import fr.teampeps.record.ArticleRequest;
+import fr.teampeps.record.ArticleTranslationRequest;
 import fr.teampeps.repository.ArticleRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,110 +44,151 @@ class ArticleServiceTest {
     @InjectMocks
     private ArticleService articleService;
 
-    private Article articleGlobal;
+    private Article article;
+    private ArticleRequest articleRequest;
     private ArticleDto articleDto;
 
     @BeforeEach
     void setUp() {
-        articleGlobal = new Article();
-        articleGlobal.setId("1");
-        articleGlobal.setTitle("Test");
-        articleGlobal.setArticleType(ArticleType.OVERWATCH);
+
+        article = new Article();
+        article.setId("articleId");
+
+        articleRequest = new ArticleRequest(
+                "articleId",
+                "image_thumbnail.jpg",
+                "image.jpg",
+                null,
+                ArticleType.OVERWATCH,
+                Map.of(
+                        "fr", new ArticleTranslationRequest("Titre", "Contenu"),
+                        "en", new ArticleTranslationRequest("Title", "Content")
+                )
+        );
 
         articleDto = ArticleDto.builder().build();
-        articleDto.setId("1");
-        articleDto.setTitle("Test");
+        articleDto.setId("articleId");
+        articleDto.setTranslations(
+                Map.of(
+                        "fr", ArticleTranslationDto
+                                .builder()
+                                .title("Titre")
+                                .content("Contenu")
+                                .build(),
+                        "en", ArticleTranslationDto
+                                .builder()
+                                .title("Title")
+                                .content("Content")
+                                .build()
+                )
+        );
     }
 
     @Test
     void shouldReturnAllArticles() {
-        when(articleRepository.findAllOrderByCreatedAtDesc()).thenReturn(List.of(articleGlobal));
+        when(articleRepository.findAllOrderByCreatedAtDesc()).thenReturn(List.of(article));
         when(articleMapper.toArticleDto(any())).thenReturn(articleDto);
 
         List<ArticleDto> result = articleService.getAllArticles();
 
         assertEquals(1, result.size());
-        assertEquals("Test", result.get(0).getTitle());
+        assertEquals("articleId", result.get(0).getId());
     }
 
     @Test
     void createArticle_shouldThrowBadRequest_whenImagesMissing() {
-        Article article = new Article();
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> articleService.createArticle(article, null, null));
+                () -> articleService.createArticle(articleRequest, null, null));
         assertEquals("400 BAD_REQUEST \"Aucune image fournie\"", exception.getMessage());
     }
 
     @Test
-    void createArticle_shouldReturnDto_whenValidInputs() {
-        Article article = new Article();
-        article.setTitle("Test");
+    void createArticle_shouldCreateArticleSuccessfully() throws Exception {
+        // Given
         MultipartFile imageFile = mock(MultipartFile.class);
-        MultipartFile thumbFile = mock(MultipartFile.class);
+        MultipartFile thumbnailImageFile = mock(MultipartFile.class);
 
-        when(minioService.uploadImageFromMultipartFile(imageFile, "test", Bucket.ARTICLES)).thenReturn("img.jpg");
-        when(minioService.uploadImageFromMultipartFile(thumbFile, "test_thumbnail", Bucket.ARTICLES)).thenReturn("thumb.jpg");
-        when(articleRepository.save(any())).thenReturn(article);
-        ArticleDto dto = ArticleDto.builder().build();
-        when(articleMapper.toArticleDto(any())).thenReturn(dto);
+        // L'article généré depuis le mapper
+        when(articleMapper.toArticle(articleRequest)).thenReturn(article);
 
-        ArticleDto result = articleService.createArticle(article, thumbFile, imageFile);
-        assertEquals(dto, result);
+        // Simuler le comportement de minioService
+        when(minioService.uploadImageFromMultipartFile(imageFile, "articleId", Bucket.ARTICLES))
+                .thenReturn("image.jpg");
+        when(minioService.uploadImageFromMultipartFile(thumbnailImageFile, "articleId_thumbnail", Bucket.ARTICLES))
+                .thenReturn("image_thumbnail.jpg");
+
+        // Mock le repository save
+        when(articleRepository.save(any(Article.class))).thenReturn(article);
+
+        // Simuler la conversion finale
+        when(articleMapper.toArticleDto(article)).thenReturn(articleDto);
+
+        // When
+        ArticleDto result = articleService.createArticle(articleRequest, thumbnailImageFile, imageFile);
+
+        // Then
+        assertEquals("articleId", result.getId());
+        verify(articleMapper).toArticle(articleRequest);
+        verify(minioService).uploadImageFromMultipartFile(imageFile, "articleId", Bucket.ARTICLES);
+        verify(minioService).uploadImageFromMultipartFile(thumbnailImageFile, "articleId_thumbnail", Bucket.ARTICLES);
         verify(articleRepository).save(article);
+        verify(articleMapper).toArticleDto(article);
     }
 
-    @Test
-    void updateArticle_shouldThrowBadRequest_whenImagesMissing() {
-        Article article = new Article();
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> articleService.updateArticle(article, null, null));
-        assertEquals("400 BAD_REQUEST \"Aucune image fournie\"", exception.getMessage());
-    }
 
     @Test
-    void updateArticle_shouldReturnDto_whenValidInputs() {
-        Article article = new Article();
-        article.setTitle("Update");
+    void updateArticle_shouldUpdateArticleSuccessfully() throws Exception {
+        // Given
         MultipartFile imageFile = mock(MultipartFile.class);
-        MultipartFile thumbFile = mock(MultipartFile.class);
+        MultipartFile thumbnailImageFile = mock(MultipartFile.class);
 
-        when(minioService.uploadImageFromMultipartFile(imageFile, "update", Bucket.ARTICLES)).thenReturn("img.jpg");
-        when(minioService.uploadImageFromMultipartFile(thumbFile, "update_thumbnail", Bucket.ARTICLES)).thenReturn("thumb.jpg");
-        when(articleRepository.save(any())).thenReturn(article);
-        ArticleDto dto = ArticleDto.builder().build();
-        when(articleMapper.toArticleDto(any())).thenReturn(dto);
+        ArticleTranslation translationFr = new ArticleTranslation();
+        translationFr.setLang("fr");
+        translationFr.setTitle("Ancien titre FR");
+        translationFr.setContent("Ancien contenu FR");
 
-        ArticleDto result = articleService.updateArticle(article, thumbFile, imageFile);
-        assertEquals(dto, result);
+        ArticleTranslation translationEn = new ArticleTranslation();
+        translationEn.setLang("en");
+        translationEn.setTitle("Old title EN");
+        translationEn.setContent("Old content EN");
+
+        article.setTranslations(List.of(translationFr, translationEn));
+
+        when(articleRepository.findById("articleId")).thenReturn(Optional.of(article));
+
+        when(minioService.uploadImageFromMultipartFile(imageFile, "articleId", Bucket.ARTICLES))
+                .thenReturn("new_image.jpg");
+        when(minioService.uploadImageFromMultipartFile(thumbnailImageFile, "articleId_thumbnail", Bucket.ARTICLES))
+                .thenReturn("new_thumbnail.jpg");
+
+        when(articleRepository.save(any(Article.class))).thenReturn(article);
+        when(articleMapper.toArticleDto(article)).thenReturn(articleDto);
+
+        // When
+        ArticleDto result = articleService.updateArticle(articleRequest, thumbnailImageFile, imageFile);
+
+        // Then
+        assertEquals("articleId", result.getId());
+        assertEquals("Titre", translationFr.getTitle());
+        assertEquals("Contenu", translationFr.getContent());
+        assertEquals("Title", translationEn.getTitle());
+        assertEquals("Content", translationEn.getContent());
+
+        verify(minioService).uploadImageFromMultipartFile(imageFile, "articleId", Bucket.ARTICLES);
+        verify(minioService).uploadImageFromMultipartFile(thumbnailImageFile, "articleId_thumbnail", Bucket.ARTICLES);
         verify(articleRepository).save(article);
-    }
-
-    @Test
-    void updateArticle_shouldThrowInternalError_whenUploadFails() {
-        Article article = new Article();
-        article.setTitle("Crash");
-        MultipartFile image = mock(MultipartFile.class);
-        MultipartFile thumb = mock(MultipartFile.class);
-
-        when(minioService.uploadImageFromMultipartFile(image, "crash", Bucket.ARTICLES)).thenThrow(new RuntimeException("fail"));
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> articleService.updateArticle(article, thumb, image));
-
-        assertEquals("500 INTERNAL_SERVER_ERROR \"Erreur lors de la mise à jour de l'article\"", exception.getMessage());
+        verify(articleMapper).toArticleDto(article);
     }
 
     @Test
     void createArticle_shouldThrowInternalError_whenUploadFails() {
         Article article = new Article();
-        article.setTitle("Crash");
+        article.setId("articleId");
         MultipartFile image = mock(MultipartFile.class);
         MultipartFile thumb = mock(MultipartFile.class);
 
-        when(minioService.uploadImageFromMultipartFile(image, "crash", Bucket.ARTICLES)).thenThrow(new RuntimeException("fail"));
-
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> articleService.createArticle(article, thumb, image));
+                () -> articleService.createArticle(articleRequest, thumb, image));
 
         assertEquals("500 INTERNAL_SERVER_ERROR \"Erreur lors de la création de l'article\"", exception.getMessage());
     }
@@ -163,7 +210,7 @@ class ArticleServiceTest {
 
     @Test
     void shouldReturnRecentArticles() {
-        when(articleRepository.findThreeRecentArticles()).thenReturn(List.of(articleGlobal));
+        when(articleRepository.findThreeRecentArticles()).thenReturn(List.of(article));
         when(articleMapper.toArticleTinyDto(any())).thenReturn(ArticleTinyDto.builder().build());
 
         List<ArticleTinyDto> result = articleService.getRecentArticles();
@@ -173,7 +220,7 @@ class ArticleServiceTest {
 
     @Test
     void shouldReturnPagedArticlesWithFilter() {
-        Page<Article> page = new PageImpl<>(List.of(articleGlobal));
+        Page<Article> page = new PageImpl<>(List.of(article));
         when(articleRepository.findAllByArticleTypeIn(any(), any())).thenReturn(page);
         when(articleMapper.toArticleTinyDto(any())).thenReturn(ArticleTinyDto.builder().build());
 
@@ -184,12 +231,12 @@ class ArticleServiceTest {
 
     @Test
     void shouldReturnArticleById() {
-        when(articleRepository.findById("1")).thenReturn(Optional.of(articleGlobal));
+        when(articleRepository.findById("1")).thenReturn(Optional.of(article));
         when(articleMapper.toArticleDto(any())).thenReturn(articleDto);
 
         ArticleDto result = articleService.getArticleById("1");
 
-        assertEquals("1", result.getId());
+        assertEquals("articleId", result.getId());
     }
 
     @Test

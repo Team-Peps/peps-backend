@@ -1,17 +1,22 @@
 package fr.teampeps.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "ambassadors")
 @Cacheable
+@Builder
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "ambassadorCache")
-public class Ambassador {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Ambassador extends TranslatableEntity<AmbassadorTranslation> {
 
     @Id
     @Column(name = "id",
@@ -22,11 +27,6 @@ public class Ambassador {
     @Column(name = "name",
         nullable = false)
     private String name;
-
-    @Column(name = "description",
-        nullable = false,
-        columnDefinition = "TEXT")
-    private String description;
 
     @Column(name = "image_key",
         nullable = false)
@@ -46,5 +46,8 @@ public class Ambassador {
 
     @Column(name = "twitch_username")
     private String twitchUsername;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AmbassadorTranslation> translations = new ArrayList<>();
 
 }

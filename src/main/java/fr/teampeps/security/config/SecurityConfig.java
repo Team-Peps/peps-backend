@@ -2,6 +2,7 @@ package fr.teampeps.security.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,6 +31,9 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
 
+    @Value("${application.cors.allowed-origins}")
+    private String allowedOrigins;
+
     /**
      *
      * @param http {@link HttpSecurity}
@@ -44,6 +48,7 @@ public class SecurityConfig {
                         (request, response, exception) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage())))
                 .authorizeHttpRequests()
                     //Everybody are able to access to the application patterns bellow
+                    .requestMatchers("/v1/legend/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/**").permitAll()
                     .requestMatchers("/v1/auth/authenticate/**").permitAll()
                     .requestMatchers("/v1/auth/refresh-token").permitAll()
@@ -65,10 +70,13 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
+        List<String> allowedOriginsList = Arrays.asList(allowedOrigins.split(","));
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4300", "http://backoffice.2.11.47.69.nip.io", "http://frontend.2.11.47.69.nip.io"));
+        configuration.setAllowedOrigins(allowedOriginsList);
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
         configuration.addAllowedHeader("*");
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

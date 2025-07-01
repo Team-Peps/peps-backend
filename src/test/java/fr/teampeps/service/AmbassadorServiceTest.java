@@ -1,9 +1,12 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.AmbassadorDto;
+import fr.teampeps.dto.AmbassadorTranslationDto;
 import fr.teampeps.mapper.AmbassadorMapper;
 import fr.teampeps.models.Ambassador;
 import fr.teampeps.enums.Bucket;
+import fr.teampeps.record.AmbassadorRequest;
+import fr.teampeps.record.AmbassadorTranslationRequest;
 import fr.teampeps.repository.AmbassadorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,41 +39,74 @@ class AmbassadorServiceTest {
     @InjectMocks
     private AmbassadorService ambassadorService;
 
+    private AmbassadorRequest ambassadorRequest;
+    private Ambassador ambassador;
+    private AmbassadorDto ambassadorDto;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        ambassador = new Ambassador();
+        ambassador.setId("ambassadorId");
+        ambassador.setName("Fefe");
+
+        ambassadorRequest = new AmbassadorRequest(
+            "ambassadorId",
+            "Fefe",
+            "image_key.png",
+            "twitter",
+            "insta",
+            "tiktok",
+            "youtube",
+            "twitch",
+            Map.of(
+                    "fr", new AmbassadorTranslationRequest("Description en français"),
+                "en", new AmbassadorTranslationRequest("Description in English")
+            )
+        );
+
+        ambassadorDto = AmbassadorDto.builder()
+            .id("ambassadorId")
+            .name("Fefe")
+            .imageKey("image_key.png")
+            .translations(Map.of(
+                "fr", AmbassadorTranslationDto
+                    .builder()
+                    .description("Description en français")
+                    .build(),
+                "en", AmbassadorTranslationDto
+                    .builder()
+                    .description("Description in English")
+                    .build()
+            ))
+            .build();
+
+
     }
 
     @Test
     void saveOrUpdateAmbassador_shouldSaveWithImage() {
-        Ambassador ambassador = new Ambassador();
-        ambassador.setName("Peps");
-
         MultipartFile imageFile = mock(MultipartFile.class);
-        String imageKey = "ambassadors/peps.png";
-        when(minioService.uploadImageFromMultipartFile(imageFile, "peps", Bucket.AMBASSADORS)).thenReturn(imageKey);
+        String imageKey = "ambassadors/fefe.png";
+        when(minioService.uploadImageFromMultipartFile(imageFile, "fefe", Bucket.AMBASSADORS)).thenReturn(imageKey);
 
-        Ambassador savedAmbassador = new Ambassador();
-        savedAmbassador.setImageKey(imageKey);
-        AmbassadorDto dto = AmbassadorDto.builder().build();
+        when(ambassadorRepository.save(ambassador)).thenReturn(ambassador);
+        when(ambassadorMapper.toAmbassadorDto(ambassador)).thenReturn(ambassadorDto);
+        when(ambassadorMapper.toAmbassador(ambassadorRequest)).thenReturn(ambassador);
 
-        when(ambassadorRepository.save(ambassador)).thenReturn(savedAmbassador);
-        when(ambassadorMapper.toAmbassadorDto(savedAmbassador)).thenReturn(dto);
+        AmbassadorDto result = ambassadorService.saveAmbassador(ambassadorRequest, imageFile);
 
-        AmbassadorDto result = ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile);
-
-        assertThat(result).isEqualTo(dto);
+        assertThat(result).isEqualTo(ambassadorDto);
         verify(ambassadorRepository).save(ambassador);
-        verify(minioService).uploadImageFromMultipartFile(imageFile, "peps", Bucket.AMBASSADORS);
+        verify(minioService).uploadImageFromMultipartFile(imageFile, "fefe", Bucket.AMBASSADORS);
     }
 
     @Test
     void shouldThrowBadRequestWhenImageFileIsNull() {
-        Ambassador ambassador = new Ambassador();
-        ambassador.setName("Test");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveOrUpdateAmbassador(ambassador, null)
+                ambassadorService.saveAmbassador(ambassadorRequest, null)
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
@@ -79,14 +116,11 @@ class AmbassadorServiceTest {
 
     @Test
     void shouldThrowBadRequestWhenImageFileIsEmpty() {
-        Ambassador ambassador = new Ambassador();
-        ambassador.setName("Test");
-
         MultipartFile emptyFile = mock(MultipartFile.class);
         when(emptyFile.isEmpty()).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveOrUpdateAmbassador(ambassador, emptyFile)
+                ambassadorService.saveAmbassador(ambassadorRequest, emptyFile)
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
@@ -96,15 +130,13 @@ class AmbassadorServiceTest {
 
     @Test
     void shouldThrowInternalErrorWhenMinioUploadFails() {
-        Ambassador ambassador = new Ambassador();
-        ambassador.setName("Test");
-
         MultipartFile imageFile = mock(MultipartFile.class);
         when(imageFile.isEmpty()).thenReturn(false);
         when(minioService.uploadImageFromMultipartFile(any(), any(), any())).thenThrow(new RuntimeException("MinIO error"));
+        when(ambassadorMapper.toAmbassador(ambassadorRequest)).thenReturn(ambassador);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveOrUpdateAmbassador(ambassador, imageFile)
+                ambassadorService.saveAmbassador(ambassadorRequest, imageFile)
         );
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());

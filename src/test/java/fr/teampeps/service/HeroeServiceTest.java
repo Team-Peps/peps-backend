@@ -77,7 +77,7 @@ class HeroeServiceTest {
         when(heroeRepository.save(any())).thenReturn(savedHeroe);
         when(heroeMapper.toHeroeDto(savedHeroe)).thenReturn(heroDto);
 
-        HeroeDto result = heroeService.saveOrUpdateHeroe(heroe, imageFile);
+        HeroeDto result = heroeService.saveHeroe(heroe, imageFile);
 
         assertEquals(heroDto, result);
         assertEquals(imageUrl, heroe.getImageKey());
@@ -91,7 +91,7 @@ class HeroeServiceTest {
         MultipartFile imageFile = null;
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> heroeService.saveOrUpdateHeroe(heroe, imageFile));
+                () -> heroeService.saveHeroe(heroe, imageFile));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Aucune image fournie", exception.getReason());
@@ -106,7 +106,7 @@ class HeroeServiceTest {
         when(minioService.uploadImageFromMultipartFile(any(), any(), any())).thenThrow(new RuntimeException("Upload failed"));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> heroeService.saveOrUpdateHeroe(heroe, file));
+                () -> heroeService.saveHeroe(heroe, file));
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         assertNotNull(exception.getReason());

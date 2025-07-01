@@ -2,12 +2,13 @@ package fr.teampeps.models;
 
 import fr.teampeps.enums.ArticleType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,21 +21,17 @@ import java.time.LocalDate;
         }
 )
 @Cacheable
+@Builder
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "articleCache")
-public class Article {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Article extends TranslatableEntity<ArticleTranslation> {
 
     @Id
     @Column(name = "id",
             nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    @Column(name = "title",
-            nullable = false)
-    private String title;
-
-    @Column(name = "content", columnDefinition = "TEXT")
-    private String content;
 
     @Column(name = "thumbnail_image_key")
     private String thumbnailImageKey;
@@ -51,4 +48,7 @@ public class Article {
             nullable = false)
     @Enumerated(EnumType.STRING)
     private ArticleType articleType;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArticleTranslation> translations = new ArrayList<>();
 }

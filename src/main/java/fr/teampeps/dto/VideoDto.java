@@ -9,4 +9,5 @@ public class VideoDto {
     private String id;
     private String title;
     private String link;
+    private String imageKey;
 }

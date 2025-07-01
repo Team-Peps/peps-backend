@@ -2,6 +2,7 @@ package fr.teampeps.controller;
 
 import fr.teampeps.dto.PartnerDto;
 import fr.teampeps.models.Partner;
+import fr.teampeps.record.PartnerRequest;
 import fr.teampeps.service.PartnerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,24 +33,24 @@ public class PartnerController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<PartnerDto>> getAllActivePartners() {
+    public ResponseEntity<Map<String, List<PartnerDto>>> getAllActivePartners() {
         return ResponseEntity.ok(partnerService.getAllActivePartners());
     }
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updatePartner(
-            @RequestPart("partner") Partner partner,
+            @RequestPart("partner") PartnerRequest partnerRequest,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
         try {
-            PartnerDto updatedPartner = partnerService.updatePartner(partner, imageFile);
+            PartnerDto updatedPartner = partnerService.updatePartner(partnerRequest, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Partenaire mis à jour avec succès",
                     PARTNER_PLACEHOLDER, updatedPartner
             ));
         } catch (Exception e) {
-            log.error("❌ Error processing partner with ID: {}", partner.getId(), e);
+            log.error("❌ Error processing partner with ID: {}", partnerRequest.id(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors du traitement du partenaire",
                     ERROR_PLACEHOLDER, e.getMessage()
@@ -60,17 +61,17 @@ public class PartnerController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> savePartner(
-            @RequestPart("partner") Partner partner,
+            @RequestPart("partner") PartnerRequest partnerRequest,
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
         try {
-            PartnerDto updatedPartner = partnerService.savePartner(partner, imageFile);
+            PartnerDto updatedPartner = partnerService.savePartner(partnerRequest, imageFile);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Partenaire enregistré avec succès",
                     PARTNER_PLACEHOLDER, updatedPartner
             ));
         } catch (Exception e) {
-            log.error("❌ Error processing partner with ID: {}", partner.getId(), e);
+            log.error("❌ Error processing partner with name: {}", partnerRequest.name(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors du traitement du partenaire",
                     ERROR_PLACEHOLDER, e.getMessage()

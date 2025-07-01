@@ -14,6 +14,7 @@ public class VideoMapper {
                 .id(video.getId())
                 .title(video.getTitle())
                 .link(video.getLink())
+                .imageKey(video.getImageKey())
                 .build();
     }
 

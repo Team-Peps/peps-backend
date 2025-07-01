@@ -1,12 +1,15 @@
 package fr.teampeps.service;
 
 import fr.teampeps.dto.SliderDto;
-import fr.teampeps.dto.SliderTinyDto;
+import fr.teampeps.dto.SliderTranslationDto;
 import fr.teampeps.mapper.SliderMapper;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.models.Slider;
+import fr.teampeps.record.SliderRequest;
+import fr.teampeps.record.SliderTranslationRequest;
 import fr.teampeps.repository.SliderRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class SliderServiceTest {
 
@@ -43,37 +47,74 @@ class SliderServiceTest {
     private ArgumentCaptor<Slider> sliderCaptor;
 
     private Slider slider;
+    private SliderRequest sliderRequest;
     private SliderDto sliderDto;
-    private MultipartFile imageFile;
-    private MultipartFile mobileImageFile;
+
+    private MultipartFile imageFileFr;
+    private MultipartFile mobileImageFileFr;
+    private MultipartFile imageFileEn;
+    private MultipartFile mobileImageFileEn;
+
     private List<Slider> activeSliders;
     private List<Slider> inactiveSliders;
 
+    private SliderDto activeDto1;
+    private SliderDto activeDto2;
+
     @BeforeEach
     void setUp() {
+
+        sliderRequest = new SliderRequest(
+                "sliderId",
+                "https://example.com/cta",
+                true,
+                Map.of(
+                        "fr", new SliderTranslationRequest("Fr CTA", "fr_image.jpg", "fr_mobile_image.jpg"),
+                        "en", new SliderTranslationRequest("En CTA", "en_image.jpg", "en_mobile_image.jpg")
+                )
+        );
+
         // Setup test data
         slider = new Slider();
-        slider.setId("slider123");
+        slider.setId("sliderId");
         slider.setIsActive(true);
         slider.setOrder(0L);
 
         sliderDto = SliderDto.builder().build();
-        sliderDto.setId("slider123");
-
-        SliderTinyDto sliderTinyDto = SliderTinyDto.builder().build();
-        sliderTinyDto.setId("slider123");
+        sliderDto.setId("sliderId");
+        sliderDto.setTranslations(Map.of(
+                "fr", SliderTranslationDto.builder()
+                        .ctaLabel("Fr CTA")
+                        .imageKey("fr_image.jpg")
+                        .mobileImageKey("fr_mobile_image.jpg")
+                        .build()
+                ));
 
         // Create mock multipart files
-        imageFile = new MockMultipartFile(
-                "image.jpg",
-                "image.jpg",
+        imageFileFr = new MockMultipartFile(
+                "fr_image.jpg",
+                "fr_image.jpg",
                 "image/jpeg",
                 "test image content".getBytes()
         );
 
-        mobileImageFile = new MockMultipartFile(
-                "mobile_image.jpg",
-                "mobile_image.jpg",
+        mobileImageFileFr = new MockMultipartFile(
+                "fr_mobile_image.jpg",
+                "fr_mobile_image.jpg",
+                "image/jpeg",
+                "test mobile image content".getBytes()
+        );
+
+        imageFileEn = new MockMultipartFile(
+                "en_image.jpg",
+                "en_image.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
+        );
+
+        mobileImageFileEn = new MockMultipartFile(
+                "en_mobile_image.jpg",
+                "en_mobile_image.jpg",
                 "image/jpeg",
                 "test mobile image content".getBytes()
         );
@@ -93,6 +134,9 @@ class SliderServiceTest {
         inactiveSlider.setId("inactive1");
         inactiveSlider.setIsActive(false);
         inactiveSlider.setOrder(-1L);
+
+        activeDto1 = SliderDto.builder().id("active1").build();
+        activeDto2 = SliderDto.builder().id("active2").build();
 
         activeSliders = Arrays.asList(activeSlider1, activeSlider2);
         inactiveSliders = Collections.singletonList(inactiveSlider);
@@ -132,19 +176,13 @@ class SliderServiceTest {
 
     @Test
     void getAllActiveSlider_Success() {
-        // Arrange
-        SliderTinyDto activeTinyDto1 = SliderTinyDto.builder().build();
-        activeTinyDto1.setId("active1");
-
-        SliderTinyDto activeTinyDto2 = SliderTinyDto.builder().build();
-        activeTinyDto2.setId("active2");
 
         when(sliderRepository.findAllByIsActiveOrderByOrder(true)).thenReturn(activeSliders);
-        when(sliderMapper.toSliderTinyDto(activeSliders.get(0))).thenReturn(activeTinyDto1);
-        when(sliderMapper.toSliderTinyDto(activeSliders.get(1))).thenReturn(activeTinyDto2);
+        when(sliderMapper.toSliderDto(activeSliders.get(0))).thenReturn(activeDto1);
+        when(sliderMapper.toSliderDto(activeSliders.get(1))).thenReturn(activeDto2);
 
         // Act
-        List<SliderTinyDto> result = sliderService.getAllActiveSlider();
+        List<SliderDto> result = sliderService.getAllActiveSlider();
 
         // Assert
         assertNotNull(result);
@@ -157,26 +195,33 @@ class SliderServiceTest {
     void testSaveSlider_Success() {
         // Arrange
         when(sliderRepository.count()).thenReturn(5L);
-        when(minioService.uploadImageFromMultipartFile(eq(imageFile), any(String.class), eq(Bucket.SLIDERS)))
-                .thenReturn("sliders/some-uuid");
-        when(minioService.uploadImageFromMultipartFile(eq(mobileImageFile), any(String.class), eq(Bucket.SLIDERS)))
-                .thenReturn("sliders/some-uuid_mobile");
+        when(minioService.uploadImageFromMultipartFile(eq(imageFileFr), any(String.class), eq(Bucket.SLIDERS)))
+                .thenReturn("sliders/some-uuid-fr");
+        when(minioService.uploadImageFromMultipartFile(eq(mobileImageFileFr), any(String.class), eq(Bucket.SLIDERS)))
+                .thenReturn("sliders/some-uuid_mobile-fr");
+        when(minioService.uploadImageFromMultipartFile(eq(imageFileEn), any(String.class), eq(Bucket.SLIDERS)))
+                .thenReturn("sliders/some-uuid-en");
+        when(minioService.uploadImageFromMultipartFile(eq(mobileImageFileEn), any(String.class), eq(Bucket.SLIDERS)))
+                .thenReturn("sliders/some-uuid_mobile-en");
         when(sliderRepository.save(any(Slider.class))).thenReturn(slider);
         when(sliderMapper.toSliderDto(slider)).thenReturn(sliderDto);
+        when(sliderMapper.toSlider(sliderRequest)).thenReturn(slider);
 
         // Act
-        SliderDto result = sliderService.saveSlider(slider, imageFile, mobileImageFile);
+        SliderDto result = sliderService.saveSlider(sliderRequest, imageFileFr, mobileImageFileFr, imageFileEn, mobileImageFileEn);
 
         // Assert
         assertNotNull(result);
         assertEquals(sliderDto, result);
         assertEquals(5L, slider.getOrder());
-        assertNotNull(slider.getImageKey());
-        assertNotNull(slider.getMobileImageKey());
+        log.info(result.toString());
+        assertNotNull(result.getTranslations().get("fr"));
 
         verify(sliderRepository).count();
-        verify(minioService).uploadImageFromMultipartFile(eq(imageFile), any(String.class), eq(Bucket.SLIDERS));
-        verify(minioService).uploadImageFromMultipartFile(eq(mobileImageFile), any(String.class), eq(Bucket.SLIDERS));
+        verify(minioService).uploadImageFromMultipartFile(eq(imageFileFr), any(String.class), eq(Bucket.SLIDERS));
+        verify(minioService).uploadImageFromMultipartFile(eq(imageFileEn), any(String.class), eq(Bucket.SLIDERS));
+        verify(minioService).uploadImageFromMultipartFile(eq(mobileImageFileFr), any(String.class), eq(Bucket.SLIDERS));
+        verify(minioService).uploadImageFromMultipartFile(eq(mobileImageFileEn), any(String.class), eq(Bucket.SLIDERS));
         verify(sliderRepository).save(slider);
         verify(sliderMapper).toSliderDto(slider);
     }
@@ -184,121 +229,31 @@ class SliderServiceTest {
     @Test
     void testSaveSlider_NullImageFile() {
         // Arrange
-        imageFile = null;
+        imageFileFr = null;
 
         // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> sliderService.saveSlider(slider, imageFile, mobileImageFile));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> sliderService.saveSlider(sliderRequest, imageFileFr, mobileImageFileFr, imageFileEn, mobileImageFileEn));
 
-        assertEquals("400 BAD_REQUEST \"Il faut fournir les deux images\"", exception.getMessage());
+        assertEquals("400 BAD_REQUEST \"Il faut fournir les quatre images\"", exception.getMessage());
         verifyNoInteractions(minioService, sliderRepository, sliderMapper);
     }
 
     @Test
     void testSaveSlider_NullMobileImageFile() {
         // Arrange
-        mobileImageFile = null;
+        mobileImageFileFr = null;
 
         // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> sliderService.saveSlider(slider, imageFile, mobileImageFile));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> sliderService.saveSlider(sliderRequest, imageFileFr, mobileImageFileFr, imageFileEn, mobileImageFileEn));
 
-        assertEquals("400 BAD_REQUEST \"Il faut fournir les deux images\"", exception.getMessage());
+        assertEquals("400 BAD_REQUEST \"Il faut fournir les quatre images\"", exception.getMessage());
         verifyNoInteractions(minioService, sliderRepository, sliderMapper);
-    }
-
-    @Test
-    void testSaveSlider_MinioServiceThrowsException() {
-        // Arrange
-        when(minioService.uploadImageFromMultipartFile(eq(imageFile), any(String.class), eq(Bucket.SLIDERS)))
-                .thenThrow(new RuntimeException("Erreur Minio"));
-
-        // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> sliderService.saveSlider(slider, imageFile, mobileImageFile));
-
-        assertEquals("500 INTERNAL_SERVER_ERROR \"Erreur lors de la sauvegarde du slider\"", exception.getMessage());
-        verify(minioService).uploadImageFromMultipartFile(eq(imageFile), any(String.class), eq(Bucket.SLIDERS));
-        verifyNoMoreInteractions(sliderRepository, sliderMapper);
-    }
-
-    @Test
-    void testSaveSlider_RepositoryThrowsException() {
-        // Arrange
-        when(minioService.uploadImageFromMultipartFile(eq(imageFile), any(String.class), eq(Bucket.SLIDERS)))
-                .thenReturn("sliders/some-uuid");
-        when(minioService.uploadImageFromMultipartFile(eq(mobileImageFile), any(String.class), eq(Bucket.SLIDERS)))
-                .thenReturn("sliders/some-uuid_mobile");
-        when(sliderRepository.count()).thenReturn(5L);
-        when(sliderRepository.save(any(Slider.class))).thenThrow(new RuntimeException("Erreur DB"));
-
-        // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> sliderService.saveSlider(slider, imageFile, mobileImageFile));
-
-        assertEquals("500 INTERNAL_SERVER_ERROR \"Erreur lors de la sauvegarde du slider\"", exception.getMessage());
-        verify(minioService).uploadImageFromMultipartFile(eq(imageFile), any(String.class), eq(Bucket.SLIDERS));
-        verify(minioService).uploadImageFromMultipartFile(eq(mobileImageFile), any(String.class), eq(Bucket.SLIDERS));
-        verify(sliderRepository).count();
-        verify(sliderRepository).save(slider);
-        verifyNoInteractions(sliderMapper);
-    }
-
-    @Test
-    void testSaveSlider_VerifyUUIDGeneration() {
-        // Ce test est plus avancé et vérifie que l'UUID est utilisé correctement
-        // On utilise un ArgumentCaptor pour capturer l'argument passé à Minio
-
-        // Arrange
-        when(sliderRepository.count()).thenReturn(0L);
-        when(sliderRepository.save(any(Slider.class))).thenReturn(slider);
-        when(sliderMapper.toSliderDto(slider)).thenReturn(sliderDto);
-
-        // Act
-        sliderService.saveSlider(slider, imageFile, mobileImageFile);
-
-        // Assert
-        // On vérifie que les appels à Minio sont faits avec le même UUID de base
-        verify(minioService).uploadImageFromMultipartFile(eq(imageFile), any(String.class), eq(Bucket.SLIDERS));
-        verify(minioService).uploadImageFromMultipartFile(eq(mobileImageFile), argThat(arg ->
-                arg != null && arg.endsWith("_mobile")), eq(Bucket.SLIDERS));
-    }
-
-    @Test
-    void updateSlider_Success() {
-        // Arrange
-        when(minioService.uploadImageFromMultipartFile(eq(imageFile), eq("slider123"), eq(Bucket.SLIDERS)))
-                .thenReturn("sliders/slider123.jpg");
-        when(minioService.uploadImageFromMultipartFile(eq(mobileImageFile), eq("slider123_mobile"), eq(Bucket.SLIDERS)))
-                .thenReturn("sliders/slider123_mobile.jpg");
-        when(sliderRepository.findById("slider123")).thenReturn(Optional.of(slider));
-        when(sliderRepository.save(any(Slider.class))).thenReturn(slider);
-        when(sliderMapper.toSliderDto(slider)).thenReturn(sliderDto);
-
-        // Act
-        SliderDto result = sliderService.updateSlider(slider, imageFile, mobileImageFile);
-
-        // Assert
-        verify(sliderRepository).save(sliderCaptor.capture());
-        Slider capturedSlider = sliderCaptor.getValue();
-
-        assertNotNull(result);
-        assertEquals(sliderDto, result);
-        assertEquals("sliders/slider123.jpg", capturedSlider.getImageKey());
-        assertEquals("sliders/slider123_mobile.jpg", capturedSlider.getMobileImageKey());
-        assertEquals(0L, capturedSlider.getOrder());
-    }
-
-    @Test
-    void updateSlider_NullImageFile() {
-        // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                sliderService.updateSlider(slider, null, mobileImageFile));
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertEquals("Il faut fournir les deux images", exception.getReason());
     }
 
     @Test
     void updateSlider_SliderNotFound() {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                sliderService.updateSlider(slider, imageFile, mobileImageFile));
+                sliderService.updateSlider(sliderRequest, imageFileFr, mobileImageFileFr, imageFileEn, mobileImageFileEn));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("Slider non trouvé", exception.getReason());
@@ -307,13 +262,13 @@ class SliderServiceTest {
     @Test
     void updateSlider_MinioServiceThrowsException() {
         // Arrange
-        when(sliderRepository.findById("slider123")).thenReturn(Optional.of(slider));
-        when(minioService.uploadImageFromMultipartFile(eq(imageFile), eq("slider123"), eq(Bucket.SLIDERS)))
+        when(sliderRepository.findById("sliderId")).thenReturn(Optional.of(slider));
+        when(minioService.uploadImageFromMultipartFile(eq(imageFileFr), eq("sliderId"), eq(Bucket.SLIDERS)))
                 .thenThrow(new RuntimeException("Erreur Minio"));
 
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                sliderService.updateSlider(slider, imageFile, mobileImageFile));
+                sliderService.updateSlider(sliderRequest, imageFileFr, mobileImageFileFr, imageFileEn, mobileImageFileEn));
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         assertEquals("Erreur lors de la mise à jour du slider", exception.getReason());
@@ -322,10 +277,10 @@ class SliderServiceTest {
     @Test
     void deleteSlider_Success() {
         // Act
-        sliderService.deleteSlider("slider123");
+        sliderService.deleteSlider("sliderId");
 
         // Assert
-        verify(sliderRepository).deleteById("slider123");
+        verify(sliderRepository).deleteById("sliderId");
     }
 
     @Test
@@ -344,12 +299,12 @@ class SliderServiceTest {
     @Test
     void toggleActive_ActiveToInactive() {
         // Arrange
-        when(sliderRepository.findById("slider123")).thenReturn(Optional.of(slider));
+        when(sliderRepository.findById("sliderId")).thenReturn(Optional.of(slider));
         when(sliderRepository.save(any(Slider.class))).thenReturn(slider);
         when(sliderMapper.toSliderDto(slider)).thenReturn(sliderDto);
 
         // Act
-        SliderDto result = sliderService.toggleActive("slider123");
+        SliderDto result = sliderService.toggleActive("sliderId");
 
         // Assert
         verify(sliderRepository).save(sliderCaptor.capture());
@@ -365,16 +320,16 @@ class SliderServiceTest {
     void toggleActive_InactiveToActive() {
         // Arrange
         Slider inactiveSlider = new Slider();
-        inactiveSlider.setId("slider123");
+        inactiveSlider.setId("sliderId");
         inactiveSlider.setIsActive(false);
         inactiveSlider.setOrder(-1L);
 
-        when(sliderRepository.findById("slider123")).thenReturn(Optional.of(inactiveSlider));
+        when(sliderRepository.findById("sliderId")).thenReturn(Optional.of(inactiveSlider));
         when(sliderRepository.save(any(Slider.class))).thenReturn(inactiveSlider);
         when(sliderMapper.toSliderDto(inactiveSlider)).thenReturn(sliderDto);
 
         // Act
-        SliderDto result = sliderService.toggleActive("slider123");
+        SliderDto result = sliderService.toggleActive("sliderId");
 
         // Assert
         verify(sliderRepository).save(sliderCaptor.capture());

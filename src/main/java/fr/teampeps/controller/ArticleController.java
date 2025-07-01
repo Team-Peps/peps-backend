@@ -3,6 +3,7 @@ package fr.teampeps.controller;
 import fr.teampeps.dto.ArticleDto;
 import fr.teampeps.dto.ArticleTinyDto;
 import fr.teampeps.models.Article;
+import fr.teampeps.record.ArticleRequest;
 import fr.teampeps.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,18 +35,18 @@ public class ArticleController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateArticle(
-            @RequestPart("article") Article article,
+            @RequestPart("article") ArticleRequest articleRequest,
             @RequestPart(value = "imageFileThumbnail", required = false) MultipartFile imageFileThumbnail,
             @RequestPart(value = "imageFileBackground", required = false) MultipartFile imageFileBackground
     ) {
         try {
-            ArticleDto updatedArticle = articleService.updateArticle(article, imageFileThumbnail, imageFileBackground);
+            ArticleDto updatedArticle = articleService.updateArticle(articleRequest, imageFileThumbnail, imageFileBackground);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Article mis à jour avec succès",
                     "article", updatedArticle
             ));
         } catch (Exception e) {
-            log.error("❌ Error processing article with ID: {}", article.getId(), e);
+            log.error("❌ Error processing article with ID: {}", articleRequest.id(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'article",
                     ERROR_PLACEHOLDER, e.getMessage()
@@ -56,20 +57,18 @@ public class ArticleController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> saveArticle(
-            @RequestPart("article") Article article,
+            @RequestPart("article") ArticleRequest articleRequest,
             @RequestPart("imageFileThumbnail") MultipartFile imageFileThumbnail,
             @RequestPart("imageFileBackground") MultipartFile imageFileBackground
     ) {
-        log.info("Bg: {}", imageFileBackground.getOriginalFilename());
-        log.info("Th: {}", imageFileThumbnail.getOriginalFilename());
         try {
-            ArticleDto updatedArticle = articleService.createArticle(article, imageFileThumbnail, imageFileBackground);
+            ArticleDto updatedArticle = articleService.createArticle(articleRequest, imageFileThumbnail, imageFileBackground);
             return ResponseEntity.ok(Map.of(
                     MESSAGE_PLACEHOLDER, "Article enregistré avec succès",
                     "article", updatedArticle
             ));
         } catch (Exception e) {
-            log.error("❌ Error processing article with ID: {}", article.getId(), e);
+            log.error("❌ Error processing article with ID: {}", articleRequest.id(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'article",
                     ERROR_PLACEHOLDER, e.getMessage()
