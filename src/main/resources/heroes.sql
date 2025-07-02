@@ -12,6 +12,7 @@ INSERT INTO heroes (id, name, game, role, image_key) VALUES
                                                        (gen_random_uuid(), 'Hanzo', 'OVERWATCH', 'DAMAGE', 'heroes/overwatch/hanzo.png'),
                                                        (gen_random_uuid(), 'Hazard', 'OVERWATCH', 'TANK', 'heroes/overwatch/hazard.png'),
                                                        (gen_random_uuid(), 'Illari', 'OVERWATCH', 'SUPPORT', 'heroes/overwatch/illari.png'),
+                                                       (gen_random_uuid(), 'Freja', 'OVERWATCH', 'DAMAGE', 'heroes/overwatch/freja.png'),
                                                        (gen_random_uuid(), 'Junker Queen', 'OVERWATCH', 'TANK', 'heroes/overwatch/junker_queen.png'),
                                                        (gen_random_uuid(), 'Junkrat', 'OVERWATCH', 'DAMAGE', 'heroes/overwatch/junkrat.png'),
                                                        (gen_random_uuid(), 'Juno', 'OVERWATCH', 'SUPPORT', 'heroes/overwatch/juno.png'),
@@ -40,7 +41,8 @@ INSERT INTO heroes (id, name, game, role, image_key) VALUES
                                                        (gen_random_uuid(), 'Winston', 'OVERWATCH', 'TANK', 'heroes/overwatch/winston.png'),
                                                        (gen_random_uuid(), 'Wrecking Ball', 'OVERWATCH', 'TANK', 'heroes/overwatch/wrecking_ball.png'),
                                                        (gen_random_uuid(), 'Zarya', 'OVERWATCH', 'TANK', 'heroes/overwatch/zarya.png'),
-                                                       (gen_random_uuid(), 'Zenyatta', 'OVERWATCH', 'SUPPORT', 'heroes/overwatch/zenyatta.png'),
+                                                       (gen_random_uuid(), 'Zenyatta', 'OVERWATCH', 'SUPPORT', 'heroes/overwatch/zenyatta.png');
+INSERT INTO heroes (id, name, game, role, image_key) VALUES
 
                                                        (gen_random_uuid(), 'Captain America', 'MARVEL_RIVALS', 'VANGUARD', 'heroes/marvel-rivals/captain_america.webp'),
                                                        (gen_random_uuid(), 'Doctor Strange', 'MARVEL_RIVALS', 'VANGUARD', 'heroes/marvel-rivals/doctor_strange.webp'),
