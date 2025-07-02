@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,7 @@ public class MemberMapper {
                 .youtubeUsername(member.getYoutubeUsername())
                 .twitchUsername(member.getTwitchUsername())
                 .game(member.getGame())
-                .achievements(achievementMapper.toAchievementDtoList(member.getAchievements()))
+                .achievements(member.getAchievements() != null ? achievementMapper.toAchievementDtoList(member.getAchievements()) : List.of())
                 .favoriteHeroes(heroeMapper.toHeroeDtoList(member.getFavoriteHeroes()))
                 .translations(translationsDto)
                 .build();

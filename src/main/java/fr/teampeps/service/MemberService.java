@@ -67,6 +67,7 @@ public class MemberService {
                     .peek(memberTranslation -> memberTranslation.setParent(member))
                     .toList();
             member.setTranslations(validTranslations);
+            member.setIsActive(true);
 
             return memberMapper.toMemberDto(memberRepository.save(member));
 
