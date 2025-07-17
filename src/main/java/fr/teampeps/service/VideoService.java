@@ -40,7 +40,7 @@ public class VideoService {
         }
 
         try {
-            String idFromLink = UUID.fromString(video.getLink()).toString();
+            String idFromLink = UUID.randomUUID().toString();
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, idFromLink, Bucket.VIDEOS);
             video.setImageKey(imageUrl);
 
