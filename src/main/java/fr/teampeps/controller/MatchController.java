@@ -8,6 +8,7 @@ import fr.teampeps.service.MatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -80,4 +81,25 @@ public class MatchController {
         return sseEmitter;
     }
 
+    @PutMapping("/vod-url/{matchId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Map<String, Object>> updateVodUrl(
+            @PathVariable String matchId,
+            @RequestBody String vodUrl
+    ) {
+        log.info("📦 Updating VOD URL for match ID: {}", matchId);
+        try {
+            MatchDto updatedMatch = matchService.updateVodUrl(matchId, vodUrl);
+            return ResponseEntity.ok(Map.of(
+                    "message", "VOD URL mise à jour avec succès",
+                    "match", updatedMatch
+            ));
+        } catch (Exception e) {
+            log.error("❌ Error updating VOD URL for match ID: {}", matchId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Erreur lors de la mise à jour de l'URL du VOD",
+                    "error", e.getMessage()
+            ));
+        }
+    }
 }

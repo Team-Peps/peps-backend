@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
 
-    @Query("SELECT m FROM Member m WHERE m.game = :game AND m.isSubstitute = false and m.isActive = true and m.role != 'COACH'")
+    @Query("SELECT m FROM Member m WHERE m.game = :game AND m.isSubstitute = false and m.isActive = true and m.role != 'COACH' and m.role != 'TEAM_MANAGER'")
     List<Member> findAllActiveHolderByGame(@PathVariable("game") Game game);
 
     @Query("SELECT m FROM Member m WHERE m.game = :game AND m.isSubstitute = true and m.isActive = true")
     List<Member> findAllActiveSubstituteByGame(@PathVariable("game") Game game);
 
-    @Query("SELECT m FROM Member m WHERE m.game = :game AND m.role = 'COACH' AND m.isActive = true")
+    @Query("SELECT m FROM Member m WHERE m.game = :game AND m.role = 'COACH' OR m.role = 'TEAM_MANAGER' AND m.isActive = true")
     List<Member> findAllActiveCoachByGame(@PathVariable("game") Game game);
 
     @Query("SELECT m FROM Member m WHERE m.game = :game AND m.isActive = false")

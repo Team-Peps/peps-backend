@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,8 @@ public class VideoService {
         }
 
         try {
-            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, video.getTitle().toLowerCase(), Bucket.VIDEOS);
+            String idFromLink = UUID.fromString(video.getLink()).toString();
+            String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, idFromLink, Bucket.VIDEOS);
             video.setImageKey(imageUrl);
 
             return videoMapper.toVideoDto(videoRepository.save(video));
@@ -62,7 +64,8 @@ public class VideoService {
         try {
 
             if(imageFile != null) {
-                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, video.getTitle().toLowerCase(), Bucket.VIDEOS);
+                String idFromLink = UUID.fromString(video.getLink()).toString();
+                String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, idFromLink, Bucket.VIDEOS);
                 video.setImageKey(imageUrl);
             }
 

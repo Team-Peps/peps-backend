@@ -153,4 +153,15 @@ public class MatchService {
                         .toList()
                 )).toList();
     }
+
+    public MatchDto updateVodUrl(String matchId, String vodUrl) {
+        log.info("📦 Updating VOD URL for match ID: {}", matchId);
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new NoSuchElementException("Match not found with ID: " + matchId));
+
+        match.setVodUrl(vodUrl);
+        Match updatedMatch = matchRepository.save(match);
+        return matchMapper.toMatchDto(updatedMatch);
+
+    }
 }
