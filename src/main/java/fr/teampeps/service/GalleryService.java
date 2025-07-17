@@ -212,8 +212,8 @@ public class GalleryService {
                             ? originalName.substring(0, originalName.lastIndexOf('.'))
                             : originalName;
 
-                    if(isConversionNeeded(zipEntry.getName())){
-                        imageBytes = convertToWebp(imageBytes, extension);
+                    if(minioService.isConversionNeeded(zipEntry.getName())){
+                        imageBytes = minioService.convertToWebp(imageBytes, extension);
                         extension = "webp";
                     }
 
@@ -235,45 +235,6 @@ public class GalleryService {
         }
 
         return photos;
-    }
-
-    private byte[] convertToWebp(byte[] imageBytes, String extension) throws IOException {
-        Path inputFile = Files.createTempFile("input_", "." + extension);
-        Path outputFile = Files.createTempFile("output_", ".webp");
-
-        Files.write(inputFile, imageBytes);
-
-        ProcessBuilder processBuilder = new ProcessBuilder(
-                "cwebp",
-                inputFile.toString(),
-                "-q", "85",
-                "-o", outputFile.toAbsolutePath().toString()
-        );
-
-        processBuilder.redirectErrorStream(true);
-
-        Process process = processBuilder.start();
-
-        try {
-            if(!process.waitFor(10, TimeUnit.SECONDS)) {
-                process.destroy();
-                log.warn("Conversion de l'image a pris trop de temps, le processus a été détruit");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.warn("Conversion de l'image interrompue : {}", e.getMessage());
-        }
-
-        byte[] convertedBytes = Files.readAllBytes(outputFile);
-
-        Files.deleteIfExists(inputFile);
-        Files.deleteIfExists(outputFile);
-
-        return convertedBytes;
-    }
-
-    private boolean isConversionNeeded(String name) {
-        return name.matches(".*\\.(jpg|png)$");
     }
 
     private boolean isImage(String name) {
