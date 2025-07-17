@@ -12,7 +12,6 @@ public class VideoMapper {
     public VideoDto toVideoDto(Video video) {
         return VideoDto.builder()
                 .id(video.getId())
-                .title(video.getTitle())
                 .link(video.getLink())
                 .imageKey(video.getImageKey())
                 .build();

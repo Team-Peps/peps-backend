@@ -11,7 +11,8 @@ public enum MemberRole {
     DUELIST("DUELIST"),
     STRATEGIST("STRATEGIST"),
     VANGUARD("VANGUARD"),
-    COACH("COACH");
+    COACH("COACH"),
+    TEAM_MANAGER("TEAM_MANAGER");
 
     private final String name;
 

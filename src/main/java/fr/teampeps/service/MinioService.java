@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -20,22 +25,21 @@ public class MinioService {
 
     public String uploadImageFromMultipartFile(MultipartFile file, String fileName, Bucket bucket) {
         try {
-            String extension;
-            extension = extractExtension(file.getOriginalFilename());
-            String key = formatKey(fileName) + extension;
+            String extension = extractExtension(file.getOriginalFilename());
+            if(extension.isEmpty()) {
+                log.warn("Le fichier {} n'a pas d'extension, on utilise .jpg par défaut", fileName);
+                extension = ".jpg";
+            } else {
+                extension = extension.toLowerCase();
+            }
+            byte[] bytes = file.getBytes();
 
-            log.info("Uploading file (from multipartfile) to Minio: {}", key);
-
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucket.name().toLowerCase())
-                            .object(key)
-                            .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build()
-            );
-
-            return bucket.name().toLowerCase() + "/" + key;
+            if(isConversionNeeded(Objects.requireNonNull(extension))) {
+                log.info("Conversion de l'image {} en webp", file.getOriginalFilename());
+                bytes = convertToWebp(bytes, extension);
+                extension = "webp";
+            }
+            return uploadImageFromBytes(bytes, fileName, extension, bucket);
 
         } catch (Exception e) {
             throw new UploadImageException("Error uploading image", e);
@@ -92,5 +96,44 @@ public class MinioService {
         } catch (Exception e) {
             throw new UploadImageException("Error deleting image", e);
         }
+    }
+
+    public byte[] convertToWebp(byte[] imageBytes, String extension) throws IOException {
+        Path inputFile = Files.createTempFile("input_", "." + extension);
+        Path outputFile = Files.createTempFile("output_", ".webp");
+
+        Files.write(inputFile, imageBytes);
+
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "cwebp",
+                inputFile.toString(),
+                "-q", "85",
+                "-o", outputFile.toAbsolutePath().toString()
+        );
+
+        processBuilder.redirectErrorStream(true);
+
+        Process process = processBuilder.start();
+
+        try {
+            if(!process.waitFor(10, TimeUnit.SECONDS)) {
+                process.destroy();
+                log.warn("Conversion de l'image a pris trop de temps, le processus a été détruit");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Conversion de l'image interrompue : {}", e.getMessage());
+        }
+
+        byte[] convertedBytes = Files.readAllBytes(outputFile);
+
+        Files.deleteIfExists(inputFile);
+        Files.deleteIfExists(outputFile);
+
+        return convertedBytes;
+    }
+
+    public boolean isConversionNeeded(String name) {
+        return name.matches(".*\\.(jpg|png)$");
     }
 }

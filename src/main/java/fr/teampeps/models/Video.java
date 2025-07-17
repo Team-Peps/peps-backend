@@ -22,15 +22,10 @@ public class Video {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "title",
-            nullable = false, length = 30)
-    private String title;
-
     @Column(name = "link",
             nullable = false)
     private String link;
 
-    @Column(name = "image_key",
-            nullable = true)
+    @Column(name = "image_key")
     private String imageKey;
 }
