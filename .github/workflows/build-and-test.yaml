@@ -1,4 +1,4 @@
-name: Build and test
+name: Build and Test
 
 on:
   pull_request:
@@ -13,16 +13,24 @@ concurrency:
 
 jobs:
   build:
+    name: 🛠️ Build & Test
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: 🔄 Checkout du code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: ⚙️ Setup Java 17 (Zulu)
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'zulu'
-          cache: maven
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-      - name: Run tests
+          cache: 'maven'
+
+      - name: 📦 Compilation du projet (tests ignorés)
+        run: mvn -B clean package -DskipTests
+
+      - name: 🧪 Exécution des tests
         run: mvn test
