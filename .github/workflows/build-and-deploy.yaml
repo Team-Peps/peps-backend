@@ -98,8 +98,11 @@ jobs:
       ENVIRONMENT: ${{ needs.set-environment.outputs.environment }}
 
     steps:
-      - name: 🔄 Checkout du code
+      - name: 🔄 Checkout du code (Push ou Tag manuel)
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.git_tag || github.ref }}
+          fetch-depth: 0
 
       - name: 📦 Récupération du tag de l’image Docker
         id: set-tag
