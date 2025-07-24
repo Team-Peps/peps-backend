@@ -4,6 +4,7 @@ import fr.teampeps.dto.AmbassadorDto;
 import fr.teampeps.models.Ambassador;
 import fr.teampeps.record.AmbassadorRequest;
 import fr.teampeps.service.AmbassadorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -37,40 +38,24 @@ public class AmbassadorController {
             @RequestPart("ambassador") AmbassadorRequest ambassadorRequest,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
-        try {
-            AmbassadorDto updatedAmbassador = ambassadorService.updateAmbassador(ambassadorRequest, imageFile);
-            return ResponseEntity.ok(Map.of(
-                    MESSAGE_PLACEHOLDER, "Ambassadeur mis à jour avec succès",
-                    "ambassador", updatedAmbassador
-            ));
-        } catch (Exception e) {
-            log.error("❌ Error processing ambassador with ID: {}", ambassadorRequest.id(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'ambassadeur",
-                    ERROR_PLACEHOLDER, e.getMessage()
-            ));
-        }
+        AmbassadorDto updatedAmbassador = ambassadorService.updateAmbassador(ambassadorRequest, imageFile);
+        return ResponseEntity.ok(Map.of(
+                MESSAGE_PLACEHOLDER, "Ambassadeur mis à jour avec succès",
+                "ambassador", updatedAmbassador
+        ));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> saveAmbassador(
-            @RequestPart("ambassador") AmbassadorRequest ambassadorRequest,
+            @RequestPart("ambassador") @Valid AmbassadorRequest ambassadorRequest,
             @RequestPart("imageFile") MultipartFile imageFile
     ) {
-        try {
-            AmbassadorDto updatedAmbassador = ambassadorService.saveAmbassador(ambassadorRequest, imageFile);
-            return ResponseEntity.ok(Map.of(
-                    MESSAGE_PLACEHOLDER, "Ambassadeur enregistré avec succès",
-                    "ambassador", updatedAmbassador
-            ));
-        } catch (Exception e) {
-            log.error("❌ Error processing ambassador with ID: {}", ambassadorRequest.id(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    MESSAGE_PLACEHOLDER, "Erreur lors du traitement de l'ambassadeur",
-                    ERROR_PLACEHOLDER, e.getMessage()
-            ));
-        }
+        AmbassadorDto updatedAmbassador = ambassadorService.saveAmbassador(ambassadorRequest, imageFile);
+        return ResponseEntity.ok(Map.of(
+                MESSAGE_PLACEHOLDER, "Ambassadeur enregistré avec succès",
+                "ambassador", updatedAmbassador
+        ));
     }
 
     @DeleteMapping("/{id}")

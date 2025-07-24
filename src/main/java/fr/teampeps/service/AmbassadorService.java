@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class AmbassadorService {
 
     private final AmbassadorRepository ambassadorRepository;
@@ -32,37 +34,30 @@ public class AmbassadorService {
     public AmbassadorDto saveAmbassador(
             AmbassadorRequest ambassadorRequest,
             MultipartFile imageFile
-    ) {
-
-        if(imageFile == null || imageFile.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune image fournie");
-        }
-
+            ) {
         Ambassador ambassador = ambassadorMapper.toAmbassador(ambassadorRequest);
 
         try {
             String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, ambassador.getName().toLowerCase(), Bucket.AMBASSADORS);
             ambassador.setImageKey(imageUrl);
-
-            List<AmbassadorTranslation> validTranslations = ambassador.getTranslations().stream()
-                    .filter(t -> t.getLang() != null && !t.getLang().isBlank() && t.getDescription() != null && !t.getDescription().isBlank())
-                    .peek(ambassadorTranslation -> ambassadorTranslation.setParent(ambassador))
-                    .toList();
-            ambassador.setTranslations(validTranslations);
-
-            return ambassadorMapper.toAmbassadorDto(ambassadorRepository.save(ambassador));
-
         } catch (Exception e) {
-            log.error("Error saving ambassador with ID: {}", ambassador.getId(), e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour de l'ambassadeur", e);
+            log.error("Error uploading image for ambassador: {}", ambassador.getName(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de l'upload de l'image de l'ambassadeur", e);
         }
+
+        List<AmbassadorTranslation> validTranslations = ambassador.getTranslations().stream()
+                .filter(t -> t.getLang() != null && !t.getLang().isBlank() && t.getDescription() != null && !t.getDescription().isBlank())
+                .peek(ambassadorTranslation -> ambassadorTranslation.setParent(ambassador))
+                .toList();
+        ambassador.setTranslations(validTranslations);
+
+        return ambassadorMapper.toAmbassadorDto(ambassadorRepository.save(ambassador));
     }
 
     public AmbassadorDto updateAmbassador(
             AmbassadorRequest ambassadorRequest,
             MultipartFile imageFile
     ) {
-
         Ambassador existingAmbassador = ambassadorRepository.findById(ambassadorRequest.id())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ambassadeur non trouvé"));
 
@@ -88,13 +83,12 @@ public class AmbassadorService {
                 String imageUrl = minioService.uploadImageFromMultipartFile(imageFile, existingAmbassador.getName().toLowerCase(), Bucket.AMBASSADORS);
                 existingAmbassador.setImageKey(imageUrl);
             }
-
-            return ambassadorMapper.toAmbassadorDto(ambassadorRepository.save(existingAmbassador));
-
         } catch (Exception e) {
-            log.error("Error saving ambassador with ID: {}", existingAmbassador.getId(), e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la mise à jour de l'ambassadeur", e);
+            log.error("Error uploading image for ambassador: {}", existingAmbassador.getName(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de l'upload de l'image de l'ambassadeur", e);
         }
+        return ambassadorMapper.toAmbassadorDto(ambassadorRepository.save(existingAmbassador));
+
     }
 
     public List<AmbassadorDto> getAllAmbassadors() {
