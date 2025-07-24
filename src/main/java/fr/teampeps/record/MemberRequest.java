@@ -2,6 +2,7 @@ package fr.teampeps.record;
 
 import fr.teampeps.enums.Game;
 import fr.teampeps.enums.MemberRole;
+import fr.teampeps.models.Achievement;
 import fr.teampeps.models.Heroe;
 
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public record MemberRequest(
     String twitchUsername,
     Game game,
     List<Heroe> favoriteHeroes,
-    Map<String, MemberTranslationRequest> translations
+    Map<String, MemberTranslationRequest> translations,
+    List<Achievement> achievements
 ) {
 }

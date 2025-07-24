@@ -79,52 +79,6 @@ class AchievementServiceTest {
                 .hasMessageContaining("Erreur lors de la mise à jour du palmarès");
     }
 
-
-    @Test
-    void saveMemberAchievement_shouldThrowExceptionIfMemberNotFound() {
-        String memberId = "123";
-        Achievement achievement = new Achievement();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> achievementService.saveMemberAchievement(achievement, memberId))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("Membre non trouvé");
-    }
-
-    @Test
-    void saveMemberAchievement_shouldSaveWithMember() {
-        String memberId = "123";
-        Member member = new Member();
-        member.setGame(Game.OVERWATCH);
-        Achievement achievement = new Achievement();
-        AchievementDto dto = AchievementDto.builder().build();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(achievementRepository.save(achievement)).thenReturn(achievement);
-        when(achievementMapper.toAchievementDto(achievement)).thenReturn(dto);
-
-        AchievementDto result = achievementService.saveMemberAchievement(achievement, memberId);
-
-        assertThat(result).isEqualTo(dto);
-        assertThat(achievement.getMember()).isEqualTo(member);
-        assertThat(achievement.getGame()).isEqualTo(Game.OVERWATCH);
-    }
-
-    @Test
-    void saveMemberAchievement_shouldThrowExceptionOnError() {
-        String memberId = "123";
-        Member member = new Member();
-        Achievement achievement = new Achievement();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(achievementRepository.save(achievement)).thenThrow(new RuntimeException("Database error"));
-
-        assertThatThrownBy(() -> achievementService.saveMemberAchievement(achievement, memberId))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("Erreur lors de la mise à jour du palmarès");
-    }
-
     @Test
     void delete_shouldCallRepositoryDeleteById() {
         String id = "id123";
@@ -140,20 +94,6 @@ class AchievementServiceTest {
         assertThatThrownBy(() -> achievementService.delete(id))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Palmarès non trouvé");
-    }
-
-    @Test
-    void getAllAchievementsByMember_shouldReturnMappedAchievements() {
-        String memberId = "member123";
-        Achievement achievement = new Achievement();
-        AchievementDto dto = AchievementDto.builder().build();
-
-        when(achievementRepository.findAllByMemberId(memberId)).thenReturn(List.of(achievement));
-        when(achievementMapper.toAchievementDto(achievement)).thenReturn(dto);
-
-        List<AchievementDto> result = achievementService.getAllAchievementsByMember(memberId);
-
-        assertThat(result).containsExactly(dto);
     }
 }
 

@@ -30,12 +30,7 @@ public class AchievementController {
         return ResponseEntity.ok(achievementService.getAllAchievementsByGame(game));
     }
 
-    @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<AchievementDto>> getAllAchievementsByMember(@PathVariable String memberId) {
-        return ResponseEntity.ok(achievementService.getAllAchievementsByMember(memberId));
-    }
-
-    @PostMapping("/game")
+    @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> createGameAchievement(
             @RequestBody Achievement achievement
@@ -55,22 +50,22 @@ public class AchievementController {
         }
     }
 
-    @PostMapping("/member/{memberId}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> createMemberAchievement(
-            @RequestBody Achievement achievement,
-            @PathVariable String memberId
+    public ResponseEntity<Map<String, Object>> updateAchievement(
+            @PathVariable String id,
+            @RequestBody Achievement achievement
     ) {
         try {
-            AchievementDto created = achievementService.saveMemberAchievement(achievement, memberId);
+            AchievementDto updated = achievementService.updateAchievement(id, achievement);
             return ResponseEntity.ok(Map.of(
-                    MESSAGE_PLACEHOLDER, "Succès : le palmarès a été enregistré",
-                    "achievement", created
+                    MESSAGE_PLACEHOLDER, "Succès : palmarès mis à jour",
+                    "achievement", updated
             ));
-        } catch (Exception e) {
-            log.error("❌ Erreur lors de la création d'un palmarès", e);
+        } catch (DataAccessException e) {
+            log.error("❌ Erreur lors de la mise à jour du palmarès avec ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    MESSAGE_PLACEHOLDER, "Erreur lors de l'enregistrement du palmarès",
+                    MESSAGE_PLACEHOLDER, "Erreur lors de la mise à jour du palmarès",
                     ERROR_PLACEHOLDER, e.getMessage()
             ));
         }
