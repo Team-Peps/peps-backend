@@ -36,6 +36,9 @@ public class Achievement {
             nullable = false)
     private Integer ranking;
 
+    @Column(name = "year")
+    private Integer year;
+
     @Column(name = "game")
     @Enumerated(EnumType.STRING)
     private Game game;

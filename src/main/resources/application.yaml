@@ -56,7 +56,7 @@ spring:
     hibernate:
       ddl-auto: update
   flyway:
-    enabled: false
+    enabled: true
 
 ---
 spring:

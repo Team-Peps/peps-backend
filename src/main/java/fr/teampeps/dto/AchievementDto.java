@@ -10,5 +10,6 @@ public class AchievementDto {
     private String id;
     private String competitionName;
     private Integer ranking;
+    private Integer year;
     private Game game;
 }

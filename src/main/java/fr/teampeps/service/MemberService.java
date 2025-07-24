@@ -5,6 +5,7 @@ import fr.teampeps.dto.MemberTinyDto;
 import fr.teampeps.mapper.MemberMapper;
 import fr.teampeps.enums.Bucket;
 import fr.teampeps.enums.Game;
+import fr.teampeps.models.Achievement;
 import fr.teampeps.models.Heroe;
 import fr.teampeps.models.Member;
 import fr.teampeps.models.MemberTranslation;
@@ -69,6 +70,11 @@ public class MemberService {
             member.setTranslations(validTranslations);
             member.setIsActive(true);
 
+            member.getAchievements().removeIf(achievement ->
+                    achievement.getRanking() == null || achievement.getCompetitionName().isEmpty() || achievement.getYear() == null
+            );
+            member.getAchievements().forEach(achievement -> achievement.setMember(member));
+
             return memberMapper.toMemberDto(memberRepository.save(member));
 
         } catch (Exception e) {
@@ -96,6 +102,21 @@ public class MemberService {
             existingMember.getFavoriteHeroes().addAll(validatedHeroes);
         }
 
+        List<Achievement> achievements = memberRequest.achievements().stream()
+            .filter(
+                    achievement -> achievement.getCompetitionName() != null && !achievement.getCompetitionName().isEmpty() &&
+                            achievement.getRanking() != null && achievement.getYear() != null
+            )
+                .map(achievement -> {
+                    Achievement memberAchievement = new Achievement();
+                    memberAchievement.setCompetitionName(achievement.getCompetitionName());
+                    memberAchievement.setRanking(achievement.getRanking());
+                    memberAchievement.setMember(existingMember);
+                    memberAchievement.setYear(achievement.getYear());
+                    return memberAchievement;
+                })
+                .toList();
+
         Map<String, MemberTranslation> translationsByLang = existingMember.getTranslations().stream()
                 .collect(Collectors.toMap(MemberTranslation::getLang, Function.identity()));
 
@@ -119,6 +140,8 @@ public class MemberService {
         existingMember.setNationality(memberRequest.nationality());
         existingMember.setRole(memberRequest.role());
         existingMember.setDateOfBirth(memberRequest.dateOfBirth());
+        existingMember.getAchievements().clear();
+        existingMember.getAchievements().addAll(achievements);
 
         try {
             if(imageFile != null) {
