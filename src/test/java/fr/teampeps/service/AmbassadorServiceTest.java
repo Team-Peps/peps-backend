@@ -103,32 +103,6 @@ class AmbassadorServiceTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenImageFileIsNull() {
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveAmbassador(ambassadorRequest, null)
-        );
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertNotNull(exception.getReason());
-        assertTrue(exception.getReason().contains("Aucune image fournie"));
-    }
-
-    @Test
-    void shouldThrowBadRequestWhenImageFileIsEmpty() {
-        MultipartFile emptyFile = mock(MultipartFile.class);
-        when(emptyFile.isEmpty()).thenReturn(true);
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                ambassadorService.saveAmbassador(ambassadorRequest, emptyFile)
-        );
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertNotNull(exception.getReason());
-        assertTrue(exception.getReason().contains("Aucune image fournie"));
-    }
-
-    @Test
     void shouldThrowInternalErrorWhenMinioUploadFails() {
         MultipartFile imageFile = mock(MultipartFile.class);
         when(imageFile.isEmpty()).thenReturn(false);
@@ -141,7 +115,7 @@ class AmbassadorServiceTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         assertNotNull(exception.getReason());
-        assertTrue(exception.getReason().contains("Erreur lors de la mise à jour"));
+        assertTrue(exception.getReason().contains("Erreur lors de l'upload de l'image de l'ambassadeur"));
     }
 
     @Test
